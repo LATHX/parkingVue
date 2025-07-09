@@ -30,6 +30,11 @@
               </a-form-item>
             </a-col>
             <a-col :span="24">
+              <a-form-item label="起停天数" v-bind="validateInfos.startDay" id="ParkingLotForm-startDay" name="startDay">
+                <a-input-number min="0" v-model:value="formData.startDay" placeholder="请输入起停天数" style="width: 100%" />
+              </a-form-item>
+            </a-col>
+            <a-col :span="24">
               <a-form-item
                 label="停车场服务标签"
                 v-bind="validateInfos.parkingServiceTags"
@@ -236,6 +241,7 @@
     lng: undefined,
     advantage: '',
     parkingName: '',
+    startDay: '',
     parkingServiceTags: '',
     parkingInstructmentTags: '',
     parkingOtherTags: '',
@@ -270,6 +276,7 @@
     feeType: [{ required: true, message: '请输入计费类型!' }],
     feeMethod: [{ required: true, message: '请输入计费方式!' }],
     prepayPrice: [{ required: true, message: '请输入预付费价格!' }],
+    startDay: [{ required: true, message: '请输入起停天数!' }],
     auditStatus: [{ required: true, message: '请输入审核状态!' }],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });

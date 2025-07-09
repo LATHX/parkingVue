@@ -2,28 +2,33 @@
   <a-spin :spinning="confirmLoading">
     <JFormContainer :disabled="disabled">
       <template #detail>
-        <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ParkingCustomerForm">
+        <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ParkingOrderRecordForm">
           <a-row>
-            <a-col :span="24">
-              <a-form-item label="手机号" v-bind="validateInfos.phone" id="ParkingCustomerForm-phone" name="phone">
-                <a-input v-model:value="formData.phone" placeholder="请输入手机号" allow-clear></a-input>
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="微信绑定openId" v-bind="validateInfos.openId" id="ParkingCustomerForm-openId" name="openId">
-                <a-input v-model:value="formData.openId" placeholder="请输入微信绑定openId" allow-clear></a-input>
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="微信绑定unionId" v-bind="validateInfos.unionId" id="ParkingCustomerForm-unionId" name="unionId">
-                <a-input v-model:value="formData.unionId" placeholder="请输入微信绑定unionId" allow-clear></a-input>
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="是否可用" v-bind="validateInfos.status" id="ParkingCustomerForm-status" name="status">
-                <j-dict-select-tag v-model:value="formData.status" dictCode="yn" placeholder="请输入是否可用" allow-clear />
-              </a-form-item>
-            </a-col>
+						<a-col :span="24">
+							<a-form-item label="次数" v-bind="validateInfos.times" id="ParkingOrderRecordForm-times" name="times">
+								<a-input-number v-model:value="formData.times" placeholder="请输入次数" style="width: 100%" />
+							</a-form-item>
+						</a-col>
+						<a-col :span="24">
+							<a-form-item label="金额" v-bind="validateInfos.price" id="ParkingOrderRecordForm-price" name="price">
+								<a-input-number v-model:value="formData.price" placeholder="请输入金额" style="width: 100%" />
+							</a-form-item>
+						</a-col>
+						<a-col :span="24">
+							<a-form-item label="微信交易成功返回的数据" v-bind="validateInfos.plainPaymentText" id="ParkingOrderRecordForm-plainPaymentText" name="plainPaymentText">
+								<a-input v-model:value="formData.plainPaymentText" placeholder="请输入微信交易成功返回的数据"  allow-clear ></a-input>
+							</a-form-item>
+						</a-col>
+						<a-col :span="24">
+							<a-form-item label="微信退款返回数据" v-bind="validateInfos.plainRefundText" id="ParkingOrderRecordForm-plainRefundText" name="plainRefundText">
+								<a-input v-model:value="formData.plainRefundText" placeholder="请输入微信退款返回数据"  allow-clear ></a-input>
+							</a-form-item>
+						</a-col>
+						<a-col :span="24">
+							<a-form-item label="完成" v-bind="validateInfos.isFinished" id="ParkingOrderRecordForm-isFinished" name="isFinished">
+								<a-input v-model:value="formData.isFinished" placeholder="请输入完成"  allow-clear ></a-input>
+							</a-form-item>
+						</a-col>
           </a-row>
         </a-form>
       </template>
@@ -36,25 +41,24 @@
   import { defHttp } from '/@/utils/http/axios';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { getValueType } from '/@/utils';
-  import { saveOrUpdate } from '../ParkingCustomer.api';
+  import { saveOrUpdate } from '../ParkingOrderRecord.api';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
-  import JDictSelectTag from '../../../../components/Form/src/jeecg/components/JDictSelectTag.vue';
-
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
-    formData: { type: Object, default: () => ({}) },
-    formBpm: { type: Boolean, default: true },
+    formData: { type: Object, default: () => ({})},
+    formBpm: { type: Boolean, default: true }
   });
   const formRef = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
     id: '',
-    phone: '',
-    openId: '',
-    unionId: '',
-    status: '',
+    times: undefined,
+    price: undefined,
+    plainPaymentText: '',   
+    plainRefundText: '',   
+    isFinished: '',   
   });
   const { createMessage } = useMessage();
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
@@ -62,22 +66,22 @@
   const confirmLoading = ref<boolean>(false);
   //表单验证
   const validatorRules = reactive({
-    status: [{ required: true, message: '请输入是否可用!' }],
   });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
 
   // 表单禁用
-  const disabled = computed(() => {
-    if (props.formBpm === true) {
-      if (props.formData.disabled === false) {
+  const disabled = computed(()=>{
+    if(props.formBpm === true){
+      if(props.formData.disabled === false){
         return false;
-      } else {
+      }else{
         return true;
       }
     }
     return props.formDisabled;
   });
 
+  
   /**
    * 新增
    */
@@ -93,10 +97,10 @@
       resetFields();
       const tmpData = {};
       Object.keys(formData).forEach((key) => {
-        if (record.hasOwnProperty(key)) {
-          tmpData[key] = record[key];
+        if(record.hasOwnProperty(key)){
+          tmpData[key] = record[key]
         }
-      });
+      })
       //赋值
       Object.assign(formData, tmpData);
     });
@@ -149,6 +153,7 @@
         confirmLoading.value = false;
       });
   }
+
 
   defineExpose({
     add,

@@ -2,26 +2,54 @@
   <a-spin :spinning="confirmLoading">
     <JFormContainer :disabled="disabled">
       <template #detail>
-        <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ParkingCustomerForm">
+        <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ParkingSettlementSettingForm">
           <a-row>
             <a-col :span="24">
-              <a-form-item label="手机号" v-bind="validateInfos.phone" id="ParkingCustomerForm-phone" name="phone">
-                <a-input v-model:value="formData.phone" placeholder="请输入手机号" allow-clear></a-input>
+              <a-form-item label="停车场" v-bind="validateInfos.parkingId" id="ParkingSettlementSettingForm-parkingId" name="parkingId">
+                <j-search-select v-model:value="formData.parkingId" dict="parking_lot,parking_name,id" allow-clear />
+              </a-form-item>
+            </a-col>
+
+            <a-col :span="24">
+              <a-form-item
+                label="服务费率(百分%)"
+                v-bind="validateInfos.serviceFeeRate"
+                id="ParkingSettlementSettingForm-serviceFeeRate"
+                name="serviceFeeRate"
+              >
+                <a-input-number
+                  min="0"
+                  max="100"
+                  v-model:value="formData.serviceFeeRate"
+                  placeholder="请输入服务费率,如果20%,则输入20"
+                  style="width: 100%"
+                />
               </a-form-item>
             </a-col>
             <a-col :span="24">
-              <a-form-item label="微信绑定openId" v-bind="validateInfos.openId" id="ParkingCustomerForm-openId" name="openId">
-                <a-input v-model:value="formData.openId" placeholder="请输入微信绑定openId" allow-clear></a-input>
+              <a-form-item
+                label="支付渠道费率(千分‰)"
+                v-bind="validateInfos.payTypeRate"
+                id="ParkingSettlementSettingForm-payTypeRate"
+                name="payTypeRate"
+              >
+                <a-input-number
+                  min="0"
+                  max="100"
+                  v-model:value="formData.payTypeRate"
+                  placeholder="请输入支付渠道费率,如果3‰,则输入3"
+                  style="width: 100%"
+                />
               </a-form-item>
             </a-col>
             <a-col :span="24">
-              <a-form-item label="微信绑定unionId" v-bind="validateInfos.unionId" id="ParkingCustomerForm-unionId" name="unionId">
-                <a-input v-model:value="formData.unionId" placeholder="请输入微信绑定unionId" allow-clear></a-input>
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="是否可用" v-bind="validateInfos.status" id="ParkingCustomerForm-status" name="status">
-                <j-dict-select-tag v-model:value="formData.status" dictCode="yn" placeholder="请输入是否可用" allow-clear />
+              <a-form-item
+                label="结算周期(日)"
+                v-bind="validateInfos.settlementDay"
+                id="ParkingSettlementSettingForm-settlementDay"
+                name="settlementDay"
+              >
+                <a-input-number min="0" v-model:value="formData.settlementDay" placeholder="请输入结算周期(日)" style="width: 100%" />
               </a-form-item>
             </a-col>
           </a-row>
@@ -36,10 +64,10 @@
   import { defHttp } from '/@/utils/http/axios';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { getValueType } from '/@/utils';
-  import { saveOrUpdate } from '../ParkingCustomer.api';
+  import { saveOrUpdate } from '../ParkingSettlementSetting.api';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
-  import JDictSelectTag from '../../../../components/Form/src/jeecg/components/JDictSelectTag.vue';
+  import JSearchSelect from '../../../../components/Form/src/jeecg/components/JSearchSelect.vue';
 
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
@@ -51,19 +79,17 @@
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
     id: '',
-    phone: '',
-    openId: '',
-    unionId: '',
-    status: '',
+    parkingId: '',
+    serviceFeeRate: undefined,
+    payTypeRate: undefined,
+    settlementDay: undefined,
   });
   const { createMessage } = useMessage();
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
   const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 16 } });
   const confirmLoading = ref<boolean>(false);
   //表单验证
-  const validatorRules = reactive({
-    status: [{ required: true, message: '请输入是否可用!' }],
-  });
+  const validatorRules = reactive({});
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
 
   // 表单禁用

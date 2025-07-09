@@ -6,35 +6,38 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '用户ID',
+    title: '订单号',
     align: 'center',
-    dataIndex: 'id',
+    dataIndex: 'orderId',
   },
   {
-    title: '手机号',
+    title: '付款类型',
     align: 'center',
-    dataIndex: 'phone',
+    dataIndex: 'times_dictText',
   },
   {
-    title: '注册日期',
+    title: '支付金额',
     align: 'center',
-    dataIndex: 'createTime',
+    dataIndex: 'price',
   },
   {
-    title: '最近更新日期',
+    title: '退款金额',
     align: 'center',
-    dataIndex: 'updateTime',
+    dataIndex: 'refundPrice',
   },
   {
-    title: '启用',
+    title: '剩余金额',
     align: 'center',
-    dataIndex: 'status_dictText'
+    dataIndex: 'remainPrice',
+  },
+  {
+    title: '完成',
+    align: 'center',
+    dataIndex: 'isFinished_dictText',
   },
 ];
 
 // 高级查询数据
 export const superQuerySchema = {
-  id: { title: '用户ID', order: 0, view: 'text', type: 'string' },
-  phone: { title: '手机号', order: 1, view: 'text', type: 'string' },
-  createTime: { title: '注册日期', order: 2, view: 'date', type: 'string' },
+  orderId: { title: '订单号', order: 2, view: 'text', type: 'string' },
 };

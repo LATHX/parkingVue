@@ -3,37 +3,20 @@
     <!--查询区域-->
     <div class="jeecg-basic-table-form-container">
       <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
-        <a-row :gutter="24">
-          <a-col :lg="6">
-            <a-form-item name="parkingName">
-              <template #label><span title="停车场名称">停车场名</span></template>
-              <JInput v-model:value="queryParam.parkingName" />
-            </a-form-item>
-          </a-col>
-          <a-col :xl="6" :lg="7" :md="8" :sm="24">
-            <span style="float: left; overflow: hidden" class="table-page-search-submitButtons">
-              <a-col :lg="6">
-                <a-button type="primary" preIcon="ant-design:search-outlined" @click="searchQuery">查询</a-button>
-                <a-button type="primary" preIcon="ant-design:reload-outlined" @click="searchReset" style="margin-left: 8px">重置</a-button>
-                <a @click="toggleSearchStatus = !toggleSearchStatus" style="margin-left: 8px">
-                  {{ toggleSearchStatus ? '收起' : '展开' }}
-                  <Icon :icon="toggleSearchStatus ? 'ant-design:up-outlined' : 'ant-design:down-outlined'" />
-                </a>
-              </a-col>
-            </span>
-          </a-col>
-        </a-row>
+        <a-row :gutter="24"></a-row>
       </a-form>
     </div>
     <!--引用表格-->
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" v-auth="'parking:parking_lot:add'" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增 </a-button>
-        <a-button type="primary" v-auth="'parking:parking_lot:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出 </a-button>
-        <j-upload-button type="primary" v-auth="'parking:parking_lot:importExcel'" preIcon="ant-design:import-outlined" @click="onImportXls"
-          >导入
-        </j-upload-button>
+        <!--        <a-button type="primary" v-auth="'parking:parking_order:add'" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增 </a-button>-->
+        <a-button type="primary" v-auth="'parking:parking_order:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls">
+          导出
+        </a-button>
+        <!--        <j-upload-button type="primary" v-auth="'parking:parking_order:importExcel'" preIcon="ant-design:import-outlined" @click="onImportXls"-->
+        <!--          >导入-->
+        <!--        </j-upload-button>-->
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -43,7 +26,7 @@
               </a-menu-item>
             </a-menu>
           </template>
-          <a-button v-auth="'parking:parking_lot:deleteBatch'"
+          <a-button v-auth="'parking:parking_order:deleteBatch'"
             >批量操作
             <Icon icon="mdi:chevron-down"></Icon>
           </a-button>
@@ -55,23 +38,22 @@
       <template #action="{ record }">
         <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)" />
       </template>
-      <template v-slot:bodyCell="{ column, record, index, text }"> </template>
+      <template v-slot:bodyCell="{ column, record, index, text }"></template>
     </BasicTable>
     <!-- 表单区域 -->
-    <ParkingLotModal ref="registerModal" @success="handleSuccess"></ParkingLotModal>
+    <ParkingOrderModal ref="registerModal" @success="handleSuccess"></ParkingOrderModal>
   </div>
 </template>
 
-<script lang="ts" name="parking-parkingLot" setup>
+<script lang="ts" name="parking-parkingOrder" setup>
   import { ref, reactive } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
-  import { columns, superQuerySchema } from './ParkingLot.data';
-  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ParkingLot.api';
+  import { columns, superQuerySchema } from './ParkingOrder.data';
+  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl, carEnterStatus, carLeaveStatus, cancelOrder } from './ParkingOrder.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
-  import ParkingLotModal from './components/ParkingLotModal.vue';
+  import ParkingOrderModal from './components/ParkingOrderModal.vue';
   import { useUserStore } from '/@/store/modules/user';
-  import JInput from '/@/components/Form/src/jeecg/components/JInput.vue';
 
   const formRef = ref();
   const queryParam = reactive<any>({});
@@ -81,7 +63,7 @@
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
-      title: '停车场场地',
+      title: '订单表',
       api: list,
       columns,
       canResize: false,
@@ -95,7 +77,7 @@
       },
     },
     exportConfig: {
-      name: '停车场场地',
+      name: '订单表',
       url: getExportUrl,
       params: queryParam,
     },
@@ -168,6 +150,19 @@
     await batchDelete({ ids: selectedRowKeys.value }, handleSuccess);
   }
 
+  async function cancelOrderHandle(record) {
+    await cancelOrder({ orderId: record.id }, handleSuccess);
+  }
+
+  async function carEnterStatusHandle(record) {
+    console.log(record);
+    await carEnterStatus({ orderId: record.id }, handleSuccess);
+  }
+
+  async function carLeaveStatusHandle(record) {
+    await carLeaveStatus({ orderId: record.id }, handleSuccess);
+  }
+
   /**
    * 成功回调
    */
@@ -180,10 +175,14 @@
    */
   function getTableAction(record) {
     return [
+      // {
+      //   label: '编辑',
+      //   onClick: handleEdit.bind(null, record),
+      //   auth: 'parking:parking_order:edit',
+      // },
       {
-        label: '编辑',
-        onClick: handleEdit.bind(null, record),
-        auth: 'parking:parking_lot:edit',
+        label: '详情',
+        onClick: handleDetail.bind(null, record),
       },
     ];
   }
@@ -192,20 +191,66 @@
    * 下拉操作栏
    */
   function getDropDownAction(record) {
-    return [
-      {
-        label: '详情',
-        onClick: handleDetail.bind(null, record),
-      },
-      {
-        label: '删除',
-        popConfirm: {
-          title: '是否确认删除',
-          confirm: handleDelete.bind(null, record),
-          placement: 'topLeft',
+    if (record.payStatus === '1' && record.carStatus === '0') {
+      return [
+        {
+          label: '车辆入场',
+          popConfirm: {
+            title: '是否确认车辆入场',
+            confirm: carEnterStatusHandle.bind(null, record),
+            placement: 'topLeft',
+          },
         },
-        auth: 'parking:parking_lot:delete',
-      },
+        {
+          label: '退款订单',
+          popConfirm: {
+            title: '是否确认退款订单',
+            confirm: cancelOrderHandle.bind(null, record),
+            placement: 'topLeft',
+          },
+        },
+      ];
+    } else if (record.payStatus === '1' && record.carStatus === '1') {
+      return [
+        {
+          label: '车辆离场',
+          popConfirm: {
+            title: '是否确认车辆离场',
+            confirm: carLeaveStatusHandle.bind(null, record),
+            placement: 'topLeft',
+          },
+        },
+        {
+          label: '退款订单',
+          popConfirm: {
+            title: '是否确认退款订单',
+            confirm: cancelOrderHandle.bind(null, record),
+            placement: 'topLeft',
+          },
+        },
+      ];
+    } else if (record.payStatus === '3') {
+      return [
+        {
+          label: '退款订单',
+          popConfirm: {
+            title: '是否确认退款订单',
+            confirm: cancelOrderHandle.bind(null, record),
+            placement: 'topLeft',
+          },
+        },
+      ];
+    }
+    return [
+      // {
+      //   label: '删除',
+      //   popConfirm: {
+      //     title: '是否确认删除',
+      //     confirm: handleDelete.bind(null, record),
+      //     placement: 'topLeft',
+      //   },
+      //   auth: 'parking:parking_order:delete',
+      // },
     ];
   }
 

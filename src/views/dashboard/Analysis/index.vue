@@ -21,4 +21,5 @@
   import IndexTask from './homePage/IndexTask.vue';
 
   const indexStyle = ref(0);
+
 </script>
