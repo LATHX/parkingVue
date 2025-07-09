@@ -28,6 +28,11 @@ export const columns: BasicColumn[] = [
     dataIndex: 'orderNum',
   },
   {
+    title: '当前休息状态',
+    align: 'center',
+    dataIndex: 'isRestValue_dictText',
+  },
+  {
     title: '审核状态',
     align: 'center',
     dataIndex: 'auditStatus_dictText',

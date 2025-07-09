@@ -205,6 +205,33 @@
               </a-form-item>
             </a-col>
             <a-col :span="24">
+              <a-form-item label="休息开始日" v-bind="validateInfos.restStartDate" id="ParkingPriceForm-restStartDate" name="restStartDate">
+                <a-date-picker
+                  placeholder="请选择休息开始日"
+                  v-model:value="formData.restStartDate"
+                  value-format="YYYY-MM-DD"
+                  style="width: 100%"
+                  allow-clear
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :span="24">
+              <a-form-item label="休息结束日" v-bind="validateInfos.restEndDate" id="ParkingPriceForm-restEndDate" name="restEndDate">
+                <a-date-picker
+                  placeholder="请选择休息结束日"
+                  v-model:value="formData.restEndDate"
+                  value-format="YYYY-MM-DD"
+                  style="width: 100%"
+                  allow-clear
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :span="24">
+              <a-form-item label="是否休息" v-bind="validateInfos.isRest" id="ParkingLotForm-isRest" name="isRest">
+                <j-dict-select-tag v-model:value="formData.isRest" dictCode="yn" placeholder="请选择休息状态" allow-clear />
+              </a-form-item>
+            </a-col>
+            <a-col :span="24">
               <a-form-item label="审核状态" v-bind="validateInfos.auditStatus" id="ParkingLotForm-auditStatus" name="auditStatus">
                 <j-dict-select-tag v-model:value="formData.auditStatus" dictCode="audit_status" placeholder="请选择审核状态" allow-clear />
               </a-form-item>
@@ -266,6 +293,9 @@
     prepayPrice: undefined,
     orderNum: undefined,
     auditStatus: undefined,
+    restStartDate: '',
+    restEndDate: '',
+    isRest: undefined,
   });
   const { createMessage } = useMessage();
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
