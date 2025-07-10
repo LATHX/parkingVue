@@ -97,12 +97,12 @@
                 />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
+            <a-col :span="24" :hidden="true">
               <a-form-item label="营业时间类型" v-bind="validateInfos.businessType" id="ParkingPriceForm-businessType" name="businessType">
                 <j-dict-select-tag v-model:value="formData.businessTimeType" dictCode="business_time_type" placeholder="请选择营业类型" allow-clear />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
+            <a-col :span="24" :hidden="true">
               <a-form-item
                 label="开始营业时间"
                 v-bind="validateInfos.businessStartTime"
@@ -118,7 +118,7 @@
                 />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
+            <a-col :span="24" :hidden="true">
               <a-form-item label="结束营业时间" v-bind="validateInfos.businessEndTime" id="ParkingPriceForm-businessEndTime" name="businessEndTime">
                 <time-picker
                   placeholder="请选择结束营业时间"
@@ -129,7 +129,7 @@
                 />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
+            <a-col :span="24" :hidden="true">
               <a-form-item label="营业状态" v-bind="validateInfos.businessStatus" id="ParkingPriceForm-businessStatus" name="businessStatus">
                 <j-dict-select-tag v-model:value="formData.businessStatus" dictCode="business_status" placeholder="请选择营业状态" allow-clear />
               </a-form-item>
@@ -157,6 +157,7 @@
   import { saveOrUpdate } from '../ParkingPrice.api';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
+  import { JAreaLinkage } from '@/components/Form';
 
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },

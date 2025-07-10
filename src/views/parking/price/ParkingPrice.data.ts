@@ -85,26 +85,6 @@ export const columns: BasicColumn[] = [
     },
   },
   {
-    title: '营业类型',
-    align: 'center',
-    dataIndex: 'businessTimeType_dictText',
-  },
-  {
-    title: '开始营业时间',
-    align: 'center',
-    dataIndex: 'businessStartTime',
-  },
-  {
-    title: '结束营业时间',
-    align: 'center',
-    dataIndex: 'businessEndTime',
-  },
-  {
-    title: '营业状态',
-    align: 'center',
-    dataIndex: 'businessStatus_dictText',
-  },
-  {
     title: '审核状态',
     align: 'center',
     dataIndex: 'auditStatus_dictText',

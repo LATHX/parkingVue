@@ -9,6 +9,12 @@
                 <a-input v-model:value="formData.parkingName" placeholder="请输入停车场名" allow-clear />
               </a-form-item>
             </a-col>
+
+            <a-col :span="24">
+              <a-form-item label="商户号" v-bind="validateInfos.merchantId" id="ParkingLotForm-merchantId" name="merchantId">
+                <j-dict-select-tag v-model:value="formData.merchantId" dictCode="merchantId" placeholder="请选择商户号" allow-clear />
+              </a-form-item>
+            </a-col>
             <a-col :span="24">
               <a-form-item label="地址" v-bind="validateInfos.address" id="ParkingLotForm-address" name="address">
                 <a-input v-model:value="formData.address" placeholder="请输入地址" allow-clear />
@@ -296,6 +302,7 @@
     restStartDate: '',
     restEndDate: '',
     isRest: undefined,
+    merchantId: undefined,
   });
   const { createMessage } = useMessage();
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
