@@ -1,5 +1,8 @@
 import { BasicColumn } from '/@/components/Table';
+import { FormSchema } from '/@/components/Table';
+import { rules } from '/@/utils/helper/validator';
 import { render } from '/@/utils/common/renderUtils';
+import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
@@ -8,39 +11,33 @@ export const columns: BasicColumn[] = [
     dataIndex: 'parkingId_dictText',
   },
   {
-    title: '停车场内部图',
+    title: '营业执照',
     align: 'center',
-    dataIndex: 'innerImg',
+    dataIndex: 'businessCertification',
     customRender: render.renderImage,
   },
   {
-    title: '停车场出入口',
+    title: '身份证正面',
     align: 'center',
-    dataIndex: 'exitImg',
+    dataIndex: 'identifyCertificationFront',
     customRender: render.renderImage,
   },
   {
-    title: '接送车图',
+    title: '身份证反面',
     align: 'center',
-    dataIndex: 'transferCarImg',
+    dataIndex: 'identifyCertificationBack',
     customRender: render.renderImage,
   },
   {
-    title: '监控室图',
+    title: '场地证明',
     align: 'center',
-    dataIndex: 'secureImg',
+    dataIndex: 'parkingCertification',
     customRender: render.renderImage,
   },
   {
-    title: '休息室图',
+    title: '车辆保险证明',
     align: 'center',
-    dataIndex: 'breakroomImg',
-    customRender: render.renderImage,
-  },
-  {
-    title: '其它图片',
-    align: 'center',
-    dataIndex: 'otherImg',
+    dataIndex: 'carInsuranceCertification',
     customRender: render.renderImage,
   },
   {

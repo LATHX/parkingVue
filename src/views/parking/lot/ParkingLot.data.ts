@@ -35,7 +35,9 @@ export const columns: BasicColumn[] = [
   {
     title: '审核状态',
     align: 'center',
+    width: '85px',
     dataIndex: 'auditStatus_dictText',
+    fixed: 'right',
   },
 ];
 
@@ -48,7 +50,13 @@ export const superQuerySchema = {
   transferType: { title: '接送类型', order: 16, view: 'number', type: 'number' },
   transferStartTime: { title: '接送开始时间', order: 17, view: 'date', type: 'string' },
   transferEndTime: { title: '接送结束时间', order: 18, view: 'date', type: 'string' },
-  parkingLocationId: { title: '车场位置', order: 20, view: 'list', type: 'string', dictCode: 'parking_location,location_name,id' },
+  parkingLocationId: {
+    title: '车场位置',
+    order: 20,
+    view: 'list',
+    type: 'string',
+    dictCode: 'parking_location,location_name,id',
+  },
   orderNum: { title: '排序', order: 28, view: 'number', type: 'number' },
   auditStatus: { title: '审核状态', order: 29, view: 'number', type: 'number', dictCode: 'audit_status' },
 };

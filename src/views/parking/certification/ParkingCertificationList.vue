@@ -1,14 +1,20 @@
 <template>
   <div class="p-2">
+    <!--查询区域-->
+    <div class="jeecg-basic-table-form-container">
+      <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
+        <a-row :gutter="24"></a-row>
+      </a-form>
+    </div>
     <!--引用表格-->
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" v-auth="'parking:parking_price:add'" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增 </a-button>
-        <a-button type="primary" v-auth="'parking:parking_price:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls">
+        <a-button type="primary" v-auth="'parking:parking_certification:add'" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增 </a-button>
+        <a-button type="primary" v-auth="'parking:parking_certification:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls">
           导出
         </a-button>
-        <j-upload-button type="primary" v-auth="'parking:parking_price:importExcel'" preIcon="ant-design:import-outlined" @click="onImportXls"
+        <j-upload-button type="primary" v-auth="'parking:parking_certification:importExcel'" preIcon="ant-design:import-outlined" @click="onImportXls"
           >导入
         </j-upload-button>
         <a-dropdown v-if="selectedRowKeys.length > 0">
@@ -20,7 +26,7 @@
               </a-menu-item>
             </a-menu>
           </template>
-          <a-button v-auth="'parking:parking_price:deleteBatch'"
+          <a-button v-auth="'parking:parking_certification:deleteBatch'"
             >批量操作
             <Icon icon="mdi:chevron-down"></Icon>
           </a-button>
@@ -35,40 +41,29 @@
       <template v-slot:bodyCell="{ column, record, index, text }"></template>
     </BasicTable>
     <!-- 表单区域 -->
-    <ParkingPriceModal ref="registerModal" @success="handleSuccess"></ParkingPriceModal>
+    <ParkingCertificationModal ref="registerModal" @success="handleSuccess"></ParkingCertificationModal>
   </div>
 </template>
 
-<script lang="ts" name="parking-parkingPrice" setup>
+<script lang="ts" name="parking-parkingCertification" setup>
   import { ref, reactive } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
-  import { columns, superQuerySchema } from './ParkingPrice.data';
-  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ParkingPrice.api';
+  import { columns, superQuerySchema } from './ParkingCertification.data';
+  import { list, audit, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ParkingCertification.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
-  import ParkingPriceModal from './components/ParkingPriceModal.vue';
+  import ParkingCertificationModal from './components/ParkingCertificationModal.vue';
   import { useUserStore } from '/@/store/modules/user';
-  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
-  import JSelectMultiple from '/@/components/Form/src/jeecg/components/JSelectMultiple.vue';
-  import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
-  import { TimePicker } from 'ant-design-vue';
 
   const formRef = ref();
   const queryParam = reactive<any>({});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
   const userStore = useUserStore();
-
-  const props = defineProps({
-    parkingId: {
-      type: String,
-      default: null,
-    },
-  });
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
-      title: '停车场价格表',
+      title: '停车场资质证明',
       api: list,
       columns,
       canResize: false,
@@ -78,11 +73,11 @@
         fixed: 'right',
       },
       beforeFetch: async (params) => {
-        return Object.assign(params, queryParam, { parkingId: props.parkingId });
+        return Object.assign(params, queryParam);
       },
     },
     exportConfig: {
-      name: '停车场价格表',
+      name: '停车场资质证明',
       url: getExportUrl,
       params: queryParam,
     },
@@ -141,6 +136,10 @@
     registerModal.value.edit(record);
   }
 
+  async function handleAudit(id, auditStatus) {
+    await audit({ id: id, auditStatus: auditStatus }, handleSuccess);
+  }
+
   /**
    * 删除事件
    */
@@ -170,7 +169,7 @@
       {
         label: '编辑',
         onClick: handleEdit.bind(null, record),
-        auth: 'parking:parking_price:edit',
+        auth: 'parking:parking_certification:edit',
       },
     ];
   }
@@ -185,13 +184,31 @@
         onClick: handleDetail.bind(null, record),
       },
       {
+        label: '审核通过',
+        popConfirm: {
+          title: '是否确认审核通过',
+          confirm: handleAudit.bind(null, record.id, 1),
+          placement: 'topLeft',
+        },
+        auth: 'parking:parking_lot:delete',
+      },
+      {
+        label: '审核不通过',
+        popConfirm: {
+          title: '是否确认审核不通过',
+          confirm: handleAudit.bind(null, record.id, 2),
+          placement: 'topLeft',
+        },
+        auth: 'parking:parking_lot:delete',
+      },
+      {
         label: '删除',
         popConfirm: {
           title: '是否确认删除',
           confirm: handleDelete.bind(null, record),
           placement: 'topLeft',
         },
-        auth: 'parking:parking_price:delete',
+        auth: 'parking:parking_certification:delete',
       },
     ];
   }

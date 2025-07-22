@@ -1,64 +1,44 @@
 <template>
-  <j-modal
-    :title="title"
-    :width="width"
-    :visible="visible"
-    @ok="handleOk"
-    :okButtonProps="{ class: { 'jee-hidden': disableSubmit } }"
-    @cancel="handleCancel"
-    cancelText="关闭"
-  >
-    <parking-lot-list :merchant-id="merchantId" v-if="showType === 'parkingLotList'" />
-    <ParkingMerchantForm ref="registerForm" @ok="submitCallback" :formDisabled="disableSubmit" :formBpm="false" v-else />
+  <j-modal :title="title" :width="width" :visible="visible" @ok="handleOk" :okButtonProps="{ class: { 'jee-hidden': disableSubmit } }" @cancel="handleCancel" cancelText="关闭">
+    <ParkingBankInfoForm ref="registerForm" @ok="submitCallback" :formDisabled="disableSubmit" :formBpm="false"></ParkingBankInfoForm>
   </j-modal>
 </template>
 
 <script lang="ts" setup>
   import { ref, nextTick, defineExpose } from 'vue';
-  import ParkingMerchantForm from './ParkingMerchantForm.vue';
+  import ParkingBankInfoForm from './ParkingBankInfoForm.vue'
   import JModal from '/@/components/Modal/src/JModal/JModal.vue';
-  import ParkingLotList from '../../lot/ParkingLotList.vue';
-
-  let showType = ref('');
+  
   const title = ref<string>('');
-  const width = ref<number>(1200);
+  const width = ref<number>(800);
   const visible = ref<boolean>(false);
   const disableSubmit = ref<boolean>(false);
   const registerForm = ref();
-  let merchantId = ref<string>('');
   const emit = defineEmits(['register', 'success']);
-
-  function showParkingLotList() {
-    showType = ref('parkingLotList');
-    title.value = '显示关联油站';
-    visible.value = true;
-  }
 
   /**
    * 新增
    */
   function add() {
-    showType = ref('');
     title.value = '新增';
     visible.value = true;
     nextTick(() => {
       registerForm.value.add();
     });
   }
-
+  
   /**
    * 编辑
    * @param record
    */
   function edit(record) {
-    showType = ref('');
     title.value = disableSubmit.value ? '详情' : '编辑';
     visible.value = true;
     nextTick(() => {
       registerForm.value.edit(record);
     });
   }
-
+  
   /**
    * 确定按钮点击事件
    */
@@ -84,9 +64,7 @@
   defineExpose({
     add,
     edit,
-    showParkingLotList,
     disableSubmit,
-    merchantId,
   });
 </script>
 

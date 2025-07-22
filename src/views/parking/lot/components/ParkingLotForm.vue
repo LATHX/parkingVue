@@ -233,6 +233,11 @@
               </a-form-item>
             </a-col>
             <a-col :span="24">
+              <a-form-item label="关联商户" v-bind="validateInfos.isRest" id="ParkingLotForm-merchantId" name="merchantId">
+                <j-dict-select-tag v-model:value="formData.merchantId" dictCode="parking_merchant,phone,id" placeholder="请选择关联商户" allow-clear />
+              </a-form-item>
+            </a-col>
+            <a-col :span="24">
               <a-form-item label="是否休息" v-bind="validateInfos.isRest" id="ParkingLotForm-isRest" name="isRest">
                 <j-dict-select-tag v-model:value="formData.isRest" dictCode="yn" placeholder="请选择休息状态" allow-clear />
               </a-form-item>

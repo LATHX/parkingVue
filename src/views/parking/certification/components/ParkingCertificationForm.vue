@@ -2,41 +2,66 @@
   <a-spin :spinning="confirmLoading">
     <JFormContainer :disabled="disabled">
       <template #detail>
-        <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ParkingMerchantForm">
+        <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ParkingCertificationForm">
           <a-row>
             <a-col :span="24">
-              <a-form-item label="名称" v-bind="validateInfos.merchantName" id="ParkingMerchantForm-merchantName" name="merchantName">
-                <a-input v-model:value="formData.merchantName" placeholder="请输入名称" allow-clear></a-input>
+              <a-form-item label="停车场名称" v-bind="validateInfos.parkingId" id="ParkingLotImageForm-parkingId" name="parkingId">
+                <j-search-select v-model:value="formData.parkingId" dict="parking_lot,parking_name,id" allow-clear />
               </a-form-item>
             </a-col>
             <a-col :span="24">
-              <a-form-item label="手机号" v-bind="validateInfos.phone" id="ParkingMerchantForm-phone" name="phone">
-                <a-input v-model:value="formData.phone" placeholder="请输入手机号" allow-clear></a-input>
+              <a-form-item
+                label="营业执照"
+                v-bind="validateInfos.businessCertification"
+                id="ParkingCertificationForm-businessCertification"
+                name="businessCertification"
+              >
+                <j-image-upload :fileMax="0" v-model:value="formData.businessCertification"></j-image-upload>
               </a-form-item>
             </a-col>
             <a-col :span="24">
-              <a-form-item label="微信绑定openId" v-bind="validateInfos.openId" id="ParkingMerchantForm-openId" name="openId">
-                <a-input v-model:value="formData.openId" placeholder="请输入微信绑定openId" allow-clear></a-input>
+              <a-form-item
+                label="身份证正面"
+                v-bind="validateInfos.identifyCertificationFront"
+                id="ParkingCertificationForm-identifyCertificationFront"
+                name="identifyCertificationFront"
+              >
+                <j-image-upload :fileMax="0" v-model:value="formData.identifyCertificationFront"></j-image-upload>
               </a-form-item>
             </a-col>
             <a-col :span="24">
-              <a-form-item label="微信绑定unionId" v-bind="validateInfos.unionId" id="ParkingMerchantForm-unionId" name="unionId">
-                <a-input v-model:value="formData.unionId" placeholder="请输入微信绑定unionId" allow-clear></a-input>
+              <a-form-item
+                label="身份证反面"
+                v-bind="validateInfos.identifyCertificationBack"
+                id="ParkingCertificationForm-identifyCertificationBack"
+                name="identifyCertificationBack"
+              >
+                <j-image-upload :fileMax="0" v-model:value="formData.identifyCertificationBack"></j-image-upload>
               </a-form-item>
             </a-col>
             <a-col :span="24">
-              <a-form-item label="城市" v-bind="validateInfos.city" id="ParkingMerchantForm-city" name="city">
-                <j-search-select v-model:value="formData.city" dict="city" allow-clear />
+              <a-form-item
+                label="场地证明"
+                v-bind="validateInfos.parkingCertification"
+                id="ParkingCertificationForm-parkingCertification"
+                name="parkingCertification"
+              >
+                <j-image-upload :fileMax="0" v-model:value="formData.parkingCertification"></j-image-upload>
               </a-form-item>
             </a-col>
             <a-col :span="24">
-              <a-form-item label="父账号" v-bind="validateInfos.parentId" id="ParkingMerchantForm-parentId" name="parentId">
-                <j-search-select v-model:value="formData.parentId" dict="parking_merchant,phone,id" allow-clear />
+              <a-form-item
+                label="车辆保险证明"
+                v-bind="validateInfos.carInsuranceCertification"
+                id="ParkingCertificationForm-carInsuranceCertification"
+                name="carInsuranceCertification"
+              >
+                <j-image-upload :fileMax="0" v-model:value="formData.carInsuranceCertification"></j-image-upload>
               </a-form-item>
             </a-col>
             <a-col :span="24">
-              <a-form-item label="是否可用" v-bind="validateInfos.status" id="ParkingCustomerForm-status" name="status">
-                <j-dict-select-tag v-model:value="formData.status" dictCode="yn" placeholder="请输入是否可用" allow-clear />
+              <a-form-item label="审核状态" v-bind="validateInfos.auditStatus" id="ParkingCertificationForm-auditStatus" name="auditStatus">
+                <j-image-upload :fileMax="0" v-model:value="formData.auditStatus"></j-image-upload>
               </a-form-item>
             </a-col>
           </a-row>
@@ -50,13 +75,12 @@
   import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted } from 'vue';
   import { defHttp } from '/@/utils/http/axios';
   import { useMessage } from '/@/hooks/web/useMessage';
+  import JImageUpload from '/@/components/Form/src/jeecg/components/JImageUpload.vue';
   import { getValueType } from '/@/utils';
-  import { saveOrUpdate } from '../ParkingMerchant.api';
+  import { saveOrUpdate } from '../ParkingCertification.api';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
-  import JDictSelectTag from '../../../../components/Form/src/jeecg/components/JDictSelectTag.vue';
-  import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
-
+  import JSearchSelect from '../../../../components/Form/src/jeecg/components/JSearchSelect.vue';
 
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
@@ -68,22 +92,20 @@
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
     id: '',
-    phone: '',
-    merchantName: '',
-    openId: '',
-    unionId: '',
-    city: '',
-    status: '',
-    parentId: '',
+    parkingId: '',
+    businessCertification: '',
+    identifyCertificationFront: '',
+    identifyCertificationBack: '',
+    parkingCertification: '',
+    carInsuranceCertification: '',
+    auditStatus: '',
   });
   const { createMessage } = useMessage();
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
   const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 16 } });
   const confirmLoading = ref<boolean>(false);
   //表单验证
-  const validatorRules = reactive({
-    status: [{ required: true, message: '请输入是否可用!' }],
-  });
+  const validatorRules = reactive({});
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
 
   // 表单禁用

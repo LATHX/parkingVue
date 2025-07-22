@@ -23,12 +23,12 @@ export const columns: BasicColumn[] = [
   {
     title: '是否可用',
     align: 'center',
-    dataIndex: 'status',
+    dataIndex: 'status_dictText',
   },
   {
     title: '父账号',
     align: 'center',
-    dataIndex: 'parentId',
+    dataIndex: 'parentId_dictText',
   },
 ];
 

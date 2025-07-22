@@ -15,6 +15,16 @@
               </a-form-item>
             </a-col>
             <a-col :span="24">
+              <a-form-item label="总库存" v-bind="validateInfos.stockTotal" id="ParkingPriceForm-stockTotal" name="stockTotal">
+                <a-input-number v-model:value="formData.stockTotal" placeholder="请输入总库存" style="width: 100%" />
+              </a-form-item>
+            </a-col>
+            <a-col :span="24">
+              <a-form-item label="库存" v-bind="validateInfos.stock" id="ParkingPriceForm-stock" name="stock">
+                <a-input-number v-model:value="formData.stock" placeholder="请输入库存" style="width: 100%" />
+              </a-form-item>
+            </a-col>
+            <a-col :span="24">
               <a-form-item label="第一天总价" v-bind="validateInfos.parkingPriceSum1" id="ParkingPriceForm-parkingPriceSum1" name="parkingPriceSum1">
                 <a-input-number v-model:value="formData.parkingPriceSum1" placeholder="请输入第一天总价" style="width: 100%" />
               </a-form-item>
@@ -171,6 +181,8 @@
     id: '',
     parkingId: '',
     parkingType: '',
+    stock: '',
+    stockTotal: '',
     parkingPriceSum1: undefined,
     parkingPriceSum2: undefined,
     parkingPriceSum3: undefined,
@@ -196,6 +208,8 @@
   const confirmLoading = ref<boolean>(false);
   //表单验证
   const validatorRules = reactive({
+    stockTotal: [{ required: true, message: '必填项!' }],
+    stock: [{ required: true, message: '必填项!' }],
     parkingPriceSum1: [{ required: true, message: '必填项!' }],
     afterDay: [{ required: true, message: '必填项!' }],
     afterDailyPrice: [{ required: true, message: '必填项!' }],

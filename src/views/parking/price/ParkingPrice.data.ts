@@ -12,6 +12,16 @@ export const columns: BasicColumn[] = [
     dataIndex: 'parkingType_dictText',
   },
   {
+    title: '总库存',
+    align: 'center',
+    dataIndex: 'stockTotal',
+  },
+  {
+    title: '库存',
+    align: 'center',
+    dataIndex: 'stock',
+  },
+  {
     title: '第一天总价',
     align: 'center',
     dataIndex: 'parkingPriceSum1',
@@ -59,7 +69,7 @@ export const columns: BasicColumn[] = [
   {
     title: '调价类型',
     align: 'center',
-    dataIndex: 'adjustPriceType',
+    dataIndex: 'adjustPriceType_dictText',
   },
   {
     title: '调整价格',

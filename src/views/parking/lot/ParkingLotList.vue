@@ -55,7 +55,7 @@
       <template #action="{ record }">
         <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)" />
       </template>
-      <template v-slot:bodyCell="{ column, record, index, text }"> </template>
+      <template v-slot:bodyCell="{ column, record, index, text }"></template>
     </BasicTable>
     <!-- 表单区域 -->
     <ParkingLotModal ref="registerModal" @success="handleSuccess"></ParkingLotModal>
@@ -63,21 +63,37 @@
 </template>
 
 <script lang="ts" name="parking-parkingLot" setup>
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, watch, watchEffect } from 'vue';
+  import { useRoute } from 'vue-router';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
   import { columns, superQuerySchema } from './ParkingLot.data';
-  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ParkingLot.api';
+  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl, audit } from './ParkingLot.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
   import ParkingLotModal from './components/ParkingLotModal.vue';
   import { useUserStore } from '/@/store/modules/user';
   import JInput from '/@/components/Form/src/jeecg/components/JInput.vue';
 
+  const route = useRoute();
   const formRef = ref();
   const queryParam = reactive<any>({});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
   const userStore = useUserStore();
+  let customQueryParam = reactive<any>({});
+  const props = defineProps({
+    merchantId: {
+      type: String,
+      default: null,
+    },
+  });
+  watchEffect(() => {
+    Object.assign(customQueryParam, {});
+    Object.assign(customQueryParam, {
+      merchantId: props.merchantId,
+      auditStatus: route.query.auditStatus === undefined ? null : route.query.auditStatus,
+    });
+  });
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
@@ -87,11 +103,11 @@
       canResize: false,
       useSearchForm: false,
       actionColumn: {
-        width: 120,
+        width: 280,
         fixed: 'right',
       },
       beforeFetch: async (params) => {
-        return Object.assign(params, queryParam);
+        return Object.assign(params, queryParam, customQueryParam);
       },
     },
     exportConfig: {
@@ -175,6 +191,12 @@
     (selectedRowKeys.value = []) && reload();
   }
 
+  function handleOther(showType, record: Recordable) {
+    registerModal.value.parkingId = record.id;
+    registerModal.value.disableSubmit = false;
+    registerModal.value.showOther(showType);
+  }
+
   /**
    * 操作栏
    */
@@ -184,6 +206,14 @@
         label: '编辑',
         onClick: handleEdit.bind(null, record),
         auth: 'parking:parking_lot:edit',
+      },
+      {
+        label: '价格',
+        onClick: handleOther.bind(null, 'parkingPriceList', record),
+      },
+      {
+        label: '图片',
+        onClick: handleOther.bind(null, 'parkingLotImage', record),
       },
     ];
   }
@@ -198,6 +228,24 @@
         onClick: handleDetail.bind(null, record),
       },
       {
+        label: '审核通过',
+        popConfirm: {
+          title: '是否确认审核通过',
+          confirm: handleAudit.bind(null, record.id, 1),
+          placement: 'topLeft',
+        },
+        auth: 'parking:parking_lot:delete',
+      },
+      {
+        label: '审核不通过',
+        popConfirm: {
+          title: '是否确认审核不通过',
+          confirm: handleAudit.bind(null, record.id, 2),
+          placement: 'topLeft',
+        },
+        auth: 'parking:parking_lot:delete',
+      },
+      {
         label: '删除',
         popConfirm: {
           title: '是否确认删除',
@@ -206,7 +254,12 @@
         },
         auth: 'parking:parking_lot:delete',
       },
+
     ];
+  }
+
+  async function handleAudit(id, auditStatus) {
+    await audit({ id: id, auditStatus: auditStatus }, handleSuccess);
   }
 
   /**
