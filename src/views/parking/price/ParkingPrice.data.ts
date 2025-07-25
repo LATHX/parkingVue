@@ -98,6 +98,7 @@ export const columns: BasicColumn[] = [
     title: '审核状态',
     align: 'center',
     dataIndex: 'auditStatus_dictText',
+    fixed: 'right',
   },
 ];
 

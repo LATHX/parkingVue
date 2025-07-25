@@ -52,6 +52,7 @@
   import JSelectMultiple from '/@/components/Form/src/jeecg/components/JSelectMultiple.vue';
   import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
   import { TimePicker } from 'ant-design-vue';
+  import { audit } from '@/views/parking/price/ParkingPrice.api.ts';
 
   const formRef = ref();
   const queryParam = reactive<any>({});
@@ -141,6 +142,10 @@
     registerModal.value.edit(record);
   }
 
+  async function handleAudit(id, auditStatus) {
+    await audit({ id: id, auditStatus: auditStatus }, handleSuccess);
+  }
+
   /**
    * 删除事件
    */
@@ -183,6 +188,22 @@
       {
         label: '详情',
         onClick: handleDetail.bind(null, record),
+      },
+      {
+        label: '审核通过',
+        popConfirm: {
+          title: '是否确认审核通过',
+          confirm: handleAudit.bind(null, record.id, 1),
+          placement: 'topLeft',
+        },
+      },
+      {
+        label: '审核不通过',
+        popConfirm: {
+          title: '是否确认审核不通过',
+          confirm: handleAudit.bind(null, record.id, 2),
+          placement: 'topLeft',
+        },
       },
       {
         label: '删除',

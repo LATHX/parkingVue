@@ -7,6 +7,7 @@ enum Api {
   list = '/parking/parkingPrice/list',
   save = '/parking/parkingPrice/add',
   edit = '/parking/parkingPrice/edit',
+  audit = '/parking/parkingPrice/audit',
   deleteOne = '/parking/parkingPrice/delete',
   deleteBatch = '/parking/parkingPrice/deleteBatch',
   importExcel = '/parking/parkingPrice/importExcel',
@@ -18,6 +19,10 @@ enum Api {
  * @param params
  */
 export const getExportUrl = Api.exportXls;
+export const audit = (params, handleSuccess) =>
+  defHttp.post({ url: Api.audit, params }).then(() => {
+    handleSuccess();
+  });
 
 /**
  * 导入api

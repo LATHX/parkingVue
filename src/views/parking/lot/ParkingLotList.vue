@@ -234,7 +234,6 @@
           confirm: handleAudit.bind(null, record.id, 1),
           placement: 'topLeft',
         },
-        auth: 'parking:parking_lot:delete',
       },
       {
         label: '审核不通过',
@@ -243,7 +242,6 @@
           confirm: handleAudit.bind(null, record.id, 2),
           placement: 'topLeft',
         },
-        auth: 'parking:parking_lot:delete',
       },
       {
         label: '删除',

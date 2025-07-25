@@ -11,12 +11,12 @@ export const columns: BasicColumn[] = [
     dataIndex: 'parkingId_dictText',
   },
   {
-    title: '卡行名',
+    title: '开户人',
     align: 'center',
     dataIndex: 'cardBank',
   },
   {
-    title: '开卡地址',
+    title: '银行名和支行',
     align: 'center',
     dataIndex: 'cardAddress',
   },
