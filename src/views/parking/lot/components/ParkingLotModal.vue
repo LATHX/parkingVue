@@ -10,6 +10,8 @@
   >
     <ParkingLotImageList :parking-id="parkingId" v-if="showType === 'parkingLotImage'" />
     <ParkingPriceList :parking-id="parkingId" v-if="showType === 'parkingPriceList'" />
+    <ParkingCertificationList :parking-id="parkingId" v-if="showType === 'parkingLotCertification'" />
+    <ParkingSettlementSettingList :parking-id="parkingId" v-if="showType === 'parkingSettlementSettingList'" />
     <ParkingLotForm ref="registerForm" @ok="submitCallback" :formDisabled="disableSubmit" :formBpm="false" v-if="showType === ''" />
   </j-modal>
 </template>
@@ -20,8 +22,10 @@
   import JModal from '/@/components/Modal/src/JModal/JModal.vue';
   import ParkingLotImageList from '@/views/parking/image/ParkingLotImageList.vue';
   import ParkingPriceList from '@/views/parking/price/ParkingPriceList.vue';
+  import ParkingCertificationList from '@/views/parking/certification/ParkingCertificationList.vue';
+  import ParkingSettlementSettingList from '@/views/parking/settlementSetting/ParkingSettlementSettingList.vue';
 
-  let parkingId = ref('')
+  let parkingId = ref('');
   const title = ref<string>('');
   const width = ref<number>(1200);
   const visible = ref<boolean>(false);

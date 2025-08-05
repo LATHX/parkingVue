@@ -6,14 +6,14 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '停车场名称',
+    title: '车辆状态',
     align: 'center',
-    dataIndex: 'parkingName',
+    dataIndex: 'carStatus_dictText',
   },
   {
-    title: '停车场类型',
+    title: '订单号',
     align: 'center',
-    dataIndex: 'parkingType_dictText',
+    dataIndex: 'id',
   },
   {
     title: '手机号',
@@ -21,20 +21,37 @@ export const columns: BasicColumn[] = [
     dataIndex: 'userId_dictText',
   },
   {
-    title: '支付状态',
+    title: '商家名',
     align: 'center',
-    dataIndex: 'payStatus_dictText',
+    dataIndex: 'merchantId_dictText',
   },
   {
-    title: '车辆状态',
+    title: '停车场',
     align: 'center',
-    dataIndex: 'carStatus_dictText',
+    dataIndex: 'parkingName',
+  },
+  {
+    title: '车位类型',
+    align: 'center',
+    dataIndex: 'parkingType_dictText',
   },
   {
     title: '车牌号',
     align: 'center',
     dataIndex: 'carPlate',
   },
+  {
+    title: '出行人数',
+    align: 'center',
+    dataIndex: 'peopleCount',
+  },
+
+  {
+    title: '支付状态',
+    align: 'center',
+    dataIndex: 'payStatus_dictText',
+  },
+
   {
     title: '预计进场时间',
     align: 'center',
@@ -46,6 +63,11 @@ export const columns: BasicColumn[] = [
     dataIndex: 'predictEndDate',
   },
   {
+    title: '预计停车天数',
+    align: 'center',
+    dataIndex: 'predictTotalDay',
+  },
+  {
     title: '实际进场时间',
     align: 'center',
     dataIndex: 'realStartDate',
@@ -54,6 +76,11 @@ export const columns: BasicColumn[] = [
     title: '实际离场时间',
     align: 'center',
     dataIndex: 'realEndDate',
+  },
+  {
+    title: '实际停车天数',
+    align: 'center',
+    dataIndex: 'realTotalDay',
   },
   {
     title: '优惠卷ID',

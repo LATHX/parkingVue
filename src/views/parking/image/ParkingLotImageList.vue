@@ -46,7 +46,7 @@
 </template>
 
 <script lang="ts" name="parking-parkingLotImage" setup>
-  import { ref, reactive, watchEffect } from 'vue';
+import { ref, reactive, watchEffect, watch } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
   import { columns, superQuerySchema } from './ParkingLotImage.data';
@@ -66,10 +66,6 @@
       type: String,
       default: null,
     },
-  });
-  watchEffect(() => {
-    Object.assign(customQueryParam, {});
-    Object.assign(customQueryParam, { merchantId: props.parkingId });
   });
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
@@ -99,6 +95,16 @@
   });
   const [registerTable, { reload, collapseAll, updateTableDataRecord, findTableDataRecord, getDataSource }, { rowSelection, selectedRowKeys }] =
     tableContext;
+
+  watch(
+    () => props.parkingId,
+    (newVal) => {
+      reload();
+      // 在这里处理变化后的逻辑
+    },
+    // 可选配置： immediate 表示是否在初始时立即执行一次
+    { immediate: true }
+  );
   const labelCol = reactive({
     xs: 24,
     sm: 4,

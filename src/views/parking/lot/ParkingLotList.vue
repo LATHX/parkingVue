@@ -215,6 +215,10 @@
         label: '图片',
         onClick: handleOther.bind(null, 'parkingLotImage', record),
       },
+      {
+        label: '资质',
+        onClick: handleOther.bind(null, 'parkingLotCertification', record),
+      },
     ];
   }
 
@@ -226,6 +230,10 @@
       {
         label: '详情',
         onClick: handleDetail.bind(null, record),
+      },
+      {
+        label: '结算设置',
+        onClick: handleOther.bind(null, 'parkingSettlementSettingList', record),
       },
       {
         label: '审核通过',

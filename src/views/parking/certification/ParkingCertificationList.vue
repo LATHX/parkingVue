@@ -46,7 +46,7 @@
 </template>
 
 <script lang="ts" name="parking-parkingCertification" setup>
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, watchEffect, watch } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
   import { columns, superQuerySchema } from './ParkingCertification.data';
@@ -60,6 +60,14 @@
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
   const userStore = useUserStore();
+
+  let customQueryParam = reactive<any>({});
+  const props = defineProps({
+    parkingId: {
+      type: String,
+      default: null,
+    },
+  });
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
@@ -73,7 +81,7 @@
         fixed: 'right',
       },
       beforeFetch: async (params) => {
-        return Object.assign(params, queryParam);
+        return Object.assign(params, queryParam, { parkingId: props.parkingId });
       },
     },
     exportConfig: {
@@ -88,6 +96,16 @@
   });
   const [registerTable, { reload, collapseAll, updateTableDataRecord, findTableDataRecord, getDataSource }, { rowSelection, selectedRowKeys }] =
     tableContext;
+
+  watch(
+    () => props.parkingId,
+    (newVal) => {
+      reload();
+      // 在这里处理变化后的逻辑
+    },
+    // 可选配置： immediate 表示是否在初始时立即执行一次
+    { immediate: true }
+  );
   const labelCol = reactive({
     xs: 24,
     sm: 4,

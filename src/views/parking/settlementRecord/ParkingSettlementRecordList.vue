@@ -1,16 +1,19 @@
 <template>
   <div class="p-2">
+    <!--查询区域-->
+    <div class="jeecg-basic-table-form-container">
+      <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
+        <a-row :gutter="24">
+        </a-row>
+      </a-form>
+    </div>
     <!--引用表格-->
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" v-auth="'parking:parking_price:add'" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增 </a-button>
-        <a-button type="primary" v-auth="'parking:parking_price:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls">
-          导出
-        </a-button>
-        <j-upload-button type="primary" v-auth="'parking:parking_price:importExcel'" preIcon="ant-design:import-outlined" @click="onImportXls"
-          >导入
-        </j-upload-button>
+        <a-button type="primary" v-auth="'parking:parking_settlement_record:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
+        <a-button  type="primary" v-auth="'parking:parking_settlement_record:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
+        <j-upload-button  type="primary" v-auth="'parking:parking_settlement_record:importExcel'"  preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -20,8 +23,7 @@
               </a-menu-item>
             </a-menu>
           </template>
-          <a-button v-auth="'parking:parking_price:deleteBatch'"
-            >批量操作
+          <a-button v-auth="'parking:parking_settlement_record:deleteBatch'">批量操作
             <Icon icon="mdi:chevron-down"></Icon>
           </a-button>
         </a-dropdown>
@@ -30,84 +32,63 @@
       </template>
       <!--操作栏-->
       <template #action="{ record }">
-        <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)" />
+        <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)"/>
       </template>
-      <template v-slot:bodyCell="{ column, record, index, text }"></template>
+      <template v-slot:bodyCell="{ column, record, index, text }">
+      </template>
     </BasicTable>
     <!-- 表单区域 -->
-    <ParkingPriceModal ref="registerModal" @success="handleSuccess"></ParkingPriceModal>
+    <ParkingSettlementRecordModal ref="registerModal" @success="handleSuccess"></ParkingSettlementRecordModal>
   </div>
 </template>
 
-<script lang="ts" name="parking-parkingPrice" setup>
-import { ref, reactive, watch } from 'vue';
+<script lang="ts" name="parking-parkingSettlementRecord" setup>
+  import { ref, reactive } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
-  import { columns, superQuerySchema } from './ParkingPrice.data';
-  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ParkingPrice.api';
+  import { columns, superQuerySchema } from './ParkingSettlementRecord.data';
+  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ParkingSettlementRecord.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
-  import ParkingPriceModal from './components/ParkingPriceModal.vue';
+  import ParkingSettlementRecordModal from './components/ParkingSettlementRecordModal.vue'
   import { useUserStore } from '/@/store/modules/user';
-  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
-  import JSelectMultiple from '/@/components/Form/src/jeecg/components/JSelectMultiple.vue';
-  import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
-  import { TimePicker } from 'ant-design-vue';
-  import { audit } from '@/views/parking/price/ParkingPrice.api.ts';
 
   const formRef = ref();
   const queryParam = reactive<any>({});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
   const userStore = useUserStore();
-
-  const props = defineProps({
-    parkingId: {
-      type: String,
-      default: null,
-    },
-  });
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
-      title: '停车场价格表',
+      title: '车场结算表',
       api: list,
       columns,
-      canResize: false,
+      canResize:false,
       useSearchForm: false,
       actionColumn: {
         width: 120,
         fixed: 'right',
       },
       beforeFetch: async (params) => {
-        return Object.assign(params, queryParam, { parkingId: props.parkingId });
+        return Object.assign(params, queryParam);
       },
     },
     exportConfig: {
-      name: '停车场价格表',
+      name: "车场结算表",
       url: getExportUrl,
       params: queryParam,
     },
-    importConfig: {
-      url: getImportUrl,
-      success: handleSuccess,
-    },
+	  importConfig: {
+	    url: getImportUrl,
+	    success: handleSuccess
+	  },
   });
-  const [registerTable, { reload, collapseAll, updateTableDataRecord, findTableDataRecord, getDataSource }, { rowSelection, selectedRowKeys }] =
-    tableContext;
-  watch(
-    () => props.parkingId,
-    (newVal) => {
-      reload();
-      // 在这里处理变化后的逻辑
-    },
-    // 可选配置： immediate 表示是否在初始时立即执行一次
-    { immediate: true }
-  );
+  const [registerTable, { reload, collapseAll, updateTableDataRecord, findTableDataRecord, getDataSource }, { rowSelection, selectedRowKeys }] = tableContext;
   const labelCol = reactive({
-    xs: 24,
-    sm: 4,
-    xl: 6,
-    xxl: 4,
+    xs:24,
+    sm:4,
+    xl:6,
+    xxl:4
   });
   const wrapperCol = reactive({
     xs: 24,
@@ -134,7 +115,7 @@ import { ref, reactive, watch } from 'vue';
     registerModal.value.disableSubmit = false;
     registerModal.value.add();
   }
-
+  
   /**
    * 编辑事件
    */
@@ -142,7 +123,7 @@ import { ref, reactive, watch } from 'vue';
     registerModal.value.disableSubmit = false;
     registerModal.value.edit(record);
   }
-
+   
   /**
    * 详情
    */
@@ -150,32 +131,28 @@ import { ref, reactive, watch } from 'vue';
     registerModal.value.disableSubmit = true;
     registerModal.value.edit(record);
   }
-
-  async function handleAudit(id, auditStatus) {
-    await audit({ id: id, auditStatus: auditStatus }, handleSuccess);
-  }
-
+   
   /**
    * 删除事件
    */
   async function handleDelete(record) {
     await deleteOne({ id: record.id }, handleSuccess);
   }
-
+   
   /**
    * 批量删除事件
    */
   async function batchHandleDelete() {
     await batchDelete({ ids: selectedRowKeys.value }, handleSuccess);
   }
-
+   
   /**
    * 成功回调
    */
   function handleSuccess() {
     (selectedRowKeys.value = []) && reload();
   }
-
+   
   /**
    * 操作栏
    */
@@ -184,11 +161,11 @@ import { ref, reactive, watch } from 'vue';
       {
         label: '编辑',
         onClick: handleEdit.bind(null, record),
-        auth: 'parking:parking_price:edit',
+        auth: 'parking:parking_settlement_record:edit'
       },
     ];
   }
-
+   
   /**
    * 下拉操作栏
    */
@@ -197,33 +174,16 @@ import { ref, reactive, watch } from 'vue';
       {
         label: '详情',
         onClick: handleDetail.bind(null, record),
-      },
-      {
-        label: '审核通过',
-        popConfirm: {
-          title: '是否确认审核通过',
-          confirm: handleAudit.bind(null, record.id, 1),
-          placement: 'topLeft',
-        },
-      },
-      {
-        label: '审核不通过',
-        popConfirm: {
-          title: '是否确认审核不通过',
-          confirm: handleAudit.bind(null, record.id, 2),
-          placement: 'topLeft',
-        },
-      },
-      {
+      }, {
         label: '删除',
         popConfirm: {
           title: '是否确认删除',
           confirm: handleDelete.bind(null, record),
           placement: 'topLeft',
         },
-        auth: 'parking:parking_price:delete',
-      },
-    ];
+        auth: 'parking:parking_settlement_record:delete'
+      }
+    ]
   }
 
   /**
@@ -232,7 +192,7 @@ import { ref, reactive, watch } from 'vue';
   function searchQuery() {
     reload();
   }
-
+  
   /**
    * 重置
    */
@@ -242,35 +202,34 @@ import { ref, reactive, watch } from 'vue';
     //刷新数据
     reload();
   }
+  
+
+
+
+
 </script>
 
 <style lang="less" scoped>
   .jeecg-basic-table-form-container {
     padding: 0;
-
     .table-page-search-submitButtons {
       display: block;
       margin-bottom: 24px;
       white-space: nowrap;
     }
-
-    .query-group-cust {
+    .query-group-cust{
       min-width: 100px !important;
     }
-
-    .query-group-split-cust {
+    .query-group-split-cust{
       width: 30px;
       display: inline-block;
-      text-align: center;
+      text-align: center
     }
-
-    .ant-form-item:not(.ant-form-item-with-help) {
+    .ant-form-item:not(.ant-form-item-with-help){
       margin-bottom: 16px;
       height: 32px;
     }
-
-    :deep(.ant-picker),
-    :deep(.ant-input-number) {
+    :deep(.ant-picker),:deep(.ant-input-number){
       width: 100%;
     }
   }
