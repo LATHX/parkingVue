@@ -3,7 +3,7 @@
     <template #headerContent>
       <div class="flex justify-between items-center">
         <span class="flex-1">
-          <a :href="GITHUB_URL" target="_blank"> 小鲸云科技有限公司 </a>
+          <a :href="GITHUB_URL" target="_blank"> 广州成耀物业服务有限公司 </a>
          </span>
       </div>
     </template>

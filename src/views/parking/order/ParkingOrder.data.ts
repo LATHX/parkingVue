@@ -6,14 +6,19 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '车辆状态',
-    align: 'center',
-    dataIndex: 'carStatus_dictText',
-  },
-  {
     title: '订单号',
     align: 'center',
     dataIndex: 'id',
+  },
+  {
+    title: '支付方式',
+    align: 'center',
+    dataIndex: 'payType_dictText',
+  },
+  {
+    title: '车辆状态',
+    align: 'center',
+    dataIndex: 'carStatus_dictText',
   },
   {
     title: '手机号',
@@ -63,7 +68,7 @@ export const columns: BasicColumn[] = [
     dataIndex: 'predictEndDate',
   },
   {
-    title: '预计停车天数',
+    title: '预计停车天数/小时',
     align: 'center',
     dataIndex: 'predictTotalDay',
   },
@@ -116,11 +121,6 @@ export const columns: BasicColumn[] = [
     title: '尾款金额',
     align: 'center',
     dataIndex: 'secondRealPrice',
-  },
-  {
-    title: '支付方式',
-    align: 'center',
-    dataIndex: 'payType_dictText',
   },
   {
     title: '结算服务费率',

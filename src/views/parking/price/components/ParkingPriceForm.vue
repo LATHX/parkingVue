@@ -139,7 +139,7 @@
                 />
               </a-form-item>
             </a-col>
-            <a-col :span="24" :hidden="true">
+            <a-col :span="24">
               <a-form-item label="营业状态" v-bind="validateInfos.businessStatus" id="ParkingPriceForm-businessStatus" name="businessStatus">
                 <j-dict-select-tag v-model:value="formData.businessStatus" dictCode="business_status" placeholder="请选择营业状态" allow-clear />
               </a-form-item>

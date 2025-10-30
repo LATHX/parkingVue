@@ -8,6 +8,12 @@ export const columns: BasicColumn[] = [
     dataIndex: 'parkingId_dictText',
   },
   {
+    title: '停车场主图',
+    align: 'center',
+    dataIndex: 'mainImg',
+    customRender: render.renderImage,
+  },
+  {
     title: '停车场内部图',
     align: 'center',
     dataIndex: 'innerImg',

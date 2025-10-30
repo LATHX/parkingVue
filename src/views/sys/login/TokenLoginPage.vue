@@ -5,7 +5,7 @@
             <div class="app-loading-dots">
                 <span class="dot dot-spin"><i></i><i></i><i></i><i></i></span>
             </div>
-            <div class="app-loading-title">小鲸云科技有限公司</div>
+            <div class="app-loading-title">广州成耀物业服务有限公司</div>
         </div>
     </div>
 </template>

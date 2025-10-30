@@ -50,6 +50,7 @@
   import { useDesign } from '/@/hooks/web/useDesign';
   import { useLocaleStore } from '/@/store/modules/locale';
   import { useLoginState, LoginStateEnum } from './useLogin';
+
   defineProps({
     sessionTimeout: {
       type: Boolean,

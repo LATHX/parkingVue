@@ -11,7 +11,8 @@
 						</a-col>
 						<a-col :span="24">
 							<a-form-item label="是否结算" v-bind="validateInfos.isSettlement" id="ParkingSettlementRecordForm-isSettlement" name="isSettlement">
-								<a-input v-model:value="formData.isSettlement" placeholder="请输入是否结算"  allow-clear ></a-input>
+                <j-dict-select-tag v-model:value="formData.isSettlement" dictCode="yn" placeholder="请输入是否结算" allow-clear />
+
 							</a-form-item>
 						</a-col>
           </a-row>
@@ -29,6 +30,7 @@
   import { saveOrUpdate } from '../ParkingSettlementRecord.api';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
+  import JDictSelectTag from '../../../../components/Form/src/jeecg/components/JDictSelectTag.vue';
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({})},

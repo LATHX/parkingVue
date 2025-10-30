@@ -6,6 +6,11 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
+    title: '流水号',
+    align: 'center',
+    dataIndex: 'id',
+  },
+  {
     title: '订单号',
     align: 'center',
     dataIndex: 'orderId',
