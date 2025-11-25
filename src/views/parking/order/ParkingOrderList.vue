@@ -50,7 +50,17 @@
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
   import { columns, superQuerySchema } from './ParkingOrder.data';
-  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl, carEnterStatus, carLeaveStatus, cancelOrder } from './ParkingOrder.api';
+  import {
+    list,
+    deleteOne,
+    batchDelete,
+    getImportUrl,
+    getExportUrl,
+    carEnterStatus,
+    carLeaveStatus,
+    cancelOrder,
+    systemCompleteOrder,
+  } from './ParkingOrder.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
   import ParkingOrderModal from './components/ParkingOrderModal.vue';
   import { useUserStore } from '/@/store/modules/user';
@@ -162,6 +172,10 @@
   async function carLeaveStatusHandle(record) {
     await carLeaveStatus({ orderId: record.id }, handleSuccess);
   }
+  async function systemCompleteHandle(record) {
+    await systemCompleteOrder({ orderId: record.id }, handleSuccess);
+  }
+
 
   /**
    * 成功回调
@@ -210,13 +224,21 @@
           },
         },
       ];
-    } else if (record.payStatus === '1' && record.carStatus === '1') {
+    } else if ((record.payStatus === '1' || record.payStatus === '2') && record.carStatus === '1') {
       return [
         {
           label: '车辆离场',
           popConfirm: {
             title: '是否确认车辆离场',
             confirm: carLeaveStatusHandle.bind(null, record),
+            placement: 'topLeft',
+          },
+        },
+        {
+          label: '系统结单',
+          popConfirm: {
+            title: '是否确认系统结单',
+            confirm: systemCompleteHandle.bind(null, record),
             placement: 'topLeft',
           },
         },

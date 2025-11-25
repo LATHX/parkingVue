@@ -14,6 +14,7 @@ enum Api {
   cancelOrder = '/parking/parkingOrder/cancelOrder',
   carEnterStatus = '/parking/parkingOrder/carEnterStatus',
   carLeaveStatus = '/parking/parkingOrder/carLeaveStatus',
+  systemCompleteOrder = '/parking/parkingOrder/systemCompleteOrder',
 }
 
 /**
@@ -29,6 +30,11 @@ export const getImportUrl = Api.importExcel;
 
 export const cancelOrder = (params, handleSuccess) => {
   defHttp.post({ url: Api.cancelOrder, params: params }).then(() => {
+    handleSuccess();
+  });
+};
+export const systemCompleteOrder = (params, handleSuccess) => {
+  defHttp.post({ url: Api.systemCompleteOrder, params: params }).then(() => {
     handleSuccess();
   });
 };

@@ -9,6 +9,7 @@ export const columns: BasicColumn[] = [
     title: '订单号',
     align: 'center',
     dataIndex: 'id',
+    width: 180,
   },
   {
     title: '支付方式',
@@ -161,6 +162,7 @@ export const columns: BasicColumn[] = [
 
 // 高级查询数据
 export const superQuerySchema = {
+  id: { title: '订单号', order: 0, view: 'text', type: 'string' },
   parkingName: { title: '停车场名称', order: 0, view: 'text', type: 'string' },
   userId: { title: '用户手机号', order: 2, view: 'sel_search', type: 'string', dictCode: 'parking_customer,phone,id' },
   payStatus: { title: '支付状态', order: 3, view: 'sel_search', type: 'string', dictCode: 'pay_status' },
