@@ -10,6 +10,11 @@
               </a-form-item>
             </a-col>
             <a-col :span="24">
+              <a-form-item label="城市" v-bind="validateInfos.city" id="ParkingLocationForm-city" name="city">
+                <j-search-select v-model:value="formData.city" placeholder="请选择" dict="city" />
+              </a-form-item>
+            </a-col>
+            <a-col :span="24">
               <a-form-item label="图片" v-bind="validateInfos.image" id="ParkingLocationForm-image" name="image">
                 <j-image-upload v-model:value="formData.image" file-max="1" />
               </a-form-item>
@@ -31,7 +36,7 @@
             </a-col>
             <a-col :span="24">
               <a-form-item label="展示在首页" v-bind="validateInfos.showHomePage" id="ParkingLocationForm-showHomePage" name="showHomePage">
-                <j-dict-select-tag v-model:value="formData.showHomePage" placeholder="请选择" dictCode="yn" :string-to-number="true"/>
+                <j-dict-select-tag v-model:value="formData.showHomePage" placeholder="请选择" dictCode="yn" :string-to-number="true" />
               </a-form-item>
             </a-col>
             <a-col :span="24">
@@ -64,7 +69,7 @@
   import { saveOrUpdate } from '../ParkingLocation.api';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
-  import { JDictSelectTag, JImageUpload } from "@/components/Form";
+  import { JDictSelectTag, JImageUpload, JSearchSelect } from '@/components/Form';
 
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
@@ -82,6 +87,7 @@
     locationType: '',
     tags: '',
     description: '',
+    city: '',
     showHomePage: undefined,
     orderNum: undefined,
   });

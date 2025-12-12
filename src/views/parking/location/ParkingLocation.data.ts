@@ -11,6 +11,11 @@ export const columns: BasicColumn[] = [
     dataIndex: 'locationName',
   },
   {
+    title: '城市',
+    align: 'center',
+    dataIndex: 'city',
+  },
+  {
     title: '图片',
     align: 'center',
     dataIndex: 'image',
