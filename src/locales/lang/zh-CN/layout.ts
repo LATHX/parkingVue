@@ -8,6 +8,10 @@ export default {
     dropdownItemSwitchDepart: '切换部门',
     dropdownItemRefreshCache: '刷新缓存',
     dropdownItemSwitchAccount: '账户设置',
+    dropdownItemSwitchDefaultHomePage: '切换首页',
+
+    dropdownItemSwitchDefaultWeb: '桌面应用',
+    dropdownItemSwitchDefaultAndroid: '移动App',
 
     // tooltip
     tooltipErrorLog: '错误日志',
@@ -34,6 +38,7 @@ export default {
     closeRight: '关闭右侧',
     closeOther: '关闭其它',
     closeAll: '关闭全部',
+    homeDesign: '门户设计',
   },
   setting: {
     // content mode
@@ -105,6 +110,7 @@ export default {
     fullContent: '全屏内容',
     grayMode: '灰色模式',
     colorWeak: '色弱模式',
+    aiIconSHow: 'Ai图标显示',
 
     progress: '顶部进度条',
     switchLoading: '切换loading',

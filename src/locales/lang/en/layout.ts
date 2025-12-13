@@ -8,7 +8,10 @@ export default {
     dropdownItemSwitchDepart: 'Switch Department',
     dropdownItemRefreshCache: 'Clean cache',
     dropdownItemSwitchAccount: 'Account Setting',
-    
+    dropdownItemSwitchDefaultHomePage: 'Switch Home Page',
+    dropdownItemSwitchDefaultWeb: 'Web Download',
+    dropdownItemSwitchDefaultAndroid: 'Android Apk Download',
+
     tooltipErrorLog: 'Error log',
     tooltipLock: 'Lock screen',
     tooltipNotify: 'Notification',
@@ -33,6 +36,7 @@ export default {
     closeRight: 'Close Right',
     closeOther: 'Close Other',
     closeAll: 'Close All',
+    homeDesign: 'Home Design',
   },
   setting: {
     // content mode

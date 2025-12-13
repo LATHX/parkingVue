@@ -24,9 +24,8 @@ export interface MenuSetting {
   mode: MenuModeEnum;
   type: MenuTypeEnum;
   theme: ThemeEnum;
-  // update-begin--author:liaozhiyang---date:20240408---for：【QQYUN-8922】左侧导航栏文字颜色调整区分彩色和暗黑
+  // 代码逻辑说明: 【QQYUN-8922】左侧导航栏文字颜色调整区分彩色和暗黑
   isThemeBright: boolean;
-  // update-end--author:liaozhiyang---date:20240408---for：【QQYUN-8922】左侧导航栏文字颜色调整区分彩色和暗黑
   topMenuAlign: 'start' | 'center' | 'end';
   trigger: TriggerEnum;
   accordion: boolean;
@@ -141,6 +140,7 @@ export interface ProjectConfig {
   closeMessageOnSwitch: boolean;
   // Whether to cancel the http request that has been sent but not responded when switching the interface.
   removeAllHttpPending: boolean;
+  aiIconShow: boolean;
 }
 
 export interface GlobConfig {
@@ -162,6 +162,10 @@ export interface GlobConfig {
   shortName: string;
   // 短标题
   shortTitle: string;
+  // 使用新任务弹窗
+  useNewTaskModal: boolean;
+  // 当前是否运行在 electron 平台
+  isElectronPlatform: boolean;
 
   // 【JEECG作为乾坤子应用】是否以乾坤子应用模式启动
   isQiankunMicro: boolean;
@@ -196,4 +200,8 @@ export interface GlobEnvConfig {
   VITE_GLOB_QIANKUN_MICRO_APP_NAME?: string;
   // 【JEECG作为乾坤子应用】作为乾坤子应用启动时必填，需与qiankun主应用注册子应用时填写的 entry 保持一致
   VITE_GLOB_QIANKUN_MICRO_APP_ENTRY?: string;
+  //在线文档编辑版本。可选属性：wps, onlyoffice
+  VITE_GLOB_ONLINE_DOCUMENT_VERSION?: string;
+  // 当前运行在什么平台
+  VITE_GLOB_RUN_PLATFORM?: 'web' | 'electron';
 }

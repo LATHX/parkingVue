@@ -2,7 +2,8 @@
   <div>
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <template #tableTitle>
-        <a-button preIcon="ant-design:user-add-outlined" type="primary" @click="handleAdd">新增</a-button>
+        <a-button preIcon="ant-design:plus-outlined" type="primary" @click="handleAdd">租户默认套餐
+        </a-button>
         <a-button
           v-if="selectedRowKeys.length > 0"
           preIcon="ant-design:delete-outlined"
@@ -11,6 +12,9 @@
           style="margin-right: 5px"
         >批量删除
         </a-button>
+        <span style="color: #666; font-size: 14px; margin-left: 12px; margin-top: 4px; display: inline-block;">
+          租户默认套餐是指新建租户时自动拥有的基础套餐，所有租户都将继承这些套餐权限
+        </span>
       </template>
       <template #action="{ record }">
         <TableAction :actions="getActions(record)" />
@@ -18,6 +22,7 @@
     </BasicTable>
     <!--  套餐包  -->
     <TenantPackMenuModal @register="registerPackMenuModal" @success="handleSuccess"/>
+    <PackPermissionDrawer @register="registerPackPermDrawer" @success="handleSuccess"/>
   </div>
 </template>
 <script lang="ts" name="tenant-default-pack" setup>
@@ -25,12 +30,14 @@
   import { BasicTable, TableAction } from '/@/components/Table';
   import { useModal } from '/@/components/Modal';
   import { deleteTenantPack, packList } from '../tenant.api';
-  import { packColumns, packFormSchema } from '../tenant.data';
+  import { defalutPackColumns, defaultPackFormSchema } from "../tenant.data";
   import TenantPackMenuModal from './TenantPackMenuModal.vue';
+  import PackPermissionDrawer from './PackPermissionDrawer.vue';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useListPage } from '/@/hooks/system/useListPage';
   import { useUserStore } from '/@/store/modules/user';
   import {Modal} from "ant-design-vue";
+  import {useDrawer} from "@/components/Drawer";
 
   const { createMessage } = useMessage();
   const [registerModal, { openModal }] = useModal();
@@ -42,9 +49,9 @@
     designScope: 'tenant-template',
     tableProps: {
       api: packList,
-      columns: packColumns,
+      columns: defalutPackColumns,
       formConfig: {
-        schemas: packFormSchema,
+        schemas: defaultPackFormSchema,
       },
       beforeFetch: (params) => {
         return Object.assign(params, { packType: 'default' });
@@ -52,6 +59,7 @@
     },
   });
   const [registerTable, { reload }, { rowSelection, selectedRowKeys, selectedRows }] = tableContext;
+  const [registerPackPermDrawer, { openDrawer: openPackPermDrawer }] = useDrawer();
 
   /**
    * 操作列定义
@@ -59,6 +67,10 @@
    */
   function getActions(record) {
     return [
+      {
+        label: '授权',
+        onClick: handleRolePrem.bind(null, record),
+      },
       {
         label: '编辑',
         onClick: handleEdit.bind(null, record),
@@ -135,6 +147,18 @@
       onOk: async () => {
         await deleteTenantPack({ ids: selectedRowKeys.value.join(',')}, handleSuccess);
       }
+    })
+  }
+
+  /**
+   * 授权
+   * 
+   * @param record
+   */
+  function handleRolePrem(record) {
+    openPackPermDrawer(true,{
+      packId: record.id,
+      permissionIds: record.permissionIds
     })
   }
 </script>

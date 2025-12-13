@@ -55,35 +55,35 @@
               {{ t('sys.login.registerButton') }}
             </Button> -->
     </FormItem>
-<!--    <ARow class="enter-x">-->
-<!--      <ACol :md="8" :xs="24">-->
-<!--        <Button block @click="setLoginState(LoginStateEnum.MOBILE)">-->
-<!--          {{ t('sys.login.mobileSignInFormTitle') }}-->
-<!--        </Button>-->
-<!--      </ACol>-->
-<!--      <ACol :md="8" :xs="24" class="!my-2 !md:my-0 xs:mx-0 md:mx-2">-->
-<!--        <Button block @click="setLoginState(LoginStateEnum.QR_CODE)">-->
-<!--          {{ t('sys.login.qrSignInFormTitle') }}-->
-<!--        </Button>-->
-<!--      </ACol>-->
-<!--      <ACol :md="7" :xs="24">-->
-<!--        <Button block @click="setLoginState(LoginStateEnum.REGISTER)">-->
-<!--          {{ t('sys.login.registerButton') }}-->
-<!--        </Button>-->
-<!--      </ACol>-->
-<!--    </ARow>-->
+    <ARow class="enter-x">
+      <ACol :md="8" :xs="24">
+        <Button block @click="setLoginState(LoginStateEnum.MOBILE)">
+          {{ t('sys.login.mobileSignInFormTitle') }}
+        </Button>
+      </ACol>
+      <ACol :md="8" :xs="24" class="!my-2 !md:my-0 xs:mx-0 md:mx-2">
+        <Button block @click="setLoginState(LoginStateEnum.QR_CODE)">
+          {{ t('sys.login.qrSignInFormTitle') }}
+        </Button>
+      </ACol>
+      <ACol :md="7" :xs="24">
+        <Button block @click="setLoginState(LoginStateEnum.REGISTER)">
+          {{ t('sys.login.registerButton') }}
+        </Button>
+      </ACol>
+    </ARow>
 
     <Divider class="enter-x">{{ t('sys.login.otherSignIn') }}</Divider>
 
-<!--    <div class="flex justify-evenly enter-x" :class="`${prefixCls}-sign-in-way`">-->
-<!--      <a @click="onThirdLogin('github')" title="github"><GithubFilled /></a>-->
-<!--      <a @click="onThirdLogin('wechat_enterprise')" title="企业微信"> <icon-font class="item-icon" type="icon-qiyeweixin3" /></a>-->
-<!--      <a @click="onThirdLogin('dingtalk')" title="钉钉"><DingtalkCircleFilled /></a>-->
-<!--      <a @click="onThirdLogin('wechat_open')" title="微信"><WechatFilled /></a>-->
-<!--    </div>-->
+    <div class="flex justify-evenly enter-x" :class="`${prefixCls}-sign-in-way`">
+      <a @click="onThirdLogin('github')" title="github"><GithubFilled /></a>
+      <a @click="onThirdLogin('wechat_enterprise')" title="企业微信"> <icon-font class="item-icon" type="icon-qiyeweixin3" /></a>
+      <a @click="onThirdLogin('dingtalk')" title="钉钉"><DingtalkCircleFilled /></a>
+      <a @click="onThirdLogin('wechat_open')" title="微信"><WechatFilled /></a>
+    </div>
   </Form>
   <!-- 第三方登录相关弹框 -->
-<!--  <ThirdModal ref="thirdModalRef"></ThirdModal>-->
+  <ThirdModal ref="thirdModalRef"></ThirdModal>
 </template>
 <script lang="ts" setup>
   import { reactive, ref, toRaw, unref, computed, onMounted } from 'vue';
@@ -99,7 +99,7 @@
   import { LoginStateEnum, useLoginState, useFormRules, useFormValid } from './useLogin';
   import { useDesign } from '/@/hooks/web/useDesign';
   import { getCodeInfo } from '/@/api/sys/user';
-  //import { onKeyStroke } from '@vueuse/core';
+  import {  encryptAESCBC } from '/@/utils/cipher';
 
   const ACol = Col;
   const ARow = Row;
@@ -143,9 +143,12 @@
     if (!data) return;
     try {
       loading.value = true;
+
+      // 密码使用AES加密传输
+      const encryptedPassword = encryptAESCBC(data.password);
       const { userInfo } = await userStore.login(
         toRaw({
-          password: data.password,
+          password: encryptedPassword,
           username: data.account,
           captcha: data.inputCode,
           checkKey: randCodeData.checkKey,
@@ -166,18 +169,13 @@
         duration: 3,
       });
       loading.value = false;
-
-      //update-begin-author:taoyan date:2022-5-3 for: issues/41 登录页面，当输入验证码错误时，验证码图片要刷新一下，而不是保持旧的验证码图片不变
       handleChangeCheckCode();
-      //update-end-author:taoyan date:2022-5-3 for: issues/41 登录页面，当输入验证码错误时，验证码图片要刷新一下，而不是保持旧的验证码图片不变
     }
   }
   function handleChangeCheckCode() {
     formData.inputCode = '';
-    //TODO 兼容mock和接口，暂时这样处理
-    //update-begin---author:chenrui ---date:2025/1/7  for：[QQYUN-10775]验证码可以复用 #7674------------
+    // 代码逻辑说明: [QQYUN-10775]验证码可以复用 #7674------------
     randCodeData.checkKey = new Date().getTime() + Math.random().toString(36).slice(-4); // 1629428467008;
-    //update-end---author:chenrui ---date:2025/1/7  for：[QQYUN-10775]验证码可以复用 #7674------------
     getCodeInfo(randCodeData.checkKey).then((res) => {
       randCodeData.randCodeImage = res;
       randCodeData.requestCodeSuccess = true;

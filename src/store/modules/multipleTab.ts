@@ -16,6 +16,7 @@ import { MULTIPLE_TABS_KEY } from '/@/enums/cacheEnum';
 import projectSetting from '/@/settings/projectSetting';
 import { useUserStore } from '/@/store/modules/user';
 import type { LocationQueryRaw, RouteParamsRaw } from 'vue-router';
+import { getMenus } from '/@/router/menus';
 
 export interface MultipleTabState {
   cacheTabList: Set<string>;
@@ -34,9 +35,8 @@ interface redirectPageParamType {
 
 function handleGotoPage(router: Router, path?) {
   const go = useGo(router);
-  // update-begin--author:liaozhiyang---date:20240605---for：【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
+  // 代码逻辑说明: 【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
   go(path || unref(router.currentRoute).path, true);
-  // update-end--author:liaozhiyang---date:20240605---for：【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
 }
 const getToTarget = (tabItem: RouteLocationNormalized) => {
   const { params, path, query } = tabItem;
@@ -65,6 +65,25 @@ const closeTabContainCurrentRoute = (router, pathList) => {
   }
   return false;
 };
+/**
+ * 2025-05-08
+ * liaozhiyang
+ * 【issues/8216】online生成的菜单sql 自动带上组件名称
+ * */
+function getMatchingRoute(menus, path) {
+  for (let i = 0, len = menus.length; i < len; i++) {
+    const item = menus[i];
+    if (item.path === path && !item.redirect && !item.paramPath) {
+      return item;
+    } else if (item.children?.length) {
+      const result = getMatchingRoute(item.children, path);
+      if (result) {
+        return result;
+      }
+    }
+  }
+  return null;
+}
 
 const cacheTab = projectSetting.multiTabsSetting.cache;
 
@@ -97,13 +116,25 @@ export const useMultipleTabStore = defineStore({
      */
     async updateCacheTab() {
       const cacheMap: Set<string> = new Set();
-
+      const allMenus = await getMenus();
       for (const tab of this.tabList) {
         const item = getRawRoute(tab);
         // Ignore the cache
         const needCache = !item.meta?.ignoreKeepAlive;
         if (!needCache) {
           continue;
+        }
+        // 代码逻辑说明: 【QQYUN-12348】online生成的菜单sql 自动带上组件名称
+        if (
+          ['OnlineAutoList', 'DefaultOnlineList', 'CgformErpList', 'OnlCgformInnerTableList', 'OnlCgformTabList', 'OnlCgReportList', 'GraphreportAutoChart', 'AutoDesformDataList'].includes(item.name as string) &&
+          allMenus?.length
+        ) {
+          const route = getMatchingRoute(allMenus, item.path);
+          if (route?.meta?.keepAlive) {
+            // 如果keepAlive为true，则添加到缓存中
+          } else {
+            continue;
+          }
         }
         const name = item.name as string;
         cacheMap.add(name);
@@ -124,6 +155,22 @@ export const useMultipleTabStore = defineStore({
         this.cacheTabList.delete(findTab);
       }
       const redo = useRedo(router);
+      await redo();
+    },
+    /**
+     * 修改设计模式
+     * changeDesign
+     */
+    async changeDesign(router: Router) {
+      const { currentRoute } = router;
+      const route = unref(currentRoute);
+      const name = route.name;
+
+      const findTab = this.getCachedTabList.find((item) => item === name);
+      if (findTab) {
+        this.cacheTabList.delete(findTab);
+      }
+      const redo = useRedo(router, { isDesign: true });
       await redo();
     },
     clearCacheTabs(): void {
@@ -153,7 +200,6 @@ export const useMultipleTabStore = defineStore({
 
     async addTab(route: RouteLocationNormalized) {
       const { path, name, fullPath, params, query, meta } = getRawRoute(route);
-      // update-begin--author:liaozhiyang---date:202401127---for：【issues/7500】vue-router4.5.0版本路由name:PageNotFound同名导致登录进不去
       // 404  The page does not need to add a tab
       if (
         path === PageEnum.ERROR_PAGE ||
@@ -163,7 +209,6 @@ export const useMultipleTabStore = defineStore({
       ) {
         return;
       }
-      // update-end--author:liaozhiyang---date:202401127---for：【issues/7500】vue-router4.5.0版本路由name:PageNotFound同名导致登录进不去
 
       let updateIndex = -1;
       // Existing pages, do not add tabs repeatedly
@@ -183,6 +228,13 @@ export const useMultipleTabStore = defineStore({
         curTab.fullPath = fullPath || curTab.fullPath;
         this.tabList.splice(updateIndex, 1, curTab);
       } else {
+        // 只比较path，忽略query
+        const findIndex = this.tabList.findIndex((tab) => tab.path === path);
+        const isTabExist = findIndex !== -1;
+        if (isTabExist) {
+          this.tabList.splice(findIndex, 1, route);
+          return;
+        }
         // Add tab
         // 获取动态路由打开数，超过 0 即代表需要控制打开数
         const dynamicLevel = meta?.dynamicLevel ?? -1;
@@ -299,19 +351,17 @@ export const useMultipleTabStore = defineStore({
             pathList.push(item.fullPath);
           }
         }
-        // update-begin--author:liaozhiyang---date:20240605---for：【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
+        // 代码逻辑说明: 【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
         isCloseCurrentTab = closeTabContainCurrentRoute(router, pathList);
-        // update-end--author:liaozhiyang---date:20240605---for：【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
         this.bulkCloseTabs(pathList);
       }
       this.updateCacheTab();
-      // update-begin--author:liaozhiyang---date:20240605---for：【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
+      // 代码逻辑说明: 【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
       if (isCloseCurrentTab) {
         handleGotoPage(router, route.path);
       } else {
         handleGotoPage(router);
       }
-      // update-end--author:liaozhiyang---date:20240605---for：【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
     },
 
     // Close the tab on the left and jump
@@ -328,19 +378,17 @@ export const useMultipleTabStore = defineStore({
             pathList.push(item.fullPath);
           }
         }
-        // update-begin--author:liaozhiyang---date:20240605---for：【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
+        // 代码逻辑说明: 【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
         isCloseCurrentTab = closeTabContainCurrentRoute(router, pathList);
-        // update-end--author:liaozhiyang---date:20240605---for：【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
         this.bulkCloseTabs(pathList);
       }
       this.updateCacheTab();
-      // update-begin--author:liaozhiyang---date:20240605---for：【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
+      // 代码逻辑说明: 【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
       if (isCloseCurrentTab) {
         handleGotoPage(router, route.path);
       } else {
         handleGotoPage(router);
       }
-      // update-end--author:liaozhiyang---date:20240605---for：【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
     },
 
     async closeAllTab(router: Router) {
@@ -348,7 +396,7 @@ export const useMultipleTabStore = defineStore({
       this.clearCacheTabs();
       this.goToPage(router);
     },
-    
+
 
     /**
      * Close other tabs
@@ -373,13 +421,12 @@ export const useMultipleTabStore = defineStore({
       isCloseCurrentTab = closeTabContainCurrentRoute(router, pathList);
       this.bulkCloseTabs(pathList);
       this.updateCacheTab();
-      // update-begin--author:liaozhiyang---date:20240605---for：【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
+      // 代码逻辑说明: 【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
       if (isCloseCurrentTab) {
         handleGotoPage(router, route.path);
       } else {
         handleGotoPage(router);
       }
-      // update-end--author:liaozhiyang---date:20240605---for：【TV360X-732】非当前页右键关闭左侧、关闭右侧、关闭其它功能正常使用
     },
 
     /**
@@ -412,6 +459,9 @@ export const useMultipleTabStore = defineStore({
     },
     setRedirectPageParam(data) {
       this.redirectPageParam = data;
+    },
+    getRedirectPageParam() {
+      return this.redirectPageParam;
     },
   },
 });

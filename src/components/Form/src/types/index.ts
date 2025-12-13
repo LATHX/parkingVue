@@ -106,6 +106,7 @@ export type ComponentType =
   | 'WeekPicker'
   | 'TimePicker'
   | 'DatePickerInFilter'
+  | 'JDatePickerMultiple'
   | 'Switch'
   | 'StrengthMeter'
   | 'Upload'
@@ -121,6 +122,7 @@ export type ComponentType =
   | 'JImageUpload'
   | 'JDictSelectTag'
   | 'JSelectDept'
+  | 'JSelectDepartPost'
   | 'JAreaSelect'
   | 'JEditor'
   | 'JMarkdownEditor'
@@ -139,6 +141,7 @@ export type ComponentType =
   | 'JTreeSelect'
   | 'JEllipsis'
   | 'JSelectUserByDept'
+  | 'JSelectUserByDeptPost'
   | 'JSelectUserByDepartment'
   | 'JUpload'
   | 'JSearchSelect'
@@ -157,5 +160,6 @@ export type ComponentType =
   | 'linkRecordSelect'
   | 'RangeTime'
   | 'JRangeNumber'
+  | 'JLinkTableCard'
   | 'JInputSelect';
-  
+

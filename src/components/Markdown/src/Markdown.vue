@@ -13,6 +13,7 @@
   import { getTenantId, getToken } from '/@/utils/auth';
   import { getFileAccessHttpUrl } from '/@/utils/common/compUtils';
   import { uploadFile } from '@/api/common/api';
+  import {$electron} from "@/electron";
 
   type Lang = 'zh_CN' | 'en_US' | 'ja_JP' | 'ko_KR' | undefined;
 
@@ -77,7 +78,7 @@
         }
         return lang;
       });
-      //update-begin-author:taoyan date:2022-5-24 for: VUEN-1090 markdown 无法上传
+      // 代码逻辑说明: VUEN-1090 markdown 无法上传
       const uploadUrl = `${window._CONFIG['domianURL']}/sys/common/upload`;
       const token = getToken();
       const tenantId = getTenantId() ? getTenantId() : '0';
@@ -105,15 +106,21 @@
         }
         return JSON.stringify(result);
       }
-      //update-end-author:taoyan date:2022-5-24 for: VUEN-1090 markdown 无法上传
       function init() {
         const wrapEl = unref(wrapRef) as HTMLElement;
         if (!wrapEl) return;
+
+        // vditor组件本地化的路径配置【QQYUN-12053】
+        let localCdn = '/resource/vditor@3.9.4';
+        if ($electron.isElectron()) {
+          localCdn = '.' + localCdn;
+        }
+
         const bindValue = { ...attrs, ...props };
         const insEditor = new Vditor(wrapEl, {
           theme: getDarkMode.value === 'dark' ? 'dark' : 'classic',
           lang: unref(getCurrentLang),
-          // update-begin--author:liaozhiyang---date:20240520---for：【TV360X-146】Markdown组件去掉录音选项
+          // 代码逻辑说明: 【TV360X-146】Markdown组件去掉录音选项
           toolbar: [
             'emoji',
             'headings',
@@ -149,17 +156,16 @@
               toolbar: ['both', 'code-theme', 'content-theme', 'export', 'outline', 'preview', 'devtools', 'info', 'help'],
             },
           ],
-          // update-end--author:liaozhiyang---date:20240520---for：【TV360X-146】Markdown组件去掉录音选项
           mode: 'sv',
-          // cdn: 'https://cdn.jsdelivr.net/npm/vditor@3.9.6',
-          cdn: 'https://unpkg.com/vditor@3.10.1',
+          cdn: 'https://unpkg.com/vditor@3.10.8',
+          //cdn: localCdn,
           fullscreen: {
             index: 520,
           },
           preview: {
             actions: [],
           },
-          //update-begin-author:taoyan date:2022-5-24 for: VUEN-1090 markdown 无法上传
+          // 代码逻辑说明: VUEN-1090 markdown 无法上传
           upload: {
             accept: 'image/*',
             //url: uploadUrl,
@@ -192,7 +198,6 @@
               }
             },
           },
-          //update-end-author:taoyan date:2022-5-24 for: VUEN-1090 markdown 无法上传
           input: (v) => {
             valueRef.value = v;
             emit('update:value', v);
@@ -243,9 +248,8 @@
   });
 </script>
 <style lang="less" scoped>
-  // update-begin--author:liaozhiyang---date:20240527---for：【TV360X-318】解决markdown控件禁用状态放大按钮还可以点击
+  // 代码逻辑说明: 【TV360X-318】解决markdown控件禁用状态放大按钮还可以点击
   :deep(.vditor-menu--disabled) {
     pointer-events: none;
   }
-  // update-end--author:liaozhiyang---date:20240527---for：【TV360X-318】解决markdown控件禁用状态放大按钮还可以点击
 </style>

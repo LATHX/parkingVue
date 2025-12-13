@@ -2,7 +2,27 @@
   <div class="chatWrap">
     <div class="content">
       <div class="header-title" v-if="type === 'view' && headerTitle">
-        {{headerTitle}}
+        <div class="title-content">
+          <span>{{headerTitle}}</span>
+          <a-button 
+            v-if="hasExtraFlowInputs" 
+            type="text" 
+            class="edit-btn" 
+            @click="handleEditSettings"
+            title="参数设置"
+          >
+            <Icon icon="ant-design:setting-outlined" :size="16" />
+          </a-button>
+        </div>
+        <div class="header-actions">
+          <div v-if="showAdvertising" class="header-advertisint">
+            AI客服由
+            <a style="color: #4183c4;margin-left: 2px;margin-right: 2px" href="https://www.qiaoqiaoyun.com/aiCustomerService" target="_blank">
+              敲敲云
+            </a>
+            提供
+          </div>
+        </div>
       </div>
       <div class="main">
         <div id="scrollRef" ref="scrollRef" class="scrollArea">
@@ -19,6 +39,10 @@
                 :appData="appData"
                 :presetQuestion="item.presetQuestion"
                 :images = "item.images"
+                :retrievalText="item.retrievalText"
+                :referenceKnowledge="item.referenceKnowledge"
+                :eventType="item.eventType"
+                :showAvatar="item.showAvatar"
                 @send="handleOutQuestion"
               ></chatMessage>
             </div>
@@ -27,7 +51,7 @@
       </div>
       <div class="footer">
         <div class="topArea">
-          <presetQuestion @outQuestion="handleOutQuestion" :quickCommandData="quickCommandData"></presetQuestion>
+          <presetQuestion @out-question="handleOutQuestion" :quickCommandData="quickCommandData"></presetQuestion>
         </div>
         <div class="bottomArea">
           <a-button type="text" class="delBtn" @click="handleDelSession()">
@@ -45,7 +69,7 @@
                 d="M816.872727 158.254545h-181.527272V139.636364c0-39.563636-30.254545-69.818182-69.818182-69.818182h-107.054546c-39.563636 0-69.818182 30.254545-69.818182 69.818182v18.618181H207.127273c-48.872727 0-90.763636 41.890909-90.763637 93.09091s41.890909 90.763636 90.763637 90.763636h609.745454c51.2 0 90.763636-41.890909 90.763637-90.763636 0-51.2-41.890909-93.090909-90.763637-93.09091zM435.2 139.636364c0-13.963636 9.309091-23.272727 23.272727-23.272728h107.054546c13.963636 0 23.272727 9.309091 23.272727 23.272728v18.618181h-153.6V139.636364z m381.672727 155.927272H207.127273c-25.6 0-44.218182-20.945455-44.218182-44.218181 0-25.6 20.945455-44.218182 44.218182-44.218182h609.745454c25.6 0 44.218182 20.945455 44.218182 44.218182 0 23.272727-20.945455 44.218182-44.218182 44.218181zM835.490909 407.272727h-121.018182c-13.963636 0-23.272727 9.309091-23.272727 23.272728s9.309091 23.272727 23.272727 23.272727h97.745455V837.818182c0 39.563636-30.254545 69.818182-69.818182 69.818182h-37.236364V602.763636c0-13.963636-9.309091-23.272727-23.272727-23.272727s-23.272727 9.309091-23.272727 23.272727V907.636364h-118.690909V602.763636c0-13.963636-9.309091-23.272727-23.272728-23.272727s-23.272727 9.309091-23.272727 23.272727V907.636364H372.363636V602.763636c0-13.963636-9.309091-23.272727-23.272727-23.272727s-23.272727 9.309091-23.272727 23.272727V907.636364h-34.909091c-39.563636 0-69.818182-30.254545-69.818182-69.818182V453.818182H558.545455c13.963636 0 23.272727-9.309091 23.272727-23.272727s-9.309091-23.272727-23.272727-23.272728H197.818182c-13.963636 0-23.272727 9.309091-23.272727 23.272728V837.818182c0 65.163636 51.2 116.363636 116.363636 116.363636h451.490909c65.163636 0 116.363636-51.2 116.363636-116.363636V430.545455c0-13.963636-11.636364-23.272727-23.272727-23.272728z"
                 fill="currentColor"
                 p-id="1585"
-              ></path>
+              />
             </svg>
           </a-button>
           <a-button v-if="type === 'view'" type="text" class="contextBtn" :class="[usingContext && 'enabled']" @click="handleUsingContext">
@@ -62,7 +86,7 @@
               <path
                 fill="currentColor"
                 d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10a9.956 9.956 0 0 1-4.708-1.175L2 22l1.176-5.29A9.956 9.956 0 0 1 2 12C2 6.477 6.477 2 12 2m0 2a8 8 0 0 0-8 8c0 1.335.326 2.618.94 3.766l.35.654l-.656 2.946l2.948-.654l.653.349A7.955 7.955 0 0 0 12 20a8 8 0 1 0 0-16m1 3v5h4v2h-6V7z"
-              ></path>
+              />
             </svg>
           </a-button>
           <div class="chat-textarea" :class="textareaActive?'textarea-active':''">
@@ -80,12 +104,13 @@
                   v-model:value="prompt"
                   :autoSize="{ minRows: 1, maxRows: 6 }"
                   :placeholder="placeholder"
-                  @pressEnter="handleEnter"
+                  @press-enter="handleEnter"
                   @focus="textareaActive = true"
                   @blur="textareaActive = false"
                   autofocus
                   :readonly="loading"
                   style="border-color: #ffffff !important;box-shadow:none"
+                  @paste="paste"
               >
               </a-textarea>
               <a-button v-if="loading" type="primary" danger @click="handleStopChat" class="stopBtn">
@@ -103,10 +128,20 @@
                       d="M512 967.111111c-250.311111 0-455.111111-204.8-455.111111-455.111111s204.8-455.111111 455.111111-455.111111 455.111111 204.8 455.111111 455.111111-204.8 455.111111-455.111111 455.111111z m0-56.888889c221.866667 0 398.222222-176.355556 398.222222-398.222222s-176.355556-398.222222-398.222222-398.222222-398.222222 176.355556-398.222222 398.222222 176.355556 398.222222 398.222222 398.222222z"
                       fill="currentColor"
                       p-id="5215"
-                  ></path>
-                  <path d="M341.333333 341.333333h341.333334v341.333334H341.333333z" fill="currentColor" p-id="5216"></path>
+                  />
+                  <path d="M341.333333 341.333333h341.333334v341.333334H341.333333z" fill="currentColor" p-id="5216"/>
                 </svg>
               </a-button>
+              <a-tooltip v-if="!loading && showWebSearch" :title="enableSearch ? '关闭联网搜索' : '开启联网搜索'">
+                <a-button 
+                  class="sendBtn webSearchBtn" 
+                  type="text"
+                  :class="{'enabled': enableSearch}"
+                  @click="toggleWebSearch"
+                >
+                  <Icon icon="ant-design:global-outlined" :style="enableSearch ? {color: '#52c41a'} : {color: '#3d4353'}"></Icon>
+                </a-button>
+              </a-tooltip>
               <a-upload
                   accept=".jpg,.jpeg,.png"
                   v-if="!loading"
@@ -122,7 +157,7 @@
               >
                 <a-tooltip title="图片上传，支持jpg/jpeg/png">
                   <a-button class="sendBtn" type="text">
-                    <Icon icon="ant-design:picture-outlined" style="color: rgba(15,21,40,0.8)"></Icon>
+                    <Icon icon="ant-design:picture-outlined" style="color: #3d4353"></Icon>
                   </a-button>
                 </a-tooltip>
               </a-upload>
@@ -152,7 +187,7 @@
                       d="M865.28 202.5472c-17.1008-15.2576-41.0624-19.6608-62.5664-11.5712L177.7664 427.1104c-23.2448 8.8064-38.5024 29.696-39.6288 54.5792-1.1264 24.8832 11.9808 47.104 34.4064 58.0608l97.5872 47.7184c4.5056 2.2528 8.0896 6.0416 9.9328 10.6496l65.4336 161.1776c7.7824 19.1488 24.4736 32.9728 44.7488 37.0688 20.2752 4.096 41.0624-2.1504 55.6032-16.7936l36.352-36.352c6.4512-6.4512 16.5888-7.8848 24.576-3.3792l156.5696 88.8832c9.4208 5.3248 19.8656 8.0896 30.3104 8.0896 8.192 0 16.4864-1.6384 24.2688-5.0176 17.8176-7.68 30.72-22.8352 35.4304-41.6768l130.7648-527.1552c5.5296-22.016-1.7408-45.2608-18.8416-60.416z m-20.8896 50.7904L713.5232 780.4928c-1.536 6.2464-5.8368 11.3664-11.776 13.9264s-12.5952 2.1504-18.2272-1.024L526.9504 704.512c-9.4208-5.3248-19.8656-7.9872-30.208-7.9872-15.9744 0-31.744 6.144-43.52 17.92l-36.352 36.352c-3.8912 3.8912-8.9088 5.9392-14.2336 6.0416l55.6032-152.1664c0.512-1.3312 1.2288-2.56 2.2528-3.6864l240.3328-246.1696c8.2944-8.4992-2.048-21.9136-12.3904-16.0768L301.6704 559.8208c-4.096-3.584-8.704-6.656-13.6192-9.1136L190.464 502.9888c-11.264-5.5296-11.5712-16.1792-11.4688-19.3536 0.1024-3.1744 1.536-13.824 13.2096-18.2272L817.152 229.2736c10.4448-3.9936 18.0224 1.3312 20.8896 3.8912 2.8672 2.4576 9.0112 9.3184 6.3488 20.1728z"
                       p-id="4238"
                       fill="currentColor"
-                  ></path>
+                  />
                 </svg>
               </a-button>
             </div>
@@ -165,7 +200,7 @@
 
 <script setup lang="ts">
   import { Ref, watch } from 'vue';
-  import { computed, ref, createVNode, onUnmounted, onMounted } from 'vue';
+  import { computed, ref, createVNode, onUnmounted, onMounted, nextTick } from 'vue';
   import { useScroll } from './js/useScroll';
   import chatMessage from './chatMessage.vue';
   import presetQuestion from './presetQuestion.vue';
@@ -178,21 +213,23 @@
   import { defHttp } from '@/utils/http/axios';
   import { cloneDeep } from "lodash-es";
   import {getFileAccessHttpUrl, getHeaders} from "@/utils/common/compUtils";
-  import { uploadUrl } from '/@/api/common/api';
   import { createImgPreview } from "@/components/Preview";
-  
+  import { useAppInject } from "@/hooks/web/useAppInject";
+  import { useGlobSetting } from "@/hooks/setting";
+  import { Icon } from '/@/components/Icon';
+
   message.config({
     prefixCls: 'ai-chat-message',
   });
-  
-  const props = defineProps(['uuid', 'prologue', 'formState', 'url', 'type','historyData','chatTitle','presetQuestion','quickCommandData']);
-  const emit = defineEmits(['save','reload-message-title']);
+
+  const props = defineProps(['uuid', 'prologue', 'formState', 'url', 'type','historyData','chatTitle','presetQuestion','quickCommandData','showAdvertising','hasExtraFlowInputs','conversationSettings']);
+  const emit = defineEmits(['save','reload-message-title','edit-settings']);
   const { scrollRef, scrollToBottom } = useScroll();
   const prompt = ref<string>('');
   const loading = ref<boolean>(false);
   const inputRef = ref<Ref | null>(null);
   const headerTitle = ref<string>(props.chatTitle);
-  
+
   //聊天数据
   const chatData = ref<any>([]);
   //应用数据
@@ -202,15 +239,34 @@
   const topicId = ref<string>('');
   //请求id
   const requestId = ref<string>('');
+  const { getIsMobile } = useAppInject();
   const conversationList = computed(() => chatData.value.filter((item) => item.inversion != 'user' && !!item.conversationOptions));
   const placeholder = computed(() => {
-    return '来说点什么吧...（Shift + Enter = 换行）';
+    if(getIsMobile.value){
+      return '来说点什么吧...'
+    } else {
+      return '来说点什么吧...（Shift + Enter = 换行）';
+    }
   });
   //token
   const headers = getHeaders();
   //文本域点击事件
   const textareaActive = ref<boolean>(false);
 
+  const globSetting = useGlobSetting();
+  const baseUploadUrl = globSetting.uploadUrl;
+  const uploadUrl = ref<string>(`${baseUploadUrl}/airag/chat/upload`);
+  //是否为断线重连
+  const isReConnect = ref<boolean>(false);
+  //是否存在思考过程
+  const isThinking = ref<boolean>(false);
+  //是否开启网络搜索
+  const enableSearch = ref<boolean>(false);
+  //是否显示网络搜索按钮（只有千问模型支持）
+  const showWebSearch = ref<boolean>(false);
+  //模型provider信息
+  const modelProvider = ref<string>('');
+  
   function handleEnter(event: KeyboardEvent) {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
@@ -218,15 +274,15 @@
     }
   }
   function handleSubmit() {
-    let message = prompt.value;
-    if (!message || message.trim() === '') return;
+    let userMessage = prompt.value;
+    if (!userMessage || userMessage.trim() === '') return;
     prompt.value = '';
-    onConversation(message);
+    onConversation(userMessage);
   }
-  const handleOutQuestion = (message) => {
-    onConversation(message);
+  const handleOutQuestion = (userMessage) => {
+    onConversation(userMessage);
   };
-  async function onConversation(message) {
+  async function onConversation(userMessage) {
     if(!props.type && props.type != 'view'){
       if(appData.value.type && appData.value.type == 'chatSimple' && !appData.value.modelId) {
         messageTip("请选择AI模型");
@@ -241,17 +297,30 @@
         return;
       }
     }
+    
+    // 检查是否需要设置额外参数
+    if (props.hasExtraFlowInputs) {
+      // 检查是否已设置
+      if (!props.conversationSettings || Object.keys(props.conversationSettings).length === 0) {
+        // 弹出设置弹窗，阻止发送
+        message.warning('请先设置对话参数');
+        emit('edit-settings');
+        return;
+      }
+    }
+    
     if (loading.value) return;
     loading.value = true;
 
     addChat(uuid.value, {
       dateTime: new Date().toLocaleString(),
-      content: message,
+      content: userMessage,
       images:uploadUrlList.value?uploadUrlList.value:[],
       inversion: 'user',
       error: false,
       conversationOptions: null,
-      requestOptions: { prompt: message, options: null },
+      requestOptions: { prompt: userMessage, options: null },
+      eventType: 'message',
     });
     scrollToBottom();
 
@@ -268,13 +337,15 @@
       inversion: 'ai',
       error: false,
       conversationOptions: null,
-      requestOptions: { prompt: message, options: { ...options } },
+      requestOptions: { prompt: userMessage, options: { ...options } },
+      referenceKnowledge: [],
+      eventType: 'message',
     });
 
     scrollToBottom();
 
     //发送消息
-    sendMessage(message,options);
+    sendMessage(userMessage,options);
   }
 
   onUnmounted(() => {
@@ -285,6 +356,10 @@
     chatData.value.push({ ...data });
   };
   const updateChat = async (uuid, index, data) => {
+    let lastChatData = chatData.value[index];
+    if(lastChatData.showAvatar){
+      data.showAvatar = lastChatData.showAvatar;
+    }
     chatData.value.splice(index, 1, data);
     await scrollToBottom();
   };
@@ -318,10 +393,11 @@
       dateTime: new Date().toLocaleString(),
       content: data,
       inversion: 'ai',
-      error: false,
+      error: true,
       loading: true,
       conversationOptions: null,
       requestOptions: null,
+      eventType: "message",
     });
     scrollToBottom();
   };
@@ -370,19 +446,30 @@
 
   handleStop();
 
+  const knowList = ref<Recordable[]>([])
+
   /**
    * 停止消息
    */
   function handleStopChat() {
-    if(requestId.value){
-      //调用后端接口停止响应
-      defHttp.get({
-        url: '/airag/chat/stop/' + requestId.value,
-      },{ isTransformResponse: false });
+    //update-begin---author:wangshuai---date:2025-06-03---for:【issues/8338】AI应用聊天回复stop无效，仍会继续输出回复---
+    const currentRequestId = requestId.value
+    if(currentRequestId){
+      try{
+        //调用后端接口停止响应
+        defHttp.get({
+          url: '/airag/chat/stop/' + currentRequestId,
+        },{ isTransformResponse: false });
+      } finally {
+        handleStop();
+        localStorage.removeItem('chat_requestId_' + uuid.value);
+      }
+      //update-end---author:wangshuai---date:2025-06-03---for:【issues/8338】AI应用聊天回复stop无效，仍会继续输出回复---
+    } else {
+      localStorage.removeItem('chat_requestId_' + uuid.value);
     }
-    handleStop();
   }
-  
+
   /**
    * 读取文本
    * @param message
@@ -397,6 +484,10 @@
         topicId: topicId.value,
         app: appData.value,
         responseMode: 'streaming',
+        // 添加对话设置参数（调试模式也需要）
+        flowInputs: props.conversationSettings || {},
+        // 添加网络搜索参数
+        enableSearch: enableSearch.value
       };
     }else{
       param = {
@@ -405,19 +496,24 @@
         images: uploadUrlList.value?uploadUrlList.value:[],
         appId: appData.value.id,
         responseMode: 'streaming',
-        conversationId: uuid.value === "1002"?'':uuid.value
+        conversationId: uuid.value === "1002"?'':uuid.value,
+        // 添加对话设置参数
+        flowInputs: props.conversationSettings || {},
+        // 添加网络搜索参数
+        enableSearch: enableSearch.value
       };
 
       if(headerTitle.value == '新建聊天'){
-        headerTitle.value = message.length>5?message.substring(0,5):message
+        headerTitle.value = message.length>10?truncateString(message,10):message
       }
 
-      emit("reload-message-title",message.length>5?message.substring(0,5):message)
+      emit("reload-message-title",message.length>10?truncateString(message,10):message)
     }
 
     uploadUrlList.value = [];
     fileInfoList.value = [];
-    
+    knowList.value = [];
+    options.message = message;
     const readableStream = await defHttp.post(
       {
         url: props.url,
@@ -430,70 +526,20 @@
         isTransformResponse: false,
       }
     ).catch((e)=>{
-      updateChatFail(uuid, chatData.value.length - 1, "服务器错误，请稍后重试！");
-      handleStop();
-      return;
+      //update-begin---author:wangshuai---date:2025-04-28---for:【QQYUN-12297】【AI】聊天，超时以后提示---
+      if(e.code === 'ETIMEDOUT'){
+        updateChatFail(uuid, chatData.value.length - 1, "当前用户较多，排队中，请稍候再次重试！");
+        handleStop();
+        return;
+      }else{
+        updateChatFail(uuid, chatData.value.length - 1, "服务器错误，请稍后重试！");
+        handleStop();
+        return;
+      }
+      console.error(e)
+      //update-end---author:wangshuai---date:2025-04-28---for:【QQYUN-12297】【AI】聊天，超时以后提示---
     });
-    const reader = readableStream.getReader();
-    const decoder = new TextDecoder('UTF-8');
-    let conversationId = '';
-    let buffer = '';
-    let text = ''; // 按 SSE 协议分割消息
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        break;
-      }
-      //update-begin---author:wangshuai---date:2025-03-12---for:【QQYUN-11555】聊天时要流式显示消息---
-      let result = decoder.decode(value, { stream: true });
-      result = buffer + result;
-      const lines = result.split('\n\n');
-      for (const line of lines) {
-        if (line.startsWith('data:')) {
-          const content = line.replace('data:', '').trim();
-          if(!content){
-            continue;
-          }
-          if(!content.endsWith('}')){
-            buffer = buffer + line;
-            continue;
-          }
-          buffer = "";
-          try {
-            //update-begin---author:wangshuai---date:2025-03-13---for:【QQYUN-11572】发布到线上不能实时动态，内容不能加载出来，得刷新才能看到全部回答---
-            let parse = JSON.parse(content);
-            await renderText(parse,conversationId,text,options).then((res)=>{
-              text = res.returnText;
-              conversationId = res.conversationId;
-            });
-            //update-end---author:wangshuai---date:2025-03-13---for:【QQYUN-11572】发布到线上不能实时动态，内容不能加载出来，得刷新才能看到全部回答---
-          } catch (error) {
-            console.log('Error parsing update:', error);
-          }
-          //update-end---author:wangshuai---date:2025-03-12---for:【QQYUN-11555】聊天时要流式显示消息---
-        }else{
-          if(!line){
-            continue;
-          }
-          if(!line.endsWith('}')){
-            buffer = buffer + line;
-            continue;
-          }
-          buffer = "";
-          //update-begin---author:wangshuai---date:2025-03-13---for:【QQYUN-11572】发布到线上不能实时动态，内容不能加载出来，得刷新才能看到全部回答---
-          try {
-            let parse = JSON.parse(line);
-            await renderText(parse, conversationId, text, options).then((res) => {
-              text = res.returnText;
-              conversationId = res.conversationId;
-            });
-          }catch (error) {
-            console.log('Error parsing update:', error);
-          }
-          //update-end---author:wangshuai---date:2025-03-13---for:【QQYUN-11572】发布到线上不能实时动态，内容不能加载出来，得刷新才能看到全部回答---
-        }
-      }
-    }
+    await renderChatByResult(readableStream,options);
   }
   // 是否使用上下文
   const handleUsingContext = () => {
@@ -522,31 +568,74 @@
    */
   async function renderText(item,conversationId,text,options) {
     let returnText = "";
-    if (item.event == 'MESSAGE') {
-      text = text + item.data.message;
-      returnText = text;
+    if (item.event == 'MESSAGE' || item.event == 'THINKING' || item.event == 'THINKING_END') {
+      let message = item.data.message;
+      let messageText = "";
+      //update-begin---author:wangshuai---date:2025-04-24---for:应该先判断是否包含card---
+      if(message && message.indexOf("::card::") !== -1){
+        messageText = message;
+      } else {
+        text = text + item.data.message;
+        messageText = text;
+        returnText = text;
+      }
+      //update-end---author:wangshuai---date:2025-04-24---for:应该先判断是否包含card---
+      // 从消息中获取 requestId
+      if (item.requestId) {
+        requestId.value = item.requestId;
+      }
+      if(item.event == 'THINKING'){
+        isThinking.value = true;
+      }
+      if(item.event == 'MESSAGE' && isThinking.value){
+        text = item.data.message;
+        returnText = item.data.message;
+        //发送用户消息
+        addChat(uuid.value, {
+          dateTime: new Date().toLocaleString(),
+          content: item.data.message,
+          images:uploadUrlList.value?uploadUrlList.value:[],
+          inversion: 'ai',
+          error: false,
+          conversationOptions: null,
+          requestOptions: { prompt: message, options: null },
+          eventType: 'message',
+          showAvatar: 'no'
+        });
+        isThinking.value = false;
+        return { returnText, conversationId };
+      }
       //更新聊天信息
       updateChat(uuid.value, chatData.value.length - 1, {
         dateTime: new Date().toLocaleString(),
-        content: text,
+        content: messageText,
         inversion: 'ai',
         error: false,
-        loading: true,
+        loading: item.event == 'THINKING_END' ? false: true,
         conversationOptions: { conversationId: conversationId, parentMessageId: topicId.value },
         requestOptions: { prompt: message, options: { ...options } },
+        referenceKnowledge: knowList.value,
+        eventType: item.event.toLowerCase(),
       });
+    }
+    if(item.event == 'INIT_REQUEST_ID'){
+      if (item.requestId && props.url != "/airag/app/debug") {
+        requestId.value = item.requestId;
+        localStorage.setItem('chat_requestId_' + uuid.value, JSON.stringify({ requestId: item.requestId, message: options.message }));
+      }
     }
     if (item.event == 'MESSAGE_END') {
       topicId.value = item.topicId;
       conversationId = item.conversationId;
       uuid.value = item.conversationId;
-      requestId.value = item.requestId;
+      localStorage.removeItem('chat_requestId_' + uuid.value);
       handleStop();
     }
     if (item.event == 'FLOW_FINISHED') {
       //update-begin---author:wangshuai---date:2025-03-07---for:【QQYUN-11457】聊天调用流程，执行失败了但是没提示---
       if(item.data && !item.data.success){
         updateChatFail(uuid, chatData.value.length - 1, item.data.message?item.data.message:'请求出错，请稍后重试！');
+        localStorage.removeItem('chat_requestId_' + uuid.value);
         handleStop();
         return "";
       }
@@ -555,51 +644,73 @@
       conversationId = item.conversationId;
       uuid.value = item.conversationId;
       requestId.value = item.requestId;
+      localStorage.removeItem('chat_requestId_' + uuid.value);
       handleStop();
     }
     if (item.event == 'ERROR') {
       updateChatFail(uuid, chatData.value.length - 1, item.data.message?item.data.message:'请求出错，请稍后重试！');
+      localStorage.removeItem('chat_requestId_' + uuid.value);
       handleStop();
       return "";
     }
 
     //update-begin---author:wangshuai---date:2025-03-21---for:【QQYUN-11495】【AI】实时展示当前思考进度---
     if(item.event === "NODE_STARTED"){
-      let aiText = "";
-      if(item.data.type === 'llm'){
-        aiText = "正在构建响应内容";
+      if(!item.data || item.data.type !== 'end'){
+        let aiText = "";
+        if(item.data.type === 'llm'){
+          aiText = "正在构建响应内容";
+        }
+        if(item.data.type === 'knowledge'){
+          aiText = "正在对知识库进行深度检索";
+        }
+        if(item.data.type === 'classifier'){
+          aiText = "正在分类";
+        }
+        if(item.data.type === 'code'){
+          aiText = "正在实施代码运行操作";
+        }
+        if(item.data.type === 'subflow'){
+          aiText = "正在运行子流程";
+        }
+        if(item.data.type === 'enhanceJava'){
+          aiText = "正在执行java增强";
+        }
+        if(item.data.type === 'http'){
+          aiText = "正在发送http请求";
+        }
+        if(!text){
+          //更新聊天信息
+          updateChat(uuid.value, chatData.value.length - 1, {
+            dateTime: new Date().toLocaleString(),
+            retrievalText: aiText,
+            text:"",
+            inversion: 'ai',
+            error: false,
+            loading: true,
+            conversationOptions: null,
+            requestOptions: { prompt: message, options: { ...options } },
+            referenceKnowledge: knowList.value,
+            eventType: 'message',
+          });
+        }
       }
-      if(item.data.type === 'knowledge'){
-        aiText = "正在对知识库进行深度检索";
-      }
-      if(item.data.type === 'classifier'){
-        aiText = "正在分类";
-      }
-      if(item.data.type === 'code'){
-        aiText = "正在实施代码运行操作";
-      }
-      if(item.data.type === 'subflow'){
-        aiText = "正在运行子流程";
-      }
-      if(item.data.type === 'enhanceJava'){
-        aiText = "正在执行java增强";
-      }
-      if(item.data.type === 'http'){
-        aiText = "正在发送http请求";
-      }
-      //更新聊天信息
-      updateChat(uuid.value, chatData.value.length - 1, {
-        dateTime: new Date().toLocaleString(),
-        content: aiText,
-        inversion: 'ai',
-        error: false,
-        loading: true,
-        conversationOptions: null,
-        requestOptions: { prompt: message, options: { ...options } },
-      });
     }
     //update-end---author:wangshuai---date:2025-03-21---for:【QQYUN-11495】【AI】实时展示当前思考进度---
-    
+    else if (item.event === 'NODE_FINISHED') {
+      if(!item.data || item.data.type !== 'end'){
+        if(item.data.type === 'knowledge'){
+          const id = item.data.id;
+          const data = item.data.outputs[id + ".documents"]
+          knowList.value = data
+          //更新聊天信息
+          updateChatSome(uuid.value, chatData.value.length - 1, {referenceKnowledge: knowList.value})
+        }
+      }
+    }
+    if(!returnText){
+      returnText = text;
+    }
     return { returnText, conversationId };
   }
 
@@ -607,7 +718,7 @@
   const uploadUrlList = ref<any>([]);
   //文件集合
   const fileInfoList = ref<any>([]);
-  
+
   /**
    * 文件上传回调事件
    * @param info
@@ -615,8 +726,9 @@
   function handleChange(info) {
     let { fileList, file } = info;
     fileInfoList.value = fileList;
-    if (file.status === 'error') {
+    if (file.status === 'error' || (file.response && file.response.code == 500)) {
       message.error(file.response?.message || `${file.name} 上传失败,请查看服务端日志`);
+      return;
     }
     if (file.status === 'done') {
       uploadUrlList.value.push(file.response.message);
@@ -625,7 +737,7 @@
 
   /**
    * 获取图片地址
-   * 
+   *
    * @param url
    */
   function getImage(url) {
@@ -642,6 +754,10 @@
         message.warning('请上传图片');
         return false;
       }
+    }
+    if(uploadUrlList.value && uploadUrlList.value.length > 2){
+      message.warning("最多只能上传三张！");
+      return false;
     }
     return true;
   }
@@ -665,7 +781,234 @@
     let imageList = [getImage(url)];
     createImgPreview({ imageList: imageList, defaultWidth: 700, rememberState: true, onImgLoad });
   }
-  
+
+  /**
+   * 截取字符串
+   * @param str
+   * @param maxLength
+   */
+  function truncateString(str, maxLength) {
+    if (str.length <= maxLength){
+      return str;
+    }
+    let chineseCount = 0;
+    let englishCount = 0;
+    let digitCount = 0;
+    let result = '';
+    for (let i = 0; i < str.length; i++) {
+      const char = str[i];
+      if (/[\u4e00-\u9fa5]/.test(char)) { // 判断是否为汉字
+        chineseCount++;
+      } else if (/[a-zA-Z]/.test(char)) { // 判断是否为英文字母
+        englishCount++;
+      } else if (/\d/.test(char)) { // 判断是否为数字
+        digitCount++;
+      }
+      if (chineseCount + englishCount / 2 + digitCount / 2 > maxLength) {
+        break;
+      }
+      result += char;
+    }
+
+    return result;
+  }
+
+  /**
+   * 粘贴事件
+   * @param event
+   */
+  function paste(event) {
+    if(uploadUrlList.value && uploadUrlList.value.length > 2){
+      message.warning("最多只能上传三张！");
+      return;
+    }
+    const items = (event.clipboardData || window.clipboardData).items;
+    if (!items || items.length === 0){
+      //说明浏览器不支持复制图片
+      message.error('当前浏览器不支持本地打开图片！');
+      return;
+    }
+    let image = null;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        image = items[i].getAsFile();
+        handleUploadImage(image);
+        break;
+      }
+    }
+  }
+
+  /**
+   * 粘贴图片
+   * @param image
+   */
+  async function handleUploadImage(image) {
+    const isReturn = (fileInfo) => {
+      try {
+        if (fileInfo.code === 0) {
+          let { message } = fileInfo;
+          uploadUrlList.value.push(message);
+          fileInfoList.value.push(image);
+        } else if (fileInfo.code === 500 || fileInfo.code === 510) {
+          message.error(fileInfo.message || `${image.name} 导入失败`);
+        }
+      } catch (error) {
+        console.log('导入的数据异常', error);
+        message.error(`${image.name} 导入失败`);
+      }
+    };
+    await defHttp.uploadFile({ url: "/airag/chat/upload" }, { file: image }, { success: isReturn });
+  }
+
+  /**
+   * 渲染返回来的结果
+   * @param readableStream
+   * @param options
+   */
+  async function renderChatByResult(readableStream, options) {
+    const reader = readableStream.getReader();
+    const decoder = new TextDecoder('UTF-8');
+    let conversationId = '';
+    let buffer = '';
+    let text = ''; // 按 SSE 协议分割消息
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+      //update-begin---author:wangshuai---date:2025-03-12---for:【QQYUN-11555】聊天时要流式显示消息---
+      let result = decoder.decode(value, { stream: true });
+      result = buffer + result;
+      const lines = result.split('\n\n');
+      for (let line of lines) {
+        if (line.startsWith('data:')) {
+          let content = line.replace('data:', '').trim();
+          if(!content){
+            continue;
+          }
+          if(!content.endsWith('}')){
+            buffer = buffer + line;
+            continue;
+          }
+          buffer = "";
+          try {
+            //update-begin---author:wangshuai---date:2025-03-13---for:【QQYUN-11572】发布到线上不能实时动态，内容不能加载出来，得刷新才能看到全部回答---
+            if(content.indexOf(":::card:::") !== -1){
+              content = content.replace(/\s+/g, '');
+            }
+            let parse = JSON.parse(content);
+            await renderText(parse,conversationId,text,options).then((res)=>{
+              text = res.returnText;
+              conversationId = res.conversationId;
+            });
+            //update-end---author:wangshuai---date:2025-03-13---for:【QQYUN-11572】发布到线上不能实时动态，内容不能加载出来，得刷新才能看到全部回答---
+          } catch (error) {
+            console.log('Error parsing update:', error);
+          }
+          //update-end---author:wangshuai---date:2025-03-12---for:【QQYUN-11555】聊天时要流式显示消息---
+        }else{
+          if(!line){
+            continue;
+          }
+          if(!line.endsWith('}')){
+            buffer = buffer + line;
+            continue;
+          }
+          buffer = "";
+          //update-begin---author:wangshuai---date:2025-03-13---for:【QQYUN-11572】发布到线上不能实时动态，内容不能加载出来，得刷新才能看到全部回答---
+          try {
+            if(line.indexOf(":::card:::") !== -1){
+              line = line.replace(/\s+/g, '');
+            }
+            let parse = JSON.parse(line);
+            await renderText(parse, conversationId, text, options).then((res) => {
+              text = res.returnText;
+              conversationId = res.conversationId;
+            });
+          } catch (error) {
+            console.log('Error parsing update:', error);
+          }
+          //update-end---author:wangshuai---date:2025-03-13---for:【QQYUN-11572】发布到线上不能实时动态，内容不能加载出来，得刷新才能看到全部回答---
+        }
+      }
+    }
+    //update-begin---author:wangshuai---date:2025-11-05---for: 如果是断线重连并且文本为空，需要移出前面两条会话---
+    if(!text && isReConnect && chatData.value.length >1){
+      //如果是断线重连的情况下，流结果为空时，移除占位的AI消息，避免空结果也新增聊天记录
+      const lastMsg = chatData.value[chatData.value.length - 1];
+      if (lastMsg && lastMsg.inversion === 'ai' && lastMsg.content === '请稍后') {
+        chatData.value.splice(chatData.value.length - 1, 1);
+        chatData.value.splice(chatData.value.length - 1, 1);
+      }
+    //update-end---author:wangshuai---date:2025-11-05---for: 如果是断线重连并且文本为空，需要移出前面两条会话---
+      localStorage.removeItem('chat_requestId_' + uuid.value);
+      loading.value = false;
+    }
+  }
+
+  /**
+   * ai重连
+   */
+  async function aiReConnection() {
+    //查询requestId
+    let chat = localStorage.getItem("chat_requestId_" + uuid.value);
+    if(chat) {
+      let array = JSON.parse(chat);
+      let message = array.message;
+      let requestId = array.requestId;
+      const result = await defHttp.get({ url: '/airag/chat/receive/' + requestId ,
+        adapter: 'fetch',
+        responseType: 'stream',
+        timeout: 5 * 60 * 1000
+      }, { isTransformResponse: false }).catch(async (err)=>{
+        loading.value = false;
+        localStorage.removeItem('chat_requestId_' + uuid.value);
+      });
+      if(result && message){
+        loading.value = true;
+        isReConnect.value = true;
+        //发送用户消息
+        addChat(uuid.value, {
+          dateTime: new Date().toLocaleString(),
+          content: message,
+          images:uploadUrlList.value?uploadUrlList.value:[],
+          inversion: 'user',
+          error: false,
+          conversationOptions: null,
+          requestOptions: { prompt: message, options: null },
+          eventType: 'message',
+        });
+        let options: any = {};
+        const lastContext = conversationList.value[conversationList.value.length - 1]?.conversationOptions;
+        if (lastContext && usingContext.value) {
+          options = { ...lastContext };
+        }
+        //添加ai消息
+        addChat(uuid.value, {
+          dateTime: new Date().toLocaleString(),
+          content: '请稍后',
+          loading: false,
+          inversion: 'ai',
+          error: false,
+          conversationOptions: null,
+          requestOptions: { prompt: message, options: { ...options } },
+          referenceKnowledge: [],
+          eventType: 'message',
+        });
+        options.message = message;
+        scrollToBottom();
+        //流式输出
+        await renderChatByResult(result,options);
+      } else {
+        loading.value = false;
+        localStorage.removeItem('chat_requestId_' + uuid.value);
+        isReConnect.value = false;
+      }
+    } else {
+      isReConnect.value = false;
+    }
+  }
+
   //监听开场白
   watch(
     () => props.prologue,
@@ -676,8 +1019,8 @@
         }
       } catch (e) {}
     }
-  );  
-  
+  );
+
   //监听开场白预制问题
   watch(
     () => props.presetQuestion,
@@ -693,12 +1036,52 @@
       try {
         if (val) {
           appData.value = val;
+          // 检查模型是否支持网络搜索
+          checkModelProvider();
         }
       } catch (e) {}
     },
     { deep: true, immediate: true }
   );
-  
+
+  // 编辑对话设置
+  function handleEditSettings() {
+    emit('edit-settings');
+  }
+
+  // 切换网络搜索
+  function toggleWebSearch() {
+    enableSearch.value = !enableSearch.value;
+    if (enableSearch.value) {
+      message.success("已开启联网搜索");
+    } else {
+      message.info("已关闭联网搜索");
+    }
+  }
+
+  // 检查模型是否支持网络搜索（从appData.metadata.modelInfo中获取）
+  function checkModelProvider() {
+    if (appData.value && appData.value.metadata) {
+      try {
+        const metadata = typeof appData.value.metadata === 'string' 
+          ? JSON.parse(appData.value.metadata) 
+          : appData.value.metadata;
+        if (metadata && metadata.modelInfo) {
+          modelProvider.value = metadata.modelInfo.provider || '';
+          // 只有千问模型支持网络搜索
+          showWebSearch.value = modelProvider.value === 'QWEN';
+        } else {
+          showWebSearch.value = false;
+        }
+      } catch (e) {
+        console.error('解析模型信息失败', e);
+        showWebSearch.value = false;
+      }
+    } else {
+      showWebSearch.value = false;
+    }
+  }
+
   //监听历史信息
   watch(
     () => props.historyData,
@@ -714,9 +1097,13 @@
           chatData.value = [];
           headerTitle.value = props.chatTitle;
         }
-        if(props.prologue && props.chatTitle){
+        //update-begin---author:wangshuai---date:2025-11-18---for:【QQYUN-14049】【AI】没有开场白，就不展示预设问题了---
+        if((props.prologue || props.presetQuestion) && props.chatTitle){
+        //update-end---author:wangshuai---date:2025-11-18---for:【QQYUN-14049】【AI】没有开场白，就不展示预设问题了---
           topChat(props.prologue)
         }
+        //ai回复重连
+        aiReConnection();
       } catch (e) {
         console.log(e)
       }
@@ -729,6 +1116,8 @@
     scrollToBottom();
     uploadUrlList.value = [];
     fileInfoList.value = [];
+    // 检查模型是否支持网络搜索
+    checkModelProvider();
   });
 </script>
 
@@ -815,6 +1204,16 @@
         display: flex;
         padding: 8px;
         align-items: center;
+        &.enabled {
+          color: @primary-color;
+        }
+      }
+      .webSearchBtn {
+        &.enabled {
+          :deep(.anticon) {
+            color: #52c41a !important;
+          }
+        }
       }
       .stopBtn {
         width: 32px;
@@ -837,9 +1236,51 @@
     font-weight: 400;
     padding-bottom: 8px;
     margin-left: 20px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 30px;
+    
+    .title-content{
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow: hidden;
+      
+      > span{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+    
+    .header-actions{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    
+    .edit-btn{
+      padding: 2px 4px;
+      color: #999;
+      flex-shrink: 0;
+      height: 24px;
+      
+      &:hover{
+        color: @primary-color;
+      }
+      
+      :deep(.anticon){
+        font-size: 16px;
+      }
+    }
+    
+    .header-advertisint{
+      display:flex;
+      margin-right: 20px;
+      font-size: 12px;
+    }
   }
   .chat-textarea{
     display: flex;
@@ -850,7 +1291,7 @@
     border-width: 1px;
     flex-direction: column;
     transition: width 0.3s;
-    border-color: rgba(68,83,130,0.2);
+    border-color: #d2d7e5;
     .textarea-top{
       border-bottom: 1px solid #f0f0f5;
       padding: 12px 28px;
@@ -881,10 +1322,10 @@
     }
   }
   .chat-textarea:hover{
-    border-color: rgba(59,130,246,0.5)
+    border-color: #9dc1fb;
   }
   .textarea-active{
-    border-color: rgba(59,130,246,0.5) !important;
+    border-color: #98bdfa !important;
   }
   :deep(.ant-divider-vertical){
     margin: 0 2px;
@@ -899,13 +1340,31 @@
     display: none;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px #e6e6e6;
     margin-left: 44px;
     margin-top: -4px;
   }
   .top-image:hover{
     .upload-icon{
       display: flex;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    //手机下的样式 平板不需要调整
+    .footer{
+      padding: 0;
+      .bottomArea{
+        .delBtn{
+          margin-right: 0;
+        }
+      }
+    }
+    .chatWrap{
+      padding: 10px 10px 10px 0;
+    }
+    .main .chatContentArea{
+      padding: 10px 0 0 10px;
     }
   }
 </style>
