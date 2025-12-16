@@ -11,10 +11,16 @@ export const columns: BasicColumn[] = [
     dataIndex: 'id',
   },
   {
+    title: '性别',
+    align: 'center',
+    dataIndex: 'sex_dictText',
+  },
+  {
     title: '手机号',
     align: 'center',
     dataIndex: 'phone',
   },
+
   {
     title: '注册日期',
     align: 'center',
@@ -28,7 +34,7 @@ export const columns: BasicColumn[] = [
   {
     title: '启用',
     align: 'center',
-    dataIndex: 'status_dictText'
+    dataIndex: 'status_dictText',
   },
 ];
 
