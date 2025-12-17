@@ -6,9 +6,14 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
+    title: '用户ID',
+    align: 'center',
+    dataIndex: 'userId',
+  },
+  {
     title: '建议内容',
-    align: "center",
-    dataIndex: 'content'
+    align: 'center',
+    dataIndex: 'content',
   },
 ];
 

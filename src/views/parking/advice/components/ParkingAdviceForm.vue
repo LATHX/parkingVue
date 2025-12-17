@@ -4,11 +4,11 @@
       <template #detail>
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ParkingAdviceForm">
           <a-row>
-						<a-col :span="24">
-							<a-form-item label="建议内容" v-bind="validateInfos.content" id="ParkingAdviceForm-content" name="content">
-								<a-input v-model:value="formData.content" placeholder="请输入建议内容"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
+            <a-col :span="24">
+              <a-form-item label="建议内容" v-bind="validateInfos.content" id="ParkingAdviceForm-content" name="content">
+                <a-input v-model:value="formData.content" placeholder="请输入建议内容" allow-clear></a-input>
+              </a-form-item>
+            </a-col>
           </a-row>
         </a-form>
       </template>
@@ -26,41 +26,38 @@
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
-    formData: { type: Object, default: () => ({})},
-    formBpm: { type: Boolean, default: true }
+    formData: { type: Object, default: () => ({}) },
+    formBpm: { type: Boolean, default: true },
   });
   const formRef = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
     id: '',
-    content: '',   
+    content: '',
   });
   const { createMessage } = useMessage();
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
   const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 16 } });
   const confirmLoading = ref<boolean>(false);
   //表单验证
-  const validatorRules = reactive({
-  });
+  const validatorRules = reactive({});
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
   //日期个性化选择
-  const fieldPickers = reactive({
-  });
+  const fieldPickers = reactive({});
 
   // 表单禁用
-  const disabled = computed(()=>{
-    if(props.formBpm === true){
-      if(props.formData.disabled === false){
+  const disabled = computed(() => {
+    if (props.formBpm === true) {
+      if (props.formData.disabled === false) {
         return false;
-      }else{
+      } else {
         return true;
       }
     }
     return props.formDisabled;
   });
 
-  
   /**
    * 新增
    */
@@ -76,10 +73,10 @@
       resetFields();
       const tmpData = {};
       Object.keys(formData).forEach((key) => {
-        if(record.hasOwnProperty(key)){
-          tmpData[key] = record[key]
+        if (record.hasOwnProperty(key)) {
+          tmpData[key] = record[key];
         }
-      })
+      });
       //赋值
       Object.assign(formData, tmpData);
     });
@@ -134,7 +131,6 @@
         confirmLoading.value = false;
       });
   }
-
 
   defineExpose({
     add,
