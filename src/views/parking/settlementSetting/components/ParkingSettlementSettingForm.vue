@@ -52,6 +52,16 @@
                 <a-input-number min="0" v-model:value="formData.settlementDay" placeholder="请输入结算周期(日)" style="width: 100%" />
               </a-form-item>
             </a-col>
+            <a-col :span="24">
+              <a-form-item
+                label="结算周期"
+                v-bind="validateInfos.settlementDay"
+                id="ParkingSettlementSettingForm-settlementDay"
+                name="settlementCycle"
+              >
+                <j-search-select v-model:value="formData.settlementCycle" dict="settlement_cycle" allow-clear />
+              </a-form-item>
+            </a-col>
           </a-row>
         </a-form>
       </template>
@@ -82,7 +92,8 @@
     parkingId: '',
     serviceFeeRate: undefined,
     payTypeRate: undefined,
-    settlementDay: undefined,
+    settlementDay: 0,
+    settlementCycle: undefined,
   });
   const { createMessage } = useMessage();
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });

@@ -21,9 +21,9 @@ export const columns: BasicColumn[] = [
     dataIndex: 'payTypeRate',
   },
   {
-    title: '结算周期(日)',
+    title: '结算周期',
     align: 'center',
-    dataIndex: 'settlementDay',
+    dataIndex: 'settlementCycle_dictText',
   },
 ];
 

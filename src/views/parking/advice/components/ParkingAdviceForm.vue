@@ -2,38 +2,13 @@
   <a-spin :spinning="confirmLoading">
     <JFormContainer :disabled="disabled">
       <template #detail>
-        <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ParkingSettlementRecordForm">
+        <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ParkingAdviceForm">
           <a-row>
-            <a-col :span="24">
-              <a-form-item label="停车场名称" v-bind="validateInfos.parkingId" id="ParkingLotImageForm-parkingId" name="parkingId">
-                <j-search-select v-model:value="formData.parkingId" dict="parking_lot,parking_name,id" allow-clear />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="开始日期" v-bind="validateInfos.startDate" id="ParkingSettlementRecordForm-startDate" name="startDate">
-                <a-date-picker v-model:value="formData.startDate" placeholder="请输入开始日期" allow-clear></a-date-picker>
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="结束日期" v-bind="validateInfos.endDate" id="ParkingSettlementRecordForm-endDate" name="endDate">
-                <a-date-picker v-model:value="formData.endDate" placeholder="请输入结束日期" allow-clear></a-date-picker>
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="结算金额" v-bind="validateInfos.balance" id="ParkingSettlementRecordForm-balance" name="balance">
-                <a-input v-model:value="formData.balance" placeholder="请输入结算金额" allow-clear></a-input>
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="是否结算" v-bind="validateInfos.isSettlement" id="ParkingSettlementRecordForm-isSettlement" name="isSettlement">
-                <j-dict-select-tag v-model:value="formData.isSettlement" dictCode="yn" placeholder="请输入是否结算" allow-clear />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="系统完成结算" v-bind="validateInfos.isComplete" id="ParkingSettlementRecordForm-isComplete" name="isComplete">
-                <j-dict-select-tag v-model:value="formData.isComplete" dictCode="yn" placeholder="请输入是否系统完成结算" allow-clear />
-              </a-form-item>
-            </a-col>
+						<a-col :span="24">
+							<a-form-item label="建议内容" v-bind="validateInfos.content" id="ParkingAdviceForm-content" name="content">
+								<a-input v-model:value="formData.content" placeholder="请输入建议内容"  allow-clear ></a-input>
+							</a-form-item>
+						</a-col>
           </a-row>
         </a-form>
       </template>
@@ -45,49 +20,47 @@
   import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted } from 'vue';
   import { defHttp } from '/@/utils/http/axios';
   import { useMessage } from '/@/hooks/web/useMessage';
-  import { getValueType } from '/@/utils';
-  import { saveOrUpdate } from '../ParkingSettlementRecord.api';
+  import { getDateByPicker, getValueType } from '/@/utils';
+  import { saveOrUpdate } from '../ParkingAdvice.api';
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
-  import JDictSelectTag from '../../../../components/Form/src/jeecg/components/JDictSelectTag.vue';
-  import JSearchSelect from '../../../../components/Form/src/jeecg/components/JSearchSelect.vue';
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
-    formData: { type: Object, default: () => ({}) },
-    formBpm: { type: Boolean, default: true },
+    formData: { type: Object, default: () => ({})},
+    formBpm: { type: Boolean, default: true }
   });
   const formRef = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
     id: '',
-    parkingId: '',
-    balance: '',
-    isSettlement: '',
-    isComplete: '',
-    startDate: '',
-    endDate: '',
+    content: '',   
   });
   const { createMessage } = useMessage();
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
   const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 16 } });
   const confirmLoading = ref<boolean>(false);
   //表单验证
-  const validatorRules = reactive({});
+  const validatorRules = reactive({
+  });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
+  //日期个性化选择
+  const fieldPickers = reactive({
+  });
 
   // 表单禁用
-  const disabled = computed(() => {
-    if (props.formBpm === true) {
-      if (props.formData.disabled === false) {
+  const disabled = computed(()=>{
+    if(props.formBpm === true){
+      if(props.formData.disabled === false){
         return false;
-      } else {
+      }else{
         return true;
       }
     }
     return props.formDisabled;
   });
 
+  
   /**
    * 新增
    */
@@ -103,10 +76,10 @@
       resetFields();
       const tmpData = {};
       Object.keys(formData).forEach((key) => {
-        if (record.hasOwnProperty(key)) {
-          tmpData[key] = record[key];
+        if(record.hasOwnProperty(key)){
+          tmpData[key] = record[key]
         }
-      });
+      })
       //赋值
       Object.assign(formData, tmpData);
     });
@@ -137,6 +110,8 @@
     }
     //循环数据
     for (let data in model) {
+      // 更新个性化日期选择器的值
+      model[data] = getDateByPicker(model[data], fieldPickers[data]);
       //如果该数据是数组并且是字符串类型
       if (model[data] instanceof Array) {
         let valueType = getValueType(formRef.value.getProps, data);
@@ -160,6 +135,7 @@
       });
   }
 
+
   defineExpose({
     add,
     edit,
@@ -169,6 +145,6 @@
 
 <style lang="less" scoped>
   .antd-modal-form {
-    padding: 14px;
+    padding: 14px 20px;
   }
 </style>

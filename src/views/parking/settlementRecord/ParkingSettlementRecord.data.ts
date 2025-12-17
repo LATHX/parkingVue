@@ -11,9 +11,14 @@ export const columns: BasicColumn[] = [
     dataIndex: 'parkingId_dictText',
   },
   {
-    title: '申请日期',
+    title: '开始日期',
     align: 'center',
-    dataIndex: 'createTime',
+    dataIndex: 'startDate',
+  },
+  {
+    title: '结束日期',
+    align: 'center',
+    dataIndex: 'endDate',
   },
   {
     title: '结算金额',
@@ -24,6 +29,11 @@ export const columns: BasicColumn[] = [
     title: '是否结算',
     align: 'center',
     dataIndex: 'isSettlement_dictText',
+  },
+  {
+    title: '系统完成结算',
+    align: 'center',
+    dataIndex: 'isComplete_dictText',
   },
 ];
 
