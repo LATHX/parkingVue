@@ -10,7 +10,7 @@
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <!--        <a-button type="primary" v-auth="'parking:parking_order:add'" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增 </a-button>-->
+        <a-button type="primary" v-auth="'parking:parking_order:add'" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增 </a-button>
         <a-button type="primary" v-auth="'parking:parking_order:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls">
           导出
         </a-button>
@@ -175,7 +175,6 @@
   async function systemCompleteHandle(record) {
     await systemCompleteOrder({ orderId: record.id }, handleSuccess);
   }
-
 
   /**
    * 成功回调

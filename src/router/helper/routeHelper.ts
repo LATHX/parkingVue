@@ -1,7 +1,7 @@
 import type { AppRouteModule, AppRouteRecordRaw } from '/@/router/types';
 import type { Router, RouteRecordNormalized } from 'vue-router';
 
-import { getParentLayout, LAYOUT, EXCEPTION_COMPONENT } from '/@/router/constant';
+import { getParentLayout, LAYOUT, EXCEPTION_COMPONENT, CUSTOMERIZE_LAYOUT } from '/@/router/constant';
 import { cloneDeep, omit } from 'lodash-es';
 import { warn } from '/@/utils/log';
 import { createRouter, createWebHashHistory } from 'vue-router';
@@ -18,6 +18,7 @@ const LayoutContent = () => import('/@/layouts/default/content/index.vue');
 const LayoutMap = new Map<string, () => Promise<typeof import('*.vue')>>();
 
 LayoutMap.set('LAYOUT', LAYOUT);
+LayoutMap.set('CUSTOMERIZE_LAYOUT', CUSTOMERIZE_LAYOUT);
 LayoutMap.set('IFRAME', IFRAME);
 //微前端qiankun
 LayoutMap.set('LayoutsContent', LayoutContent);
@@ -128,7 +129,7 @@ export function transformObjToRoute<T = AppRouteModule>(routeList: AppRouteModul
     const component = route.component as string;
     if (component) {
       route.originComponent = component;
-      if (component.toUpperCase() === 'LAYOUT') {
+      if (LayoutMap.has(component.toUpperCase())) {
         route.component = LayoutMap.get(component.toUpperCase());
       } else {
         route.children = [cloneDeep(route)];
@@ -219,7 +220,7 @@ function isMultipleRoute(routeModule: AppRouteModule) {
  * @updateBy:lsq
  * @updateDate:2021-09-08
  */
-export function addSlashToRouteComponent(routeList: AppRouteRecordRaw[]) {
+export function addSlashToRouteComponent<T = AppRouteModule>(routeList: AppRouteRecordRaw[]) {
   routeList.forEach((route) => {
     let component = route.component as string;
     if (component) {
