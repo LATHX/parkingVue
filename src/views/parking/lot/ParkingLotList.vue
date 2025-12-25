@@ -26,7 +26,7 @@
       </a-form>
     </div>
     <!--引用表格-->
-    <BasicTable @register="registerTable" :rowSelection="rowSelection">
+    <BasicTable @register="registerTable">
       <!--插槽:table标题-->
       <template #tableTitle>
         <a-button type="primary" v-auth="'parking:parking_lot:add'" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增 </a-button>
@@ -73,6 +73,7 @@
   import ParkingLotModal from './components/ParkingLotModal.vue';
   import { useUserStore } from '/@/store/modules/user';
   import JInput from '/@/components/Form/src/jeecg/components/JInput.vue';
+  import { EditOutlined } from '@ant-design/icons-vue';
 
   const route = useRoute();
   const formRef = ref();
@@ -101,7 +102,10 @@
       api: list,
       columns,
       canResize: false,
+      bordered: false,
       useSearchForm: false,
+      showIndexColumn: true,
+      clickToRowSelect: false,
       actionColumn: {
         width: 280,
         fixed: 'right',
@@ -203,22 +207,48 @@
   function getTableAction(record) {
     return [
       {
-        label: '编辑',
+        tooltip: '查看',
+        onClick: handleDetail.bind(null, record),
+        icon: 'mdi:eye',
+      },
+      {
+        tooltip: '编辑',
         onClick: handleEdit.bind(null, record),
+        icon: 'ri:edit-line',
         auth: 'parking:parking_lot:edit',
       },
       {
-        label: '价格',
-        onClick: handleOther.bind(null, 'parkingPriceList', record),
+        tooltip: '删除',
+        icon: 'material-symbols:delete',
+        popConfirm: {
+          title: '是否确认删除',
+          confirm: handleDelete.bind(null, record),
+          placement: 'topLeft',
+        },
+        auth: 'parking:parking_lot:delete',
       },
       {
-        label: '图片',
-        onClick: handleOther.bind(null, 'parkingLotImage', record),
+        tooltip: '订单',
+        onClick: handleEdit.bind(null, record),
+        icon: 'lsicon:order-filled',
       },
       {
-        label: '资质',
-        onClick: handleOther.bind(null, 'parkingLotCertification', record),
+        tooltip: '车场评价',
+        onClick: handleEdit.bind(null, record),
+        icon: 'material-symbols:comment',
       },
+      // {
+      //   label: '价格',
+      //   onClick: handleOther.bind(null, 'parkingPriceList', record),
+      // },
+      // {
+      //   label: '图片',
+      //   onClick: handleOther.bind(null, 'parkingLotImage', record),
+      // },
+      // {
+      //   label: '资质',
+      //   onClick: handleOther.bind(null, 'parkingLotCertification', record),
+      // },
     ];
   }
 
@@ -227,40 +257,26 @@
    */
   function getDropDownAction(record) {
     return [
-      {
-        label: '详情',
-        onClick: handleDetail.bind(null, record),
-      },
-      {
-        label: '结算设置',
-        onClick: handleOther.bind(null, 'parkingSettlementSettingList', record),
-      },
-      {
-        label: '审核通过',
-        popConfirm: {
-          title: '是否确认审核通过',
-          confirm: handleAudit.bind(null, record.id, 1),
-          placement: 'topLeft',
-        },
-      },
-      {
-        label: '审核不通过',
-        popConfirm: {
-          title: '是否确认审核不通过',
-          confirm: handleAudit.bind(null, record.id, 2),
-          placement: 'topLeft',
-        },
-      },
-      {
-        label: '删除',
-        popConfirm: {
-          title: '是否确认删除',
-          confirm: handleDelete.bind(null, record),
-          placement: 'topLeft',
-        },
-        auth: 'parking:parking_lot:delete',
-      },
-
+      // {
+      //   label: '结算设置',
+      //   onClick: handleOther.bind(null, 'parkingSettlementSettingList', record),
+      // },
+      // {
+      //   label: '审核通过',
+      //   popConfirm: {
+      //     title: '是否确认审核通过',
+      //     confirm: handleAudit.bind(null, record.id, 1),
+      //     placement: 'topLeft',
+      //   },
+      // },
+      // {
+      //   label: '审核不通过',
+      //   popConfirm: {
+      //     title: '是否确认审核不通过',
+      //     confirm: handleAudit.bind(null, record.id, 2),
+      //     placement: 'topLeft',
+      //   },
+      // },
     ];
   }
 

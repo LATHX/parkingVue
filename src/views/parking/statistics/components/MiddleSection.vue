@@ -35,7 +35,7 @@
         <div class="table-row" v-for="(item, index) in cityData" :key="index">
           <span>{{ item.city }}</span>
           <span>{{ item.count }}</span>
-          <span>{{ item.amount }}</span>
+          <span>{{ item.amount.toFixed(2) }}</span>
         </div>
       </div>
     </div>
@@ -46,7 +46,7 @@
         <span class="title">最新订单</span>
       </div>
       <div class="order-list">
-        <div :class="['order-item', 'status-tag', item.statusClass]" v-for="(item, index) in latestOrders" :key="index">
+        <div :class="['order-item', item.statusClass]" v-for="(item, index) in latestOrders" :key="index">
           <div class="order-info">
             <div class="order-main">
               <span class="order-id">{{ item.id }} 提交了订单</span>
@@ -301,10 +301,17 @@
           height: 100%;
           
           .order-item {
-              padding: 8px 0; /* Reduce padding slightly */
-              border-bottom: 1px solid #f0f0f0;
-              &:last-child { border-bottom: none; }
+              padding: 8px 12px; /* Reduce padding slightly, add horizontal padding */
+              border-radius: 6px; /* Add rounded corners */
+              margin-bottom: 8px; /* Add spacing between items */
+              &:last-child { margin-bottom: 0; }
               
+              /* Dynamic background colors based on status class */
+              &.pending { background: #fff7e6; }
+              &.processing { background: #e6f7ff; }
+              &.canceled { background: #f5f5f5; }
+              &.pending-red { background: #fff1f0; }
+
               .order-info {
                   .order-main {
                       display: flex;
@@ -315,16 +322,19 @@
                           font-size: 12px;
                           padding: 1px 5px; /* Compact tag */
                           border-radius: 4px;
-                          &.pending { background: #fff7e6; color: #fa8c16; }
-                          &.processing { background: #e6f7ff; color: #1890ff; }
-                          &.canceled { background: #f5f5f5; color: #999; }
-                          &.pending-red { background: #fff1f0; color: #f5222d; }
+                          color: white !important; /* Force white text */
+                          
+                          /* Match tag background to item background's "text color" counterpart */
+                          &.pending { background: #fa8c16 !important; }
+                          &.processing { background: #1890ff !important; }
+                          &.canceled { background: #999 !important; }
+                          &.pending-red { background: #f5222d !important; }
                       }
                   }
                   .order-sub {
                       display: flex;
                       justify-content: space-between;
-                      color: #999;
+                      color: #666; /* Darker text for better contrast on colored backgrounds */
                       font-size: 12px;
                       
                       .park-name {

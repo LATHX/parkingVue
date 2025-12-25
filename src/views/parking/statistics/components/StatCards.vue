@@ -3,8 +3,8 @@
         <div class="stat-card purple">
             <div class="card-content">
                 <div class="title">入驻车场</div>
-                <div class="value">{{ stats.parkingCount }}</div>
-                <div class="sub-value">今日新增 +{{ stats.parkingAdd }}</div>
+                <div class="value">{{ Math.round(parkingCount) }}</div>
+                <div class="sub-value">今日新增 +{{ Math.round(parkingAdd) }}</div>
             </div>
             <div class="chart-mini" :style="{ backgroundImage: `url(${iconParking})` }"></div>
         </div>
@@ -12,8 +12,8 @@
         <div class="stat-card orange">
             <div class="card-content">
                 <div class="title">车场商户</div>
-                <div class="value">{{ stats.merchantCount }}</div>
-                <div class="sub-value">今日新增 +{{ stats.merchantAdd }}</div>
+                <div class="value">{{ Math.round(merchantCount) }}</div>
+                <div class="sub-value">今日新增 +{{ Math.round(merchantAdd) }}</div>
             </div>
             <div class="chart-mini" :style="{ backgroundImage: `url(${iconMerchant})` }"></div>
         </div>
@@ -21,8 +21,8 @@
         <div class="stat-card green">
             <div class="card-content">
                 <div class="title">车场顾客</div>
-                <div class="value">{{ stats.userCount }}</div>
-                <div class="sub-value">今日新增 +{{ stats.userAdd }}</div>
+                <div class="value">{{ Math.round(userCount) }}</div>
+                <div class="sub-value">今日新增 +{{ Math.round(userAdd) }}</div>
             </div>
             <div class="chart-mini" :style="{ backgroundImage: `url(${iconCustomer})` }"></div>
         </div>
@@ -30,8 +30,8 @@
         <div class="stat-card blue">
             <div class="card-content">
                 <div class="title">订单总数</div>
-                <div class="value">{{ stats.orderCount?.toLocaleString() }}</div>
-                <div class="sub-value">今日新增 +{{ stats.orderAdd?.toLocaleString() }}</div>
+                <div class="value">{{ Math.round(orderCount).toLocaleString() }}</div>
+                <div class="sub-value">今日新增 +{{ Math.round(orderAdd).toLocaleString() }}</div>
             </div>
             <div class="chart-mini" :style="{ backgroundImage: `url(${iconOrder})` }"></div>
         </div>
@@ -39,8 +39,8 @@
         <div class="stat-card red">
             <div class="card-content">
                 <div class="title">订单金额</div>
-                <div class="value">{{ stats.orderPrice?.toLocaleString() }}</div>
-                <div class="sub-value">今日新增 +{{ stats.orderPriceAdd?.toLocaleString() }}</div>
+                <div class="value">{{ orderPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
+                <div class="sub-value">今日新增 +{{ orderPriceAdd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
             </div>
             <div class="chart-mini" :style="{ backgroundImage: `url(${iconAmount})` }"></div>
         </div>
@@ -49,6 +49,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useTransition, TransitionPresets } from '@vueuse/core';
 import { queryDataStatistics } from '../statistics.api';
 import iconParking from '/@/assets/customerize/statistics/top/入驻车场.png';
 import iconMerchant from '/@/assets/customerize/statistics/top/车场商户.png';
@@ -68,6 +69,20 @@ const stats = ref({
     orderPrice: 0,
     orderPriceAdd: 0
 });
+
+const duration = 1500;
+const transition = TransitionPresets.easeOutExpo;
+
+const parkingCount = useTransition(() => stats.value.parkingCount, { duration, transition });
+const parkingAdd = useTransition(() => stats.value.parkingAdd, { duration, transition });
+const merchantCount = useTransition(() => stats.value.merchantCount, { duration, transition });
+const merchantAdd = useTransition(() => stats.value.merchantAdd, { duration, transition });
+const userCount = useTransition(() => stats.value.userCount, { duration, transition });
+const userAdd = useTransition(() => stats.value.userAdd, { duration, transition });
+const orderCount = useTransition(() => stats.value.orderCount, { duration, transition });
+const orderAdd = useTransition(() => stats.value.orderAdd, { duration, transition });
+const orderPrice = useTransition(() => stats.value.orderPrice, { duration, transition });
+const orderPriceAdd = useTransition(() => stats.value.orderPriceAdd, { duration, transition });
 
 onMounted(async () => {
     try {

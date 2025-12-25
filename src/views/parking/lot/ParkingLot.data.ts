@@ -22,22 +22,14 @@ export const columns: BasicColumn[] = [
     dataIndex: 'phone',
   },
   {
-    title: '排序',
-    align: 'center',
-    sorter: true,
-    dataIndex: 'orderNum',
-  },
-  {
     title: '当前休息状态',
     align: 'center',
     dataIndex: 'isRestValue_dictText',
   },
   {
-    title: '审核状态',
+    title: '地址',
     align: 'center',
-    width: '85px',
-    dataIndex: 'auditStatus_dictText',
-    fixed: 'right',
+    dataIndex: 'address',
   },
 ];
 

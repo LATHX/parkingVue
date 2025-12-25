@@ -3,28 +3,28 @@
     <div class="left-section">
       <!-- AppLogo with adjusted size/style -->
       <div class="logo-wrapper">
-         <AppLogo :showTitle="false" theme="light" />
+        <AppLogo :showTitle="false" theme="light" />
       </div>
       <div class="company-name">广州成耀物业服务有限公司</div>
-      
+
       <!-- Moved Workbench button to left section -->
-      <!-- <a-button type="primary" class="workbench-btn">
+      <a-button type="primary" class="workbench-btn" @click="goStatistics">
         <template #icon><AppstoreOutlined /></template>
         工作台
-      </a-button> -->
+      </a-button>
     </div>
 
     <div class="right-section">
       <div class="action-item">
-         <AppSearch />
+        <AppSearch />
       </div>
 
       <div class="action-item">
         <Notify />
       </div>
-      
+
       <div class="action-item user-item">
-        <UserDropDown :theme="theme"/>
+        <UserDropDown :theme="theme" />
       </div>
     </div>
   </div>
@@ -37,6 +37,7 @@
   import { UserDropDown, Notify } from '/@/layouts/default/header/components';
   import { AppSearch, AppLogo } from '/@/components/Application';
   import { useHeaderSetting } from '/@/hooks/setting/useHeaderSetting';
+      import { useRouter } from 'vue-router';
 
   export default defineComponent({
     name: 'CustomerizeTopBar',
@@ -50,8 +51,15 @@
     },
     setup() {
       const { getHeaderTheme } = useHeaderSetting();
+      const router = useRouter();
+
+      const goStatistics = () => {
+        router.push('/statistics/index');
+      };
+
       return {
         theme: getHeaderTheme,
+        goStatistics,
       };
     },
   });
@@ -71,15 +79,15 @@
     .left-section {
       display: flex;
       align-items: center;
-      
+
       .logo-wrapper {
         display: flex;
         align-items: center;
         margin-right: 12px;
-        
+
         :deep(img) {
-           height: 32px;
-           width: auto;
+          height: 32px;
+          width: auto;
         }
       }
 
@@ -97,18 +105,18 @@
         align-items: center;
         border: none;
         // Light blue background matching the image
-        background-color: #e6f1fe; 
+        background-color: #e6f1fe;
         color: #1890ff;
         font-weight: 500;
         box-shadow: none;
-        
+
         &:hover {
-           background-color: #dcf4ff;
+          background-color: #dcf4ff;
         }
-        
+
         :deep(.anticon) {
-            margin-right: 6px;
-            font-size: 16px;
+          margin-right: 6px;
+          font-size: 16px;
         }
       }
     }
@@ -129,10 +137,10 @@
         &:hover {
           background-color: rgba(0, 0, 0, 0.025);
         }
-        
+
         :deep(.anticon) {
-            font-size: 18px;
-            color: #666;
+          font-size: 18px;
+          color: #666;
         }
       }
     }
