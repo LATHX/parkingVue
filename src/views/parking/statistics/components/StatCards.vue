@@ -3,65 +3,106 @@
         <div class="stat-card purple">
             <div class="card-content">
                 <div class="title">入驻车场</div>
-                <div class="value">1250</div>
-                <div class="sub-value">今日新增 +26</div>
+                <div class="value">{{ stats.parkingCount }}</div>
+                <div class="sub-value">今日新增 +{{ stats.parkingAdd }}</div>
             </div>
-            <div class="chart-mini">
-                <img src="/@/assets/customerize/statistics/top/入驻车场.png" alt="chart" />
-            </div>
+            <div class="chart-mini" :style="{ backgroundImage: `url(${iconParking})` }"></div>
         </div>
 
         <div class="stat-card orange">
             <div class="card-content">
                 <div class="title">车场商户</div>
-                <div class="value">287</div>
-                <div class="sub-value">今日新增 +0</div>
+                <div class="value">{{ stats.merchantCount }}</div>
+                <div class="sub-value">今日新增 +{{ stats.merchantAdd }}</div>
             </div>
-            <div class="chart-mini">
-                <img src="/@/assets/customerize/statistics/top/车场商户.png" alt="chart" />
-            </div>
+            <div class="chart-mini" :style="{ backgroundImage: `url(${iconMerchant})` }"></div>
         </div>
 
         <div class="stat-card green">
             <div class="card-content">
                 <div class="title">车场顾客</div>
-                <div class="value">8935</div>
-                <div class="sub-value">今日新增 +158</div>
+                <div class="value">{{ stats.userCount }}</div>
+                <div class="sub-value">今日新增 +{{ stats.userAdd }}</div>
             </div>
-            <div class="chart-mini">
-                <img src="/@/assets/customerize/statistics/top/车场顾客.png" alt="chart" />
-            </div>
+            <div class="chart-mini" :style="{ backgroundImage: `url(${iconCustomer})` }"></div>
         </div>
 
         <div class="stat-card blue">
             <div class="card-content">
                 <div class="title">订单总数</div>
-                <div class="value">4982</div>
-                <div class="sub-value">今日新增 +243</div>
+                <div class="value">{{ stats.orderCount?.toLocaleString() }}</div>
+                <div class="sub-value">今日新增 +{{ stats.orderAdd?.toLocaleString() }}</div>
             </div>
-            <div class="chart-mini">
-                <img src="/@/assets/customerize/statistics/top/订单总数.png" alt="chart" />
-            </div>
+            <div class="chart-mini" :style="{ backgroundImage: `url(${iconOrder})` }"></div>
         </div>
 
         <div class="stat-card red">
             <div class="card-content">
                 <div class="title">订单金额</div>
-                <div class="value">3,764,865</div>
-                <div class="sub-value">今日新增 +15,540</div>
+                <div class="value">{{ stats.orderPrice?.toLocaleString() }}</div>
+                <div class="sub-value">今日新增 +{{ stats.orderPriceAdd?.toLocaleString() }}</div>
             </div>
-            <div class="chart-mini">
-                <img src="/src/assets/customerize/statistics/top/订单金额.png" alt="chart" />
-            </div>
+            <div class="chart-mini" :style="{ backgroundImage: `url(${iconAmount})` }"></div>
         </div>
     </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { queryDataStatistics } from '../statistics.api';
+import iconParking from '/@/assets/customerize/statistics/top/入驻车场.png';
+import iconMerchant from '/@/assets/customerize/statistics/top/车场商户.png';
+import iconCustomer from '/@/assets/customerize/statistics/top/车场顾客.png';
+import iconOrder from '/@/assets/customerize/statistics/top/订单总数.png';
+import iconAmount from '/@/assets/customerize/statistics/top/订单金额.png';
 
-export default defineComponent({
-    name: 'StatCards',
+const stats = ref({
+    parkingCount: 0,
+    parkingAdd: 0,
+    merchantCount: 0,
+    merchantAdd: 0,
+    userCount: 0,
+    userAdd: 0,
+    orderCount: 0,
+    orderAdd: 0,
+    orderPrice: 0,
+    orderPriceAdd: 0
+});
+
+onMounted(async () => {
+    try {
+        const res = await queryDataStatistics();
+        const data = Array.isArray(res) ? res : res?.result;
+        
+        if (Array.isArray(data)) {
+            data.forEach((item: any) => {
+                switch (item.name) {
+                    case 'parkingLot':
+                        stats.value.parkingCount = item.total;
+                        stats.value.parkingAdd = item.todayTotal;
+                        break;
+                    case 'merchant':
+                        stats.value.merchantCount = item.total;
+                        stats.value.merchantAdd = item.todayTotal;
+                        break;
+                    case 'customer':
+                        stats.value.userCount = item.total;
+                        stats.value.userAdd = item.todayTotal;
+                        break;
+                    case 'order':
+                        stats.value.orderCount = item.total;
+                        stats.value.orderAdd = item.todayTotal;
+                        break;
+                    case 'orderAmount':
+                        stats.value.orderPrice = item.total;
+                        stats.value.orderPriceAdd = item.todayTotal;
+                        break;
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Failed to fetch statistics:', error);
+    }
 });
 </script>
 
@@ -84,7 +125,7 @@ export default defineComponent({
         height: 140px;
 
         .card-content {
-            z-index: 1;
+            z-index: 2; /* Ensure text is above background */
 
             .title {
                 font-size: 14px;
@@ -107,16 +148,17 @@ export default defineComponent({
         }
 
         .chart-mini {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 85%; /* Adjust width as needed, maybe 60% or auto */
+            background-repeat: no-repeat;
+            background-position: right center; /* Align to right */
+            background-size: contain; /* Stretch to fit */
+            opacity: 0.8; /* Optional: slight transparency if it interferes too much */
             z-index: 1;
-            display: flex;
-            align-items: flex-end;
-            height: 140px;
-
-            img {
-                height: 100%;
-                width: auto;
-                object-fit: contain;
-            }
+            pointer-events: none;
         }
 
         &.purple {

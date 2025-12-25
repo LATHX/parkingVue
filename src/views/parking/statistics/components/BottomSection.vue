@@ -8,28 +8,28 @@
         </div>
         <div class="stats-content">
           <div class="total-large">
-            <div class="number">1250</div>
+            <div class="number">{{ locationTypeStats.total }}</div>
             <div class="label">总数</div>
           </div>
           <div class="types-row">
-            <div class="type-item airport">
+            <div class="type-item airport" v-if="locationTypeStats.list.find(i => i.type === 'flight')">
               <div class="icon-img">
                 <img src="/@/assets/customerize/statistics/bottom/机场.png" alt="机场" />
               </div>
               <div class="info">
                 <div class="name">机场</div>
-                <div class="count">500</div>
-                <div class="percent">占比: 40%</div>
+                <div class="count">{{ locationTypeStats.list.find(i => i.type === 'flight').value }}</div>
+                <div class="percent">占比: {{ locationTypeStats.list.find(i => i.type === 'flight').rate }}%</div>
               </div>
             </div>
-            <div class="type-item train">
+            <div class="type-item train" v-if="locationTypeStats.list.find(i => i.type === 'train')">
               <div class="icon-img">
                 <img src="/@/assets/customerize/statistics/bottom/高铁站.png" alt="高铁站" />
               </div>
               <div class="info">
                 <div class="name">高铁站</div>
-                <div class="count">750</div>
-                <div class="percent">占比: 60%</div>
+                <div class="count">{{ locationTypeStats.list.find(i => i.type === 'train').value }}</div>
+                <div class="percent">占比: {{ locationTypeStats.list.find(i => i.type === 'train').rate }}%</div>
               </div>
             </div>
           </div>
@@ -59,7 +59,7 @@
       </div>
       <div class="stats-content">
         <div class="total-large">
-          <div class="number">9222</div>
+          <div class="number">{{ userStats.customerCount }}</div>
           <div class="label">总数</div>
         </div>
         <div class="merchant-row">
@@ -69,34 +69,34 @@
              <span>车场商户</span>
             </span>
              
-               <span class="count">287</span>
+               <span class="count">{{ userStats.merchantCount }}</span>
            </div>
         </div>
         <div class="gender-row">
-           <div class="gender-box blue">
+           <div class="gender-box blue" v-if="userStats.sexList.find(i => i.name === 'man')">
                <div class="progress-bar">
-                   <div class="progress-fill blue" style="height: 60%"></div>
+                   <div class="progress-fill blue" :style="{ height: userStats.sexList.find(i => i.name === 'man').rate + '%' }"></div>
                    <div class="icon">
                     <img src="/@/assets/customerize/statistics/bottom/男性.png" alt="男性" />
                 </div>
                </div>
                <div class="info">
                    <div class="label">男性顾客</div>
-                   <div class="count blue-text">5361</div>
-                   <div class="percent">占比: 60%</div>
+                   <div class="count blue-text">{{ userStats.sexList.find(i => i.name === 'man').value }}</div>
+                   <div class="percent">占比: {{ userStats.sexList.find(i => i.name === 'man').rate }}%</div>
                </div>
            </div>
-           <div class="gender-box orange">
+           <div class="gender-box orange" v-if="userStats.sexList.find(i => i.name === 'lady')">
                <div class="progress-bar">
-                   <div class="progress-fill orange" style="height: 40%"></div>
+                   <div class="progress-fill orange" :style="{ height: userStats.sexList.find(i => i.name === 'lady').rate + '%' }"></div>
                    <div class="icon">
                     <img src="/@/assets/customerize/statistics/bottom/女性.png" alt="女性" />
                 </div>
                </div>
                <div class="info">
                    <div class="label">女性顾客</div>
-                   <div class="count orange-text">3574</div>
-                   <div class="percent">占比: 40%</div>
+                   <div class="count orange-text">{{ userStats.sexList.find(i => i.name === 'lady').value }}</div>
+                   <div class="percent">占比: {{ userStats.sexList.find(i => i.name === 'lady').rate }}%</div>
                </div>
            </div>
         </div>
@@ -124,21 +124,100 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent } from 'vue';
+  import { defineComponent, ref, onMounted } from 'vue';
   import Pie from '/@/components/chart/Pie.vue';
+  import { queryLocationTypeStatistics, queryCityLotStatistics, queryUserMerchantStats, queryCustomerCityStats } from '../statistics.api';
 
   export default defineComponent({
     name: 'BottomSection',
     components: { Pie },
     setup() {
-      const pieData = [
-        { value: 250, name: '广州市' },
-        { value: 220, name: '上海市' },
-        { value: 130, name: '深圳市' },
-        { value: 100, name: '苏州市' },
-        { value: 50, name: '重庆市' },
-        { value: 250, name: '其它' },
-      ];
+      const locationTypeStats = ref({
+        total: 0,
+        list: [] as any[]
+      });
+
+      const userStats = ref({
+        customerCount: 0,
+        merchantCount: 0,
+        sexList: [] as any[]
+      });
+
+      const pieData = ref<any[]>([]);
+      const bubbleData = ref<any[]>([]);
+
+      const fetchLocationTypeStats = async () => {
+        try {
+          const res = await queryLocationTypeStatistics();
+          if (res) {
+            locationTypeStats.value = res;
+          }
+        } catch (error) {
+          console.error('Failed to fetch location type statistics:', error);
+        }
+      };
+
+      const fetchUserStats = async () => {
+        try {
+          const res = await queryUserMerchantStats();
+          if (res) {
+            userStats.value = res;
+          }
+        } catch (error) {
+          console.error('Failed to fetch user stats:', error);
+        }
+      };
+
+      const fetchCityLotStats = async () => {
+        try {
+          const res = await queryCityLotStatistics();
+          const data = Array.isArray(res) ? res : res?.result;
+          if (Array.isArray(data)) {
+            pieData.value = data;
+          }
+        } catch (error) {
+          console.error('Failed to fetch city lot statistics:', error);
+        }
+      };
+
+      const fetchCustomerCityStats = async () => {
+        try {
+          const res = await queryCustomerCityStats();
+          const data = Array.isArray(res) ? res : res?.result;
+          
+          if (Array.isArray(data)) {
+             // Sort and limit if needed, though backend implies top 10
+             const sortedData = data.sort((a: any, b: any) => b.value - a.value).slice(0, 10);
+             
+             bubbleData.value = sortedData.map((city: any, index: number) => {
+                // Determine size class
+                let sizeClass = 'small';
+                if (index === 0) sizeClass = 'largest'; // Rank 1 is largest
+                else if (city.value > 2000) sizeClass = 'big';
+                else if (city.value > 1000) sizeClass = 'medium';
+
+                // Assign position (cycle through if more data than positions)
+                const pos = positions[index % positions.length];
+                
+                // Assign color (cycle through)
+                const colorPair = colors[index % colors.length];
+                const bgStyle = `linear-gradient(135deg, ${colorPair[0]}, ${colorPair[1]})`;
+
+                return {
+                    ...city,
+                    sizeClass,
+                    style: {
+                        top: pos.top,
+                        left: pos.left,
+                        background: bgStyle,
+                    }
+                };
+             });
+          }
+        } catch (error) {
+          console.error('Failed to fetch customer city stats:', error);
+        }
+      };
 
       const pieOption = {
         color: ['#ff4d4f', '#faad14', '#52c41a', '#1890ff', '#722ed1', '#eb2f96'],
@@ -153,8 +232,8 @@
             itemGap: 13, // Adjust gap between items
             icon: 'circle', // Change legend icon to circle
             formatter: (name: string) => {
-                const item = pieData.find(p => p.name === name);
-                const total = pieData.reduce((acc, cur) => acc + cur.value, 0);
+                const item = pieData.value.find((p: any) => p.name === name);
+                const total = pieData.value.reduce((acc: number, cur: any) => acc + cur.value, 0);
                 const percent = item ? ((item.value / total) * 100).toFixed(0) + '%' : ''; // Removed decimals for cleaner look
                 // Pad name for alignment (simple approach)
                 return `${name}  ${item?.value}/${percent}`;
@@ -190,20 +269,6 @@
         ]
       };
 
-      // Backend data simulation (Sorted by value)
-      const customerCities = [
-        { name: '广州市', value: 3768 },
-        { name: '深圳市', value: 2533 },
-        { name: '北京市', value: 1283 },
-        { name: '上海市', value: 1119 },
-        { name: '苏州市', value: 899 },
-        { name: '天津市', value: 721 },
-        { name: '东莞市', value: 691 },
-        { name: '佛山市', value: 544 },
-        { name: '成都市', value: 534 },
-        { name: '重庆市', value: 521 },
-      ].sort((a, b) => b.value - a.value);
-
       // Predefined positions designed to avoid collision
       // Rank 1 is at center (50%, 50%)
       const positions = [
@@ -228,32 +293,14 @@
           ['rgba(79, 172, 254, 0.7)', 'rgba(0, 242, 254, 0.7)'], // Light Blue
       ];
 
-      const bubbleData = customerCities.map((city, index) => {
-          // Determine size class
-          let sizeClass = 'small';
-          if (index === 0) sizeClass = 'largest'; // Rank 1 is largest
-          else if (city.value > 2000) sizeClass = 'big';
-          else if (city.value > 1000) sizeClass = 'medium';
-
-          // Assign position (cycle through if more data than positions)
-          const pos = positions[index % positions.length];
-          
-          // Assign color (cycle through)
-          const colorPair = colors[index % colors.length];
-          const bgStyle = `linear-gradient(135deg, ${colorPair[0]}, ${colorPair[1]})`;
-
-          return {
-              ...city,
-              sizeClass,
-              style: {
-                  top: pos.top,
-                  left: pos.left,
-                  background: bgStyle,
-              }
-          };
+      onMounted(() => {
+        fetchLocationTypeStats();
+        fetchCityLotStats();
+        fetchUserStats();
+        fetchCustomerCityStats();
       });
 
-      return { pieData, pieOption, bubbleData };
+      return { pieData, pieOption, bubbleData, locationTypeStats, userStats };
     },
   });
 </script>
@@ -309,7 +356,7 @@
             justify-content: space-between;
             .type-item {
               flex: 1;
-              margin: 0 4px;
+              margin: 0 10px;
               padding: 10px;
               border-radius: 4px;
               text-align: center;

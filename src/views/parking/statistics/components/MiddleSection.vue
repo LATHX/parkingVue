@@ -5,9 +5,9 @@
       <div class="card-header">
         <span class="title">订单统计</span>
         <div class="actions">
-          <span class="active">日</span>
-          <span>月</span>
-          <span>年</span>
+          <span :class="{ active: timeType === 'D' }" @click="handleTypeChange('D')">日</span>
+          <span :class="{ active: timeType === 'M' }" @click="handleTypeChange('M')">月</span>
+          <span :class="{ active: timeType === 'Y' }" @click="handleTypeChange('Y')">年</span>
         </div>
       </div>
       <div class="chart-content">
@@ -53,8 +53,8 @@
               <span :class="['status-tag', item.statusClass]">{{ item.status }}</span>
             </div>
             <div class="order-sub">
-              <span>{{ item.parkName }}</span>
-              <span>{{ item.time }}</span>
+              <span class="park-name" :title="item.parkName">{{ item.parkName }}</span>
+                      <span class="order-time">{{ item.time }}</span>
             </div>
           </div>
         </div>
@@ -64,43 +64,115 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref } from 'vue';
+  import { defineComponent, ref, onMounted } from 'vue';
   import * as echarts from 'echarts';
   import SingleLine from '/@/components/chart/SingleLine.vue';
+  import { queryOrderChartStatistics, queryTop5CityOrderStatistics, queryNewOrderStatistics } from '../statistics.api';
 
   export default defineComponent({
     name: 'MiddleSection',
     components: { SingleLine },
     setup() {
-      const cityData = [
-        { city: '广州市', count: 2324, amount: '1,345,220' },
-        { city: '深圳市', count: 2275, amount: '1,164,590' },
-        { city: '东莞市', count: 1935, amount: '992,450' },
-        { city: '佛山市', count: 1846, amount: '792,800' },
-        { city: '北京市', count: 1799, amount: '654,950' },
-      ];
+      const cityData = ref<any[]>([]);
+      const latestOrders = ref<any[]>([]);
 
-      const latestOrders = [
-        { id: '13800138000', status: '待支付', statusClass: 'pending', parkName: 'XXXXXXXX停车场', time: '2025-10-20 15:55:55' },
-        { id: '杨光明', status: '进行中', statusClass: 'processing', parkName: 'XXXXXXXX停车场', time: '2025-10-20 15:51:23' },
-        { id: '赵梓轩', status: '已取消', statusClass: 'canceled', parkName: 'XXXXXXXX停车场', time: '2025-10-20 15:43:11' },
-        { id: '李思思', status: '待付款', statusClass: 'pending-red', parkName: 'XXXXXXXX停车场', time: '2025-10-20 15:30:22' },
-      ];
+      const getStatusClass = (status: string) => {
+        switch (status) {
+          case '0': // 待支付
+          case '2': // 待付尾款
+          case '7': // 待完成
+          case '5': // 待退款
+            return 'pending';
+          case '1': // 进行中
+            return 'processing';
+          case '3': // 已完成
+          case '4': // 系统结单
+          case '8': // 已退款
+            return 'processing'; 
+          case '6': // 已取消
+            return 'canceled';
+          default:
+            return '';
+        }
+      };
 
-      const chartData = [
-        { name: '1月', value: 50 },
-        { name: '2月', value: 100 },
-        { name: '3月', value: 350 },
-        { name: '4月', value: 400 },
-        { name: '5月', value: 910 },
-        { name: '6月', value: 250 },
-        { name: '7月', value: 800 },
-        { name: '8月', value: 500 },
-        { name: '9月', value: 450 },
-        { name: '10月', value: 1320 },
-        { name: '11月', value: 300 },
-        { name: '12月', value: 400 },
-      ];
+      const getStatusText = (status: string) => {
+        const map: Record<string, string> = {
+          '0': '待支付',
+          '1': '进行中',
+          '2': '待付尾款',
+          '3': '已完成',
+          '4': '系统结单',
+          '5': '待退款',
+          '6': '已取消',
+          '7': '待完成',
+          '8': '已退款'
+        };
+        return map[status] || status;
+      };
+
+      const chartData = ref<any[]>([]);
+      const timeType = ref('D'); // D: Day, M: Month, Y: Year
+
+      const fetchOrderStats = async () => {
+        try {
+          const res = await queryOrderChartStatistics({ type: timeType.value });
+          if (res && res.result) {
+            chartData.value = res.result;
+          } else if (Array.isArray(res)) {
+            chartData.value = res;
+          }
+        } catch (error) {
+          console.error('Failed to fetch order statistics:', error);
+        }
+      };
+
+      const fetchCityStats = async () => {
+        try {
+          const res = await queryTop5CityOrderStatistics();
+          const data = Array.isArray(res) ? res : res?.result;
+          if (Array.isArray(data)) {
+            cityData.value = data.map((item: any) => ({
+              city: item.name,
+              count: item.value,
+              amount: item.amount
+            }));
+          }
+        } catch (error) {
+          console.error('Failed to fetch city statistics:', error);
+        }
+      };
+
+      const fetchLatestOrders = async () => {
+        try {
+            const res = await queryNewOrderStatistics();
+            // Handle both direct array (if API changes back) or Page object (records)
+            const data = Array.isArray(res) ? res : (res?.records || res?.result);
+            
+            if (Array.isArray(data)) {
+                latestOrders.value = data.map((item: any) => ({
+                    id: item.userId_dictText || item.userId, // Prefer dictText if available
+                    status: getStatusText(item.payStatus),
+                    statusClass: getStatusClass(item.payStatus),
+                    parkName: item.parkingName,
+                    time: item.createTime
+                }));
+            }
+        } catch (error) {
+            console.error('Failed to fetch latest orders:', error);
+        }
+      };
+
+      const handleTypeChange = (type: string) => {
+        timeType.value = type;
+        fetchOrderStats();
+      };
+
+      onMounted(() => {
+        fetchOrderStats();
+        fetchCityStats();
+        fetchLatestOrders();
+      });
 
       const chartOption = {
          grid: { top: 40, right: 20, bottom: 20, left: 40, containLabel: true },
@@ -149,7 +221,7 @@
          }]
       };
 
-      return { cityData, latestOrders, chartData, chartOption };
+      return { cityData, latestOrders, chartData, chartOption, timeType, handleTypeChange };
     },
   });
 </script>
@@ -221,9 +293,14 @@
       }
 
       .order-list {
-          overflow-y: auto;
+          overflow: hidden; /* Hide scrollbar */
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          height: 100%;
+          
           .order-item {
-              padding: 12px 0;
+              padding: 8px 0; /* Reduce padding slightly */
               border-bottom: 1px solid #f0f0f0;
               &:last-child { border-bottom: none; }
               
@@ -231,11 +308,11 @@
                   .order-main {
                       display: flex;
                       justify-content: space-between;
-                      margin-bottom: 6px;
-                      .order-id { font-weight: 500; font-size: 14px; }
+                      margin-bottom: 4px; /* Reduce margin */
+                      .order-id { font-weight: 500; font-size: 13px; } /* Slightly smaller font */
                       .status-tag {
                           font-size: 12px;
-                          padding: 2px 6px;
+                          padding: 1px 5px; /* Compact tag */
                           border-radius: 4px;
                           &.pending { background: #fff7e6; color: #fa8c16; }
                           &.processing { background: #e6f7ff; color: #1890ff; }
@@ -248,6 +325,19 @@
                       justify-content: space-between;
                       color: #999;
                       font-size: 12px;
+                      
+                      .park-name {
+                          flex: 1;
+                          overflow: hidden;
+                          text-overflow: ellipsis;
+                          white-space: nowrap;
+                          margin-right: 8px; /* Add some spacing between name and time */
+                      }
+
+                      .order-time {
+                          flex-shrink: 0; /* Prevent time from shrinking */
+                          font-size: 11px; /* Slightly smaller time font */
+                      }
                   }
               }
           }
