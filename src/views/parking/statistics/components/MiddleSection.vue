@@ -82,15 +82,16 @@
           case '2': // 待付尾款
           case '7': // 待完成
           case '5': // 待退款
-            return 'pending';
           case '1': // 进行中
-            return 'processing';
+            return 'processing';break;
           case '3': // 已完成
+            return 'processing';break;
           case '4': // 系统结单
+            return 'processing';break;
           case '8': // 已退款
-            return 'processing'; 
+            return 'pending-red'; break;
           case '6': // 已取消
-            return 'canceled';
+            return 'pending-red';break;
           default:
             return '';
         }
