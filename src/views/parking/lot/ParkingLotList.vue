@@ -1,56 +1,87 @@
 <template>
-  <div class="p-2">
-    <!--查询区域-->
-    <div class="jeecg-basic-table-form-container">
-      <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
-        <a-row :gutter="24">
-          <a-col :lg="6">
-            <a-form-item name="parkingName">
-              <template #label><span title="停车场名称">停车场名</span></template>
-              <JInput v-model:value="queryParam.parkingName" />
-            </a-form-item>
-          </a-col>
-          <a-col :xl="6" :lg="7" :md="8" :sm="24">
-            <span style="float: left; overflow: hidden" class="table-page-search-submitButtons">
-              <a-col :lg="6">
-                <a-button type="primary" preIcon="ant-design:search-outlined" @click="searchQuery">查询</a-button>
-                <a-button type="primary" preIcon="ant-design:reload-outlined" @click="searchReset" style="margin-left: 8px">重置</a-button>
-                <a @click="toggleSearchStatus = !toggleSearchStatus" style="margin-left: 8px">
-                  {{ toggleSearchStatus ? '收起' : '展开' }}
-                  <Icon :icon="toggleSearchStatus ? 'ant-design:up-outlined' : 'ant-design:down-outlined'" />
-                </a>
-              </a-col>
-            </span>
-          </a-col>
-        </a-row>
-      </a-form>
+  <div class="p-2 parking-lot-list">
+    <!-- Top Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="icon-wrapper">
+          <img :src="iconParkingLeft" alt="车场总数" />
+        </div>
+        <div class="content">
+          <div class="label">车场总数</div>
+          <div class="value blue-text">{{ totalParkingAnim.toFixed(0) }}</div>
+        </div>
+        <img class="chart-line" :src="bgParkingRight" alt="车场总数" />
+      </div>
+
+      <div class="stat-card">
+        <div class="icon-wrapper">
+          <img :src="iconAirportLeft" alt="机场类型" />
+        </div>
+        <div class="content">
+          <div class="label">机场类型</div>
+          <div class="value orange-text">{{ airportAnim.toFixed(0) }}</div>
+        </div>
+            <img class="chart-line" :src="bgAirportRight" alt="车场总数" />
+      </div>
+
+      <div class="stat-card">
+        <div class="icon-wrapper">
+          <img :src="iconTrainLeft" alt="高铁站类型" />
+        </div>
+        <div class="content">
+          <div class="label">高铁站类型</div>
+          <div class="value green-text">{{ trainAnim.toFixed(0) }}</div>
+        </div>
+            <img class="chart-line" :src="bgTrainRight" alt="车场总数" />
+      </div>
+
+      <div class="stat-card">
+        <div class="icon-wrapper">
+          <img :src="iconNewLeft" alt="今日新增" />
+        </div>
+        <div class="content">
+          <div class="label">今日新增</div>
+          <div class="value red-text">{{ todayNewAnim.toFixed(0) }}</div>
+        </div>
+            <img class="chart-line" :src="bgNewRight" alt="车场总数" />
+      </div>
     </div>
+
     <!--引用表格-->
     <BasicTable @register="registerTable">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" v-auth="'parking:parking_lot:add'" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增 </a-button>
-        <a-button type="primary" v-auth="'parking:parking_lot:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出 </a-button>
-        <j-upload-button type="primary" v-auth="'parking:parking_lot:importExcel'" preIcon="ant-design:import-outlined" @click="onImportXls"
-          >导入
-        </j-upload-button>
-        <a-dropdown v-if="selectedRowKeys.length > 0">
-          <template #overlay>
-            <a-menu>
-              <a-menu-item key="1" @click="batchHandleDelete">
-                <Icon icon="ant-design:delete-outlined"></Icon>
-                删除
-              </a-menu-item>
-            </a-menu>
-          </template>
-          <a-button v-auth="'parking:parking_lot:deleteBatch'"
-            >批量操作
-            <Icon icon="mdi:chevron-down"></Icon>
-          </a-button>
-        </a-dropdown>
-        <!-- 高级查询 -->
-        <super-query :config="superQueryConfig" @search="handleSuperQuery" />
+        <div class="custom-toolbar">
+          <div class="page-title">入驻车场</div>
+        </div>
       </template>
+      <!-- Remove default toolbar -->
+      <template #toolbar>
+        <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam">
+          <div class="custom-toolbar">
+            <div style="width: 200px; margin-right: 10px">
+              <a-input v-model:value="queryParam.parkingName" placeholder="请输入停车场名称搜索" class="search-input" @pressEnter="searchQuery">
+                <template #prefix><SearchOutlined /></template>
+              </a-input>
+            </div>
+            <div class="actions">
+              <j-search-select v-model:value="queryParam.city" dict="city" placeholder="所属区域" class="filter-item" @change="handleCitySelect" />
+              <j-search-select
+                v-model:value="queryParam.locationType"
+                dict="locationType"
+                placeholder="车场类型"
+                class="filter-item"
+                @change="handleLocationTypeSelect"
+              />
+              <a-button @click="searchReset">清空</a-button>
+              <!--            <a-button @click="onImportXls">导入</a-button>-->
+              <a-button @click="onExportXls">导出</a-button>
+              <a-button type="primary" @click="handleAdd">新增</a-button>
+            </div></div
+          ></a-form
+        >
+      </template>
+
       <!--操作栏-->
       <template #action="{ record }">
         <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)" />
@@ -59,27 +90,51 @@
     </BasicTable>
     <!-- 表单区域 -->
     <ParkingLotModal ref="registerModal" @success="handleSuccess"></ParkingLotModal>
+    <ParkingLotTabsModal ref="parkingLotTabsModal" @success="handleSuccess"></ParkingLotTabsModal>
   </div>
 </template>
 
 <script lang="ts" name="parking-parkingLot" setup>
-  import { ref, reactive, watch, watchEffect } from 'vue';
+  import { ref, reactive, watch, watchEffect, onMounted } from 'vue';
   import { useRoute } from 'vue-router';
+  import { useTransition, TransitionPresets } from '@vueuse/core';
+  import { SearchOutlined } from '@ant-design/icons-vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
   import { columns, superQuerySchema } from './ParkingLot.data';
   import { list, deleteOne, batchDelete, getImportUrl, getExportUrl, audit } from './ParkingLot.api';
+  import { queryDataStatistics, queryLocationTypeStatistics } from '/@/views/parking/statistics/statistics.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
   import ParkingLotModal from './components/ParkingLotModal.vue';
+  import ParkingLotTabsModal from './components/ParkingLotTabsModal.vue';
   import { useUserStore } from '/@/store/modules/user';
   import JInput from '/@/components/Form/src/jeecg/components/JInput.vue';
-  import { EditOutlined } from '@ant-design/icons-vue';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
+
+  // Left Icons
+  import iconParkingLeft from '/@/assets/customerize/lot/车场总数左.png';
+  import iconAirportLeft from '/@/assets/customerize/lot/机场类型左.png';
+  import iconTrainLeft from '/@/assets/customerize/lot/高铁站类型左.png';
+  import iconNewLeft from '/@/assets/customerize/lot/今日新增左.png';
+
+  // Right Backgrounds
+  import bgParkingRight from '/@/assets/customerize/lot/车场总数右.png';
+  import bgAirportRight from '/@/assets/customerize/lot/机场类型右.png';
+  import bgTrainRight from '/@/assets/customerize/lot/高铁站类型右.png';
+  import bgNewRight from '/@/assets/customerize/lot/今日新增右.png';
+
+  import { JSearchSelect } from '@/components/Form';
 
   const route = useRoute();
   const formRef = ref();
-  const queryParam = reactive<any>({});
+  const queryParam = reactive<any>({
+    parkingName: undefined,
+    locationType: undefined,
+    city: undefined,
+  });
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
+  const parkingLotTabsModal = ref();
   const userStore = useUserStore();
   let customQueryParam = reactive<any>({});
   const props = defineProps({
@@ -88,6 +143,42 @@
       default: null,
     },
   });
+
+  // Stats Logic
+  const stats = ref({
+    totalParking: 0,
+    airport: 0,
+    train: 0,
+    todayNew: 0,
+  });
+
+  const duration = 1500;
+  const transition = TransitionPresets.easeOutExpo;
+  const totalParkingAnim = useTransition(() => stats.value.totalParking, { duration, transition });
+  const airportAnim = useTransition(() => stats.value.airport, { duration, transition });
+  const trainAnim = useTransition(() => stats.value.train, { duration, transition });
+  const todayNewAnim = useTransition(() => stats.value.todayNew, { duration, transition });
+
+  onMounted(async () => {
+    try {
+      const locStats = await queryLocationTypeStatistics();
+
+      // Process locStats
+      if (locStats) {
+        stats.value.totalParking = Number(locStats.total) || 0;
+        stats.value.todayNew = Number(locStats.todayAdd) || 0;
+        if (locStats.list) {
+          const air = locStats.list.find((i: any) => i.type === 'flight');
+          const tr = locStats.list.find((i: any) => i.type === 'train');
+          stats.value.airport = Number(air?.value) || 0;
+          stats.value.train = Number(tr?.value) || 0;
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  });
+
   watchEffect(() => {
     Object.assign(customQueryParam, {});
     Object.assign(customQueryParam, {
@@ -106,8 +197,14 @@
       useSearchForm: false,
       showIndexColumn: true,
       clickToRowSelect: false,
+      tableSetting: {
+        redo: false,
+        size: false,
+        setting: false,
+        fullScreen: false,
+      },
       actionColumn: {
-        width: 280,
+        width: 220,
         fixed: 'right',
       },
       beforeFetch: async (params) => {
@@ -174,6 +271,11 @@
     registerModal.value.edit(record);
   }
 
+  function handleShowInfo(record: Recordable) {
+    parkingLotTabsModal.value.disableSubmit = true;
+    parkingLotTabsModal.value.edit(record);
+  }
+
   /**
    * 删除事件
    */
@@ -208,7 +310,7 @@
     return [
       {
         tooltip: '查看',
-        onClick: handleDetail.bind(null, record),
+        onClick: handleShowInfo.bind(null, record),
         icon: 'mdi:eye',
       },
       {
@@ -237,18 +339,6 @@
         onClick: handleEdit.bind(null, record),
         icon: 'material-symbols:comment',
       },
-      // {
-      //   label: '价格',
-      //   onClick: handleOther.bind(null, 'parkingPriceList', record),
-      // },
-      // {
-      //   label: '图片',
-      //   onClick: handleOther.bind(null, 'parkingLotImage', record),
-      // },
-      // {
-      //   label: '资质',
-      //   onClick: handleOther.bind(null, 'parkingLotCertification', record),
-      // },
     ];
   }
 
@@ -256,28 +346,7 @@
    * 下拉操作栏
    */
   function getDropDownAction(record) {
-    return [
-      // {
-      //   label: '结算设置',
-      //   onClick: handleOther.bind(null, 'parkingSettlementSettingList', record),
-      // },
-      // {
-      //   label: '审核通过',
-      //   popConfirm: {
-      //     title: '是否确认审核通过',
-      //     confirm: handleAudit.bind(null, record.id, 1),
-      //     placement: 'topLeft',
-      //   },
-      // },
-      // {
-      //   label: '审核不通过',
-      //   popConfirm: {
-      //     title: '是否确认审核不通过',
-      //     confirm: handleAudit.bind(null, record.id, 2),
-      //     placement: 'topLeft',
-      //   },
-      // },
-    ];
+    return [];
   }
 
   async function handleAudit(id, auditStatus) {
@@ -288,7 +357,17 @@
    * 查询
    */
   function searchQuery() {
-    reload();
+    reload({ page: 1 });
+  }
+
+  function handleCitySelect(text) {
+    queryParam.city = text;
+    searchQuery();
+  }
+
+  function handleLocationTypeSelect(text) {
+    queryParam.locationType = text;
+    searchQuery();
   }
 
   /**
@@ -297,39 +376,130 @@
   function searchReset() {
     formRef.value.resetFields();
     selectedRowKeys.value = [];
+    queryParam.city = undefined;
+    queryParam.locationType = undefined;
+    queryParam.parkingName = undefined;
     //刷新数据
     reload();
   }
 </script>
 
 <style lang="less" scoped>
-  .jeecg-basic-table-form-container {
-    padding: 0;
-
-    .table-page-search-submitButtons {
-      display: block;
-      margin-bottom: 24px;
-      white-space: nowrap;
-    }
-
-    .query-group-cust {
-      min-width: 100px !important;
-    }
-
-    .query-group-split-cust {
-      width: 30px;
-      display: inline-block;
-      text-align: center;
-    }
-
-    .ant-form-item:not(.ant-form-item-with-help) {
+  .parking-lot-list {
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
       margin-bottom: 16px;
-      height: 32px;
+
+      .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        height: 100px;
+
+        .icon-wrapper {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 16px;
+          z-index: 2;
+
+          img {
+            width: 40px;
+            height: 40px;
+          }
+
+          &.blue-bg {
+            background: rgba(24, 144, 255, 0.1);
+          }
+          &.orange-bg {
+            background: rgba(250, 140, 22, 0.1);
+          }
+          &.green-bg {
+            background: rgba(82, 196, 26, 0.1);
+          }
+          &.red-bg {
+            background: rgba(245, 34, 45, 0.1);
+          }
+        }
+
+        .content {
+          z-index: 2;
+          .label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 4px;
+          }
+          .value {
+            font-size: 24px;
+            font-weight: bold;
+
+            &.blue-text {
+              color: #1890ff;
+            }
+            &.orange-text {
+              color: #fa8c16;
+            }
+            &.green-text {
+              color: #52c41a;
+            }
+            &.red-text {
+              color: #f5222d;
+            }
+          }
+        }
+        .chart-line {
+          position: absolute;
+          right: 0;
+          bottom: 0;
+          height: 80px;
+          width: 248px;
+          object-fit: fill;
+          z-index: 1;
+        }
+      }
     }
 
-    :deep(.ant-picker),
-    :deep(.ant-input-number) {
-      width: 100%;
+    .custom-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 0px;
+
+      .page-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+
+        .search-input {
+          width: 260px !important;
+          border-radius: 4px;
+        }
+
+        .filter-item {
+          width: 120px;
+        }
+      }
     }
+  }
+
+  /* Override basic table default padding/margin if needed */
+  :deep(.jeecg-basic-table-form-container) {
+    padding: 0;
   }
 </style>

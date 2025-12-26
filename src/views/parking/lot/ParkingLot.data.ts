@@ -1,15 +1,32 @@
 import { BasicColumn } from '/@/components/Table';
+import { render } from '@/utils/common/renderUtils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
     title: '车场名称',
     align: 'center',
     dataIndex: 'parkingName',
+    customRender: ({ text }) => {
+      return render.renderTip(text);
+    },
   },
   {
     title: '车场位置',
     align: 'center',
     dataIndex: 'parkingLocationId_dictText',
+  },
+  {
+    title: '车场类型',
+    align: 'center',
+    dataIndex: 'locationType_dictText',
+    customRender: ({ text }) => {
+      return render.renderDict(text, 'locationType');
+    },
+  },
+  {
+    title: '所属区域',
+    align: 'center',
+    dataIndex: 'city_dictText',
   },
   {
     title: '紧急联系人',
@@ -22,14 +39,20 @@ export const columns: BasicColumn[] = [
     dataIndex: 'phone',
   },
   {
-    title: '当前休息状态',
+    title: '当前状态',
     align: 'center',
-    dataIndex: 'isRestValue_dictText',
+    dataIndex: 'isRestValue',
+    customRender: ({ text }) => {
+      return render.renderDict(text, 'is_rest_value', true);
+    },
   },
   {
     title: '地址',
     align: 'center',
     dataIndex: 'address',
+    customRender: ({ text }) => {
+      return render.renderTip(text);
+    },
   },
 ];
 

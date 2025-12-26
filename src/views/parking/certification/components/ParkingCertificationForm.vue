@@ -60,8 +60,8 @@
               </a-form-item>
             </a-col>
             <a-col :span="24">
-              <a-form-item label="审核状态" v-bind="validateInfos.auditStatus" id="ParkingCertificationForm-auditStatus" name="auditStatus">
-                <j-image-upload :fileMax="0" v-model:value="formData.auditStatus"></j-image-upload>
+              <a-form-item label="审核状态" v-bind="validateInfos.auditStatus" id="ParkingLotImageForm-auditStatus" name="auditStatus">
+                <j-dict-select-tag v-model:value="formData.auditStatus" dictCode="audit_status" placeholder="请选择审核状态" allow-clear />
               </a-form-item>
             </a-col>
           </a-row>
@@ -81,6 +81,7 @@
   import { Form } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
   import JSearchSelect from '../../../../components/Form/src/jeecg/components/JSearchSelect.vue';
+  import JDictSelectTag from '../../../../components/Form/src/jeecg/components/JDictSelectTag.vue';
 
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
