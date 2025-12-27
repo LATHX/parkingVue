@@ -3,13 +3,17 @@
     <JFormContainer :disabled="disabled">
       <template #detail>
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ParkingBondForm">
+          <div class="section-header">
+            <span class="bar">|</span>
+            <span class="title">车场保证金</span>
+          </div>
           <a-row>
-            <a-col :span="24">
+            <a-col :span="16" :hidden="formData.parkingId !== null">
               <a-form-item label="停车场名称" v-bind="validateInfos.parkingId" id="ParkingLotImageForm-parkingId" name="parkingId">
                 <j-search-select v-model:value="formData.parkingId" dict="parking_lot,parking_name,id" allow-clear />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
+            <a-col :span="16">
               <a-form-item label="保证金金额" v-bind="validateInfos.balance" id="ParkingBondForm-balance" name="balance">
                 <a-input-number v-model:value="formData.balance" placeholder="请输入保证金金额" style="width: 100%" />
               </a-form-item>
@@ -146,5 +150,24 @@
 <style lang="less" scoped>
   .antd-modal-form {
     padding: 14px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    margin-top: 8px;
+
+    .bar {
+      color: #1890ff;
+      font-weight: bold;
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+    }
   }
 </style>

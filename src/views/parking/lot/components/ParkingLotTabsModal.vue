@@ -27,7 +27,8 @@
           <ParkingCertificationForm ref="ParkingCertificationFormRef" @ok="submitCallback" :formDisabled="disableSubmit" :formBpm="false" />
         </a-tab-pane>
         <a-tab-pane key="6" tab="其他信息" :forceRender="true">
-          <ParkingSettlementSettingList :parking-id="parkingId" />
+          <ParkingBondForm ref="ParkingBondFormRef" @ok="submitCallback" :formDisabled="disableSubmit" :formBpm="false" />
+          <ParkingBankInfoForm ref="ParkingBankInfoFormRef" @ok="submitCallback" :formDisabled="disableSubmit" :formBpm="false"></ParkingBankInfoForm>
         </a-tab-pane>
       </a-tabs>
     </div>
@@ -42,7 +43,8 @@
   import ParkingLotImageForm from '@/views/parking/image/components/ParkingLotImageForm.vue';
   import ParkingPriceForm from '@/views/parking/price/components/ParkingPriceForm.vue';
   import ParkingCertificationForm from '@/views/parking/certification/components/ParkingCertificationForm.vue';
-  import ParkingSettlementSettingList from '@/views/parking/settlementSetting/ParkingSettlementSettingList.vue';
+  import ParkingBondForm from '@/views/parking/bond/components/ParkingBondForm.vue';
+  import ParkingBankInfoForm from '@/views/parking/bank/components/ParkingBankInfoForm.vue';
 
   const ATabs = Tabs;
   const ATabPane = Tabs.TabPane;
@@ -56,6 +58,8 @@
   const parkingInnerPriceFormRef = ref();
   const ParkingLotImageFormRef = ref();
   const ParkingCertificationFormRef = ref();
+  const ParkingBondFormRef = ref();
+  const ParkingBankInfoFormRef = ref();
   const activeKey = ref('1');
   const emit = defineEmits(['register', 'success']);
 
@@ -81,20 +85,47 @@
     activeKey.value = '1';
     parkingId.value = record.id;
     title.value = disableSubmit.value ? '详情' : '编辑';
-    let parkingOuterPriceRecord = record.parkingPricesList.filter((item) => item.parkingType === '0');
-    let parkingInnerPriceRecord = record.parkingPricesList.filter((item) => item.parkingType === '1');
-    if (parkingOuterPriceRecord.length > 0) {
-      parkingOuterPriceRecord = parkingOuterPriceRecord[0];
-    }
-    if (parkingInnerPriceRecord.length > 0) {
-      parkingInnerPriceRecord = parkingInnerPriceRecord[0];
+    let defaultInfo = { parkingId: record.id };
+    let parkingOuterPriceRecord = defaultInfo;
+    let parkingInnerPriceRecord = defaultInfo;
+    let parkingLotImageRecord = defaultInfo;
+    let parkingCertificationRecord = defaultInfo;
+    let parkingBondRecord = defaultInfo;
+    let parkingBankInfoRecord = defaultInfo;
+    if (record.parkingPricesList) {
+      let outerTempList = record.parkingPricesList.filter((item) => item.parkingType === '0');
+      let innerTempList = record.parkingPricesList.filter((item) => item.parkingType === '1');
+      if (outerTempList.length > 0) {
+        parkingOuterPriceRecord = outerTempList[0];
+      } else {
+        parkingOuterPriceRecord.parkingType = '0';
+      }
+      if (innerTempList.length > 0) {
+        parkingInnerPriceRecord = innerTempList[0];
+      } else {
+        parkingOuterPriceRecord.parkingType = '1';
+      }
+      if (record.parkingLotImage) {
+        parkingLotImageRecord = record.parkingLotImage;
+      }
+      if (record.parkingCertification) {
+        parkingCertificationRecord = record.parkingCertification;
+      }
+      if (record.parkingBond) {
+        parkingBondRecord = record.parkingBond;
+      }
+      if (record.parkingBankInfo) {
+        parkingBankInfoRecord = record.parkingBankInfo;
+      }
     }
     nextTick(() => {
       parkingLotFormRef.value.edit(record);
       parkingOuterPriceFormRef.value.edit(parkingOuterPriceRecord);
       parkingInnerPriceFormRef.value.edit(parkingInnerPriceRecord);
-      ParkingLotImageFormRef.value.edit(record.parkingLotImage);
-      ParkingCertificationFormRef.value.edit(record.parkingCertification);
+      ParkingLotImageFormRef.value.edit(parkingLotImageRecord);
+      ParkingCertificationFormRef.value.edit(parkingCertificationRecord);
+      ParkingBondFormRef.value.edit(parkingBondRecord);
+      ParkingBankInfoFormRef.value.edit(parkingBankInfoRecord);
     });
     visible.value = true;
   }
@@ -109,7 +140,20 @@
       title.value = '编辑';
     } else {
       // 当前是编辑状态，点击保存
-      parkingLotFormRef.value.submitForm();
+      if (activeKey.value === '1') {
+        parkingLotFormRef.value.submitForm();
+      } else if (activeKey.value === '2') {
+        parkingOuterPriceFormRef.value.submitForm();
+      } else if (activeKey.value === '3') {
+        parkingInnerPriceFormRef.value.submitForm();
+      } else if (activeKey.value === '4') {
+        ParkingLotImageFormRef.value.submitForm();
+      } else if (activeKey.value === '5') {
+        ParkingCertificationFormRef.value.submitForm();
+      } else if (activeKey.value === '6') {
+        ParkingBondFormRef.value.submitForm();
+        ParkingBankInfoFormRef.value.submitForm();
+      }
     }
   }
 
@@ -117,7 +161,7 @@
    * form保存回调事件
    */
   function submitCallback() {
-    handleCancel();
+    // handleCancel();
     emit('success');
   }
 

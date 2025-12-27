@@ -8,12 +8,12 @@
             <span class="title">车位价格表</span>
           </div>
           <a-row :gutter="24">
-            <a-col :span="24" v-show="false">
+            <a-col :span="24" :hidden="formData.parkingId !== null">
               <a-form-item label="停车场名" v-bind="validateInfos.parkingId" id="ParkingPriceForm-parkingId" name="parkingId">
                 <j-search-select v-model:value="formData.parkingId" dict="parking_lot,parking_name,id" allow-clear />
               </a-form-item>
             </a-col>
-            
+
             <a-col :span="12">
               <a-form-item label="车位类型" v-bind="validateInfos.parkingType" id="ParkingPriceForm-parkingType" name="parkingType">
                 <j-dict-select-tag v-model:value="formData.parkingType" dictCode="parking_type" placeholder="请选择车位类型" allow-clear />
@@ -224,6 +224,7 @@
   const validatorRules = reactive({
     stockTotal: [{ required: true, message: '必填项!' }],
     stock: [{ required: true, message: '必填项!' }],
+    parkingId: [{ required: true, message: '必填项!' }],
     parkingPriceSum1: [{ required: true, message: '必填项!' }],
     afterDay: [{ required: true, message: '必填项!' }],
     afterDailyPrice: [{ required: true, message: '必填项!' }],

@@ -4,14 +4,14 @@
       <template #detail>
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ParkingLotImageForm">
           <a-row>
-            <a-col :span="24">
+            <a-col :span="24" :hidden="formData.parkingId !== null">
               <a-form-item label="停车场名称" v-bind="validateInfos.parkingId" id="ParkingLotImageForm-parkingId" name="parkingId">
                 <j-search-select v-model:value="formData.parkingId" dict="parking_lot,parking_name,id" allow-clear />
               </a-form-item>
             </a-col>
             <a-col :span="24">
               <a-form-item label="停车场主图" v-bind="validateInfos.mainImg" id="ParkingLotImageForm-mainImg" name="mainImg">
-                <j-image-upload :fileMax="0" v-model:value="formData.mainImg"/>
+                <j-image-upload :fileMax="0" v-model:value="formData.mainImg" />
               </a-form-item>
             </a-col>
             <a-col :span="24">
@@ -26,7 +26,7 @@
             </a-col>
             <a-col :span="24">
               <a-form-item label="接送车图" v-bind="validateInfos.transferCarImg" id="ParkingLotImageForm-transferCarImg" name="transferCarImg">
-                <j-image-upload :fileMax="0" v-model:value="formData.transferCarImg"/>
+                <j-image-upload :fileMax="0" v-model:value="formData.transferCarImg" />
               </a-form-item>
             </a-col>
             <a-col :span="24">
