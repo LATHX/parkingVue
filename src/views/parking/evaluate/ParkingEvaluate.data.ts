@@ -6,19 +6,24 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '停车场',
+    title: '评价时间',
     align: 'center',
-    dataIndex: 'parkingId_dictText',
+    dataIndex: 'createTime',
   },
   {
-    title: '用户',
+    title: '用户名称',
     align: 'center',
     dataIndex: 'userId_dictText',
   },
   {
     title: '星级',
     align: 'center',
-    dataIndex: 'star_dictText',
+    dataIndex: 'star',
+  },
+  {
+    title: '评价类型',
+    align: 'center',
+    dataIndex: 'evaluateType_dictText',
   },
   {
     title: '评价内容',
@@ -26,9 +31,9 @@ export const columns: BasicColumn[] = [
     dataIndex: 'content',
   },
   {
-    title: '评价类型',
+    title: '车场名称',
     align: 'center',
-    dataIndex: 'evaluateType_dictText',
+    dataIndex: 'parkingId_dictText',
   },
 ];
 

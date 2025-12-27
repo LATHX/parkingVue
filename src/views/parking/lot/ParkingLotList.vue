@@ -21,7 +21,7 @@
           <div class="label">机场类型</div>
           <div class="value orange-text">{{ airportAnim.toFixed(0) }}</div>
         </div>
-            <img class="chart-line" :src="bgAirportRight" alt="车场总数" />
+        <img class="chart-line" :src="bgAirportRight" alt="车场总数" />
       </div>
 
       <div class="stat-card">
@@ -32,7 +32,7 @@
           <div class="label">高铁站类型</div>
           <div class="value green-text">{{ trainAnim.toFixed(0) }}</div>
         </div>
-            <img class="chart-line" :src="bgTrainRight" alt="车场总数" />
+        <img class="chart-line" :src="bgTrainRight" alt="车场总数" />
       </div>
 
       <div class="stat-card">
@@ -43,7 +43,7 @@
           <div class="label">今日新增</div>
           <div class="value red-text">{{ todayNewAnim.toFixed(0) }}</div>
         </div>
-            <img class="chart-line" :src="bgNewRight" alt="车场总数" />
+        <img class="chart-line" :src="bgNewRight" alt="车场总数" />
       </div>
     </div>
 
@@ -91,6 +91,7 @@
     <!-- 表单区域 -->
     <ParkingLotModal ref="registerModal" @success="handleSuccess"></ParkingLotModal>
     <ParkingLotTabsModal ref="parkingLotTabsModal" @success="handleSuccess"></ParkingLotTabsModal>
+    <ParkingEvaluateListModal ref="parkingEvaluateListModal"></ParkingEvaluateListModal>
   </div>
 </template>
 
@@ -107,6 +108,7 @@
   import { downloadFile } from '/@/utils/common/renderUtils';
   import ParkingLotModal from './components/ParkingLotModal.vue';
   import ParkingLotTabsModal from './components/ParkingLotTabsModal.vue';
+  import ParkingEvaluateListModal from './components/ParkingEvaluateListModal.vue';
   import { useUserStore } from '/@/store/modules/user';
   import JInput from '/@/components/Form/src/jeecg/components/JInput.vue';
   import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
@@ -135,6 +137,7 @@
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
   const parkingLotTabsModal = ref();
+  const parkingEvaluateListModal = ref();
   const userStore = useUserStore();
   let customQueryParam = reactive<any>({});
   const props = defineProps({
@@ -208,7 +211,7 @@
         fixed: 'right',
       },
       beforeFetch: async (params) => {
-        return Object.assign(params, queryParam, customQueryParam);
+        return Object.assign(params, queryParam, customQueryParam, { auditStatus: '1' });
       },
     },
     exportConfig: {
@@ -276,6 +279,11 @@
     parkingLotTabsModal.value.edit(record);
   }
 
+  function handleEvaluate(record: Recordable) {
+    console.log(record)
+    parkingEvaluateListModal.value.show(record.id);
+  }
+
   /**
    * 删除事件
    */
@@ -336,7 +344,7 @@
       },
       {
         tooltip: '车场评价',
-        onClick: handleEdit.bind(null, record),
+        onClick: handleEvaluate.bind(null, record),
         icon: 'material-symbols:comment',
       },
     ];

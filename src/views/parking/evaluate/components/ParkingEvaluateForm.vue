@@ -16,7 +16,7 @@
             </a-col>
             <a-col :span="24">
               <a-form-item label="用户名" v-bind="validateInfos.userName" id="ParkingEvaluateForm-userName" name="userName">
-                <a-input v-model:value="formData.userName" placeholder="请输入用户名" allow-clear disabled />
+                <a-input v-model:value="formData.userName" placeholder="请输入用户名" allow-clear />
               </a-form-item>
             </a-col>
             <a-col :span="24">
@@ -31,7 +31,7 @@
             </a-col>
             <a-col :span="24">
               <a-form-item label="评价类型" v-bind="validateInfos.evaluateType" id="ParkingEvaluateForm-evaluateType" name="evaluateType">
-                <j-search-select v-model:value="formData.evaluateType" dict="evaluate_type" disabled allow-clear />
+                <j-search-select v-model:value="formData.evaluateType" dict="evaluate_type" allow-clear />
               </a-form-item>
             </a-col>
             <a-col :span="24">
