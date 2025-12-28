@@ -6,15 +6,21 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
+    title: '订单时间',
+    align: 'center',
+    dataIndex: 'createTime',
+    width: 180,
+  },
+  {
     title: '订单号',
     align: 'center',
     dataIndex: 'id',
     width: 180,
   },
   {
-    title: '支付方式',
+    title: '关联车场',
     align: 'center',
-    dataIndex: 'payType_dictText',
+    dataIndex: 'parkingName',
   },
   {
     title: '车辆状态',
@@ -22,91 +28,9 @@ export const columns: BasicColumn[] = [
     dataIndex: 'carStatus_dictText',
   },
   {
-    title: '手机号',
-    align: 'center',
-    dataIndex: 'userId_dictText',
-  },
-  {
-    title: '商家名',
-    align: 'center',
-    dataIndex: 'merchantId_dictText',
-  },
-  {
-    title: '停车场',
-    align: 'center',
-    dataIndex: 'parkingName',
-  },
-  {
-    title: '车位类型',
-    align: 'center',
-    dataIndex: 'parkingType_dictText',
-  },
-  {
-    title: '车牌号',
-    align: 'center',
-    dataIndex: 'carPlate',
-  },
-  {
-    title: '出行人数',
-    align: 'center',
-    dataIndex: 'peopleCount',
-  },
-
-  {
-    title: '支付状态',
+    title: '订单状态',
     align: 'center',
     dataIndex: 'payStatus_dictText',
-  },
-
-  {
-    title: '预计进场时间',
-    align: 'center',
-    dataIndex: 'predictStartDate',
-  },
-  {
-    title: '预计离场时间',
-    align: 'center',
-    dataIndex: 'predictEndDate',
-  },
-  {
-    title: '预计停车天数/小时',
-    align: 'center',
-    dataIndex: 'predictTotalDay',
-  },
-  {
-    title: '实际进场时间',
-    align: 'center',
-    dataIndex: 'realStartDate',
-  },
-  {
-    title: '实际离场时间',
-    align: 'center',
-    dataIndex: 'realEndDate',
-  },
-  {
-    title: '实际停车天数',
-    align: 'center',
-    dataIndex: 'realTotalDay',
-  },
-  {
-    title: '优惠卷ID',
-    align: 'center',
-    dataIndex: 'couponId',
-  },
-  {
-    title: '优惠卷金额',
-    align: 'center',
-    dataIndex: 'couponPrice',
-  },
-  {
-    title: '平台承担优惠卷金额',
-    align: 'center',
-    dataIndex: 'settlementPlatformCouponPrice',
-  },
-  {
-    title: '商家承担优惠卷金额',
-    align: 'center',
-    dataIndex: 'settlementMerchantCouponPrice',
   },
   {
     title: '应付金额',
@@ -124,39 +48,14 @@ export const columns: BasicColumn[] = [
     dataIndex: 'secondRealPrice',
   },
   {
-    title: '结算服务费率',
-    align: 'center',
-    dataIndex: 'settlementServiceRate',
-  },
-  {
-    title: '结算服务费',
+    title: '平台分成',
     align: 'center',
     dataIndex: 'settlementServicePrice',
   },
   {
-    title: '支付渠道费率',
-    align: 'center',
-    dataIndex: 'settlementRate',
-  },
-  {
-    title: '支付渠道金额',
-    align: 'center',
-    dataIndex: 'settlementRatePrice',
-  },
-  {
-    title: '结算金额',
+    title: '车场结算',
     align: 'center',
     dataIndex: 'settlementPrice',
-  },
-  {
-    title: '结算日期',
-    align: 'center',
-    dataIndex: 'settlementDate',
-  },
-  {
-    title: '是否已结算',
-    align: 'center',
-    dataIndex: 'isSettlement_dictText',
   },
 ];
 
