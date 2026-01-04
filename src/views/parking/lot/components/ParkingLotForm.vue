@@ -55,13 +55,13 @@
               </a-form-item>
             </a-col>
             <a-col :span="8">
-              <a-form-item label="紧急联系人" v-bind="validateInfos.contact" id="ParkingLotForm-contact" name="contact">
-                <a-input v-model:value="formData.contact" placeholder="请输入紧急联系人" allow-clear />
+              <a-form-item label="接送司机" v-bind="validateInfos.contact" id="ParkingLotForm-contact" name="contact">
+                <a-input v-model:value="formData.contact" placeholder="请输入接送司机" allow-clear />
               </a-form-item>
             </a-col>
             <a-col :span="8">
-              <a-form-item label="紧急联系人电话" v-bind="validateInfos.phone" id="ParkingLotForm-phone" name="phone">
-                <a-input v-model:value="formData.phone" placeholder="请输入紧急联系人电话" allow-clear />
+              <a-form-item label="接送电话" v-bind="validateInfos.phone" id="ParkingLotForm-phone" name="phone">
+                <a-input v-model:value="formData.phone" placeholder="请输入接送电话" allow-clear />
               </a-form-item>
             </a-col>
             <a-col :span="8">

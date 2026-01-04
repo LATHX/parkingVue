@@ -92,6 +92,7 @@
     <ParkingLotModal ref="registerModal" @success="handleSuccess"></ParkingLotModal>
     <ParkingLotTabsModal ref="parkingLotTabsModal" @success="handleSuccess"></ParkingLotTabsModal>
     <ParkingEvaluateListModal ref="parkingEvaluateListModal"></ParkingEvaluateListModal>
+    <ParkingOrderInfoModal ref="parkingOrderInfoModal"></ParkingOrderInfoModal>
   </div>
 </template>
 
@@ -109,6 +110,7 @@
   import ParkingLotModal from './components/ParkingLotModal.vue';
   import ParkingLotTabsModal from './components/ParkingLotTabsModal.vue';
   import ParkingEvaluateListModal from './components/ParkingEvaluateListModal.vue';
+  import ParkingOrderInfoModal from './components/ParkingOrderInfoModal.vue';
   import { useUserStore } from '/@/store/modules/user';
   import JInput from '/@/components/Form/src/jeecg/components/JInput.vue';
   import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
@@ -138,6 +140,7 @@
   const registerModal = ref();
   const parkingLotTabsModal = ref();
   const parkingEvaluateListModal = ref();
+  const parkingOrderInfoModal = ref();
   const userStore = useUserStore();
   let customQueryParam = reactive<any>({});
   const props = defineProps({
@@ -284,6 +287,10 @@
     parkingEvaluateListModal.value.show(record.id);
   }
 
+  function handleOrder(record: Recordable) {
+    parkingOrderInfoModal.value.show(record.id);
+  }
+
   /**
    * 删除事件
    */
@@ -339,7 +346,7 @@
       },
       {
         tooltip: '订单',
-        onClick: handleEdit.bind(null, record),
+        onClick: handleOrder.bind(null, record),
         icon: 'lsicon:order-filled',
       },
       {

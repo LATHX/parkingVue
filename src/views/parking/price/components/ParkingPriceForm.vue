@@ -8,7 +8,7 @@
             <span class="title">车位价格表</span>
           </div>
           <a-row :gutter="24">
-            <a-col :span="24" :hidden="formData.parkingId !== null">
+            <a-col :span="12" :hidden="hiddenParkingId">
               <a-form-item label="停车场名" v-bind="validateInfos.parkingId" id="ParkingPriceForm-parkingId" name="parkingId">
                 <j-search-select v-model:value="formData.parkingId" dict="parking_lot,parking_name,id" allow-clear />
               </a-form-item>
@@ -188,6 +188,7 @@
     formData: { type: Object, default: () => ({}) },
     formBpm: { type: Boolean, default: true },
   });
+  const hiddenParkingId = ref(true)
   const formRef = ref();
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
@@ -225,6 +226,7 @@
     stockTotal: [{ required: true, message: '必填项!' }],
     stock: [{ required: true, message: '必填项!' }],
     parkingId: [{ required: true, message: '必填项!' }],
+    parkingType: [{ required: true, message: '必填项!' }],
     parkingPriceSum1: [{ required: true, message: '必填项!' }],
     afterDay: [{ required: true, message: '必填项!' }],
     afterDailyPrice: [{ required: true, message: '必填项!' }],
@@ -247,6 +249,7 @@
    * 新增
    */
   function add() {
+    hiddenParkingId.value = false;
     edit({});
   }
 

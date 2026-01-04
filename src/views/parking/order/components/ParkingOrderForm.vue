@@ -3,294 +3,202 @@
     <JFormContainer :disabled="disabled">
       <template #detail>
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ParkingOrderForm">
-          <a-row>
-            <a-col :span="24">
-              <a-form-item label="停车场Id" v-bind="validateInfos.parkingId" id="ParkingPriceForm-parkingId" name="parkingId">
-                <j-search-select v-model:value="formData.parkingId" dict="parking_lot,parking_name,id" allow-clear />
+          <!-- 订单信息 -->
+          <div class="section-header">
+            <span class="section-title">订单信息</span>
+          </div>
+          <a-row :gutter="24">
+            <a-col :span="8">
+              <a-form-item label="订单时间" name="createTime">
+                <a-input v-model:value="formData.createTime" placeholder="请输入订单时间" disabled />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item label="停车场名称" v-bind="validateInfos.parkingName" id="ParkingOrderForm-parkingName" name="parkingName">
-                <j-search-select v-model:value="formData.parkingName" dict="parking_lot,parking_name,parking_name" allow-clear />
+            <a-col :span="8">
+              <a-form-item label="订单号" name="id">
+                <a-input v-model:value="formData.id" placeholder="请输入订单号" disabled />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item label="停车场类型" v-bind="validateInfos.parkingType" id="ParkingOrderForm-parkingType" name="parkingType">
-                <j-dict-select-tag v-model:value="formData.parkingType" dictCode="parking_type" placeholder="请选择停车场类型" allow-clear />
+            <a-col :span="8">
+              <a-form-item label="支付方式" name="payType">
+                <j-dict-select-tag v-model:value="formData.payType" dictCode="pay_type" placeholder="请选择支付方式" disabled />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item label="用户手机号" v-bind="validateInfos.userId" id="ParkingOrderForm-userId" name="userId">
-                <j-dict-select-tag v-model:value="formData.userId" dictCode="parking_customer,phone,id" placeholder="请选择用户" allow-clear />
+            <a-col :span="8">
+              <a-form-item label="关联车场" name="parkingName">
+                <a-input v-model:value="formData.parkingName" placeholder="请输入关联车场" disabled />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item label="支付方式" v-bind="validateInfos.payType" id="ParkingOrderForm-payType" name="payType">
-                <j-dict-select-tag v-model:value="formData.payType" dictCode="pay_type" placeholder="请选择支付方式" allow-clear />
+            <a-col :span="8">
+              <a-form-item label="手机号" name="userId">
+                <j-dict-select-tag v-model:value="formData.userId" dictCode="parking_customer,phone,id" placeholder="请选择用户" disabled />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item label="支付状态" v-bind="validateInfos.payStatus" id="ParkingOrderForm-payStatus" name="payStatus">
-                <j-dict-select-tag v-model:value="formData.payStatus" dictCode="pay_status" placeholder="请选择支付状态" allow-clear />
+            <a-col :span="8">
+              <a-form-item label="车位类型" name="parkingType">
+                <j-dict-select-tag v-model:value="formData.parkingType" dictCode="parking_type" placeholder="请选择车位类型" disabled />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item label="车辆状态" v-bind="validateInfos.carStatus" id="ParkingOrderForm-carStatus" name="carStatus">
-                <j-dict-select-tag v-model:value="formData.carStatus" dictCode="car_status" placeholder="请选择车辆状态" allow-clear />
+            <a-col :span="8">
+              <a-form-item label="车牌号" name="carPlate">
+                <a-input v-model:value="formData.carPlate" placeholder="请输入车牌号" disabled />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item
-                label="预计进场时间"
-                v-bind="validateInfos.predictStartDate"
-                id="ParkingOrderForm-predictStartDate"
-                name="predictStartDate"
-              >
+            <a-col :span="8">
+              <a-form-item label="出行人数" name="peopleCount">
+                <a-input v-model:value="formData.peopleCount" placeholder="请输入出行人数" disabled />
+              </a-form-item>
+            </a-col>
+            <a-col :span="8">
+              <a-form-item label="车辆状态" name="carStatus">
+                <j-dict-select-tag v-model:value="formData.carStatus" dictCode="car_status" placeholder="请选择车辆状态" disabled />
+              </a-form-item>
+            </a-col>
+            <a-col :span="8">
+              <a-form-item label="订单状态" name="payStatus">
+                <j-dict-select-tag v-model:value="formData.payStatus" dictCode="pay_status" placeholder="请选择订单状态" disabled />
+              </a-form-item>
+            </a-col>
+            <a-col :span="16"></a-col>
+
+            <a-col :span="8">
+              <a-form-item label="预计进场时间" name="predictStartDate">
                 <a-date-picker
-                  placeholder="请选择预计进场时间"
                   v-model:value="formData.predictStartDate"
                   showTime
                   value-format="YYYY-MM-DD HH:mm:ss"
                   style="width: 100%"
-                  allow-clear
-                  required
+                  disabled
                 />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item label="预计离场时间" v-bind="validateInfos.predictEndDate" id="ParkingOrderForm-predictEndDate" name="predictEndDate">
+            <a-col :span="8">
+              <a-form-item label="预计离场时间" name="predictEndDate">
                 <a-date-picker
-                  placeholder="请选择预计离场时间"
                   v-model:value="formData.predictEndDate"
                   showTime
                   value-format="YYYY-MM-DD HH:mm:ss"
                   style="width: 100%"
-                  allow-clear
+                  disabled
                 />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item label="实际进场时间" v-bind="validateInfos.realStartDate" id="ParkingOrderForm-realStartDate" name="realStartDate">
+            <a-col :span="8">
+              <a-form-item label="预计停车天数" name="predictDays">
+                <a-input v-model:value="formData.predictDays" disabled />
+              </a-form-item>
+            </a-col>
+            <a-col :span="8">
+              <a-form-item label="实际进场时间" name="realStartDate">
                 <a-date-picker
-                  placeholder="请选择实际进场时间"
                   v-model:value="formData.realStartDate"
                   showTime
                   value-format="YYYY-MM-DD HH:mm:ss"
                   style="width: 100%"
-                  allow-clear
+                  disabled
                 />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item label="实际离场时间" v-bind="validateInfos.realEndDate" id="ParkingOrderForm-realEndDate" name="realEndDate">
+            <a-col :span="8">
+              <a-form-item label="实际离场时间" name="realEndDate">
                 <a-date-picker
-                  placeholder="请选择实际离场时间"
                   v-model:value="formData.realEndDate"
                   showTime
                   value-format="YYYY-MM-DD HH:mm:ss"
                   style="width: 100%"
-                  allow-clear
+                  disabled
                 />
               </a-form-item>
             </a-col>
-
-            <a-col :span="24">
-              <a-form-item label="车牌号" v-bind="validateInfos.carPlate" id="ParkingOrderForm-carPlate" name="carPlate">
-                <a-input v-model:value="formData.carPlate" placeholder="请输入车牌号" allow-clear />
+            <a-col :span="8">
+              <a-form-item label="实际停车天数" name="realDays">
+                <a-input v-model:value="formData.realDays" disabled />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item label="优惠卷" v-bind="validateInfos.couponId" id="ParkingOrderForm-couponId" name="couponId">
+          </a-row>
+
+          <!-- 价格体系 -->
+          <div class="section-header">
+            <span class="section-title">价格体系</span>
+          </div>
+          <a-row :gutter="24">
+            <a-col :span="8">
+              <a-form-item label="优惠券ID" name="couponId">
                 <j-dict-select-tag
                   v-model:value="formData.couponId"
                   dictCode="parking_coupon,id,coupon_name"
-                  placeholder="请选择优惠卷"
-                  allow-clear
+                  disabled
                 />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item label="优惠卷金额" v-bind="validateInfos.couponPrice" id="ParkingOrderForm-couponPrice" name="couponPrice">
-                <a-input-number v-model:value="formData.couponPrice" placeholder="请输入优惠卷金额" style="width: 100%" />
+            <a-col :span="8">
+              <a-form-item label="优惠券金额" name="couponPrice">
+                <a-input-number v-model:value="formData.couponPrice" style="width: 100%" disabled />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item
-                label="优惠卷平台承担金额"
-                v-bind="validateInfos.settlementPlatformCouponPrice"
-                id="ParkingOrderForm-settlementPlatformCouponPrice"
-                name="settlementPlatformCouponPrice"
-              >
-                <a-input-number v-model:value="formData.settlementPlatformCouponPrice" placeholder="请输入优惠卷平台承担金额" style="width: 100%" />
+            <a-col :span="8">
+              <a-form-item label="平台承担优惠券金额" name="settlementPlatformCouponPrice">
+                <a-input-number v-model:value="formData.settlementPlatformCouponPrice" style="width: 100%" disabled />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item
-                label="优惠卷商家承担金额"
-                v-bind="validateInfos.settlementMerchantCouponPrice"
-                id="ParkingOrderForm-settlementMerchantCouponPrice"
-                name="settlementMerchantCouponPrice"
-              >
-                <a-input-number
-                  v-model:value="formData.settlementMerchantCouponPrice"
-                  placeholder="请输入结算商家优惠卷承担金额"
-                  style="width: 100%"
-                />
+            <a-col :span="8">
+              <a-form-item label="商家承担优惠券金额" name="settlementMerchantCouponPrice">
+                <a-input-number v-model:value="formData.settlementMerchantCouponPrice" style="width: 100%" disabled />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item label="应付金额" v-bind="validateInfos.payablePrice" id="ParkingOrderForm-payablePrice" name="payablePrice">
-                <a-input-number v-model:value="formData.payablePrice" placeholder="请输入应付金额" style="width: 100%" />
+            <a-col :span="8">
+              <a-form-item label="应付金额" name="payablePrice">
+                <a-input-number v-model:value="formData.payablePrice" style="width: 100%" disabled />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item label="首付金额" v-bind="validateInfos.firstRealPrice" id="ParkingOrderForm-firstRealPrice" name="firstRealPrice">
-                <a-input-number v-model:value="formData.firstRealPrice" placeholder="请输入首付金额" style="width: 100%" />
+            <a-col :span="8">
+              <a-form-item label="首付金额" name="firstRealPrice">
+                <a-input-number v-model:value="formData.firstRealPrice" style="width: 100%" disabled />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item label="尾款金额" v-bind="validateInfos.secondRealPrice" id="ParkingOrderForm-secondRealPrice" name="secondRealPrice">
-                <a-input-number v-model:value="formData.secondRealPrice" placeholder="请输入尾款金额" style="width: 100%" />
+            <a-col :span="8">
+              <a-form-item label="尾款金额" name="secondRealPrice">
+                <a-input-number v-model:value="formData.secondRealPrice" style="width: 100%" disabled />
               </a-form-item>
             </a-col>
-
-            <a-col :span="24">
-              <a-form-item label="出行人数" v-bind="validateInfos.peopleCount" id="ParkingOrderForm-peopleCount" name="peopleCount">
-                <a-input-number v-model:value="formData.peopleCount" placeholder="请输入出行人数" style="width: 100%" />
+            <a-col :span="8">
+              <a-form-item label="结算服务费率" name="settlementServiceRate">
+                <a-input v-model:value="formData.settlementServiceRate" suffix="%" style="width: 100%" disabled />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item label="备注" v-bind="validateInfos.remark" id="ParkingOrderForm-remark" name="remark">
-                <a-textarea v-model:value="formData.remark" placeholder="请输入备注" allow-clear />
+            <a-col :span="8">
+              <a-form-item label="结算服务费" name="settlementServicePrice">
+                <a-input-number v-model:value="formData.settlementServicePrice" style="width: 100%" disabled />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item label="结算日期" v-bind="validateInfos.settlementDate" id="ParkingOrderForm-settlementDate" name="settlementDate">
+            <a-col :span="8">
+              <a-form-item label="支付渠道费率" name="settlementRate">
+                 <a-input v-model:value="formData.settlementRate" suffix="‰" style="width: 100%" disabled />
+              </a-form-item>
+            </a-col>
+            <a-col :span="8">
+              <a-form-item label="支付渠道金额" name="settlementRatePrice">
+                <a-input-number v-model:value="formData.settlementRatePrice" style="width: 100%" disabled />
+              </a-form-item>
+            </a-col>
+            <a-col :span="8">
+              <a-form-item label="结算金额" name="settlementPrice">
+                <a-input-number v-model:value="formData.settlementPrice" style="width: 100%" disabled />
+              </a-form-item>
+            </a-col>
+            <a-col :span="8">
+              <a-form-item label="结算日期" name="settlementDate">
                 <a-date-picker
-                  placeholder="请选择结算日期"
                   v-model:value="formData.settlementDate"
                   showTime
                   value-format="YYYY-MM-DD HH:mm:ss"
                   style="width: 100%"
-                  allow-clear
+                  disabled
                 />
               </a-form-item>
             </a-col>
-            <a-col :span="24">
-              <a-form-item
-                label="结算服务费率(%)"
-                v-bind="validateInfos.settlementServiceRate"
-                id="ParkingOrderForm-settlementServiceRate"
-                name="settlementServiceRate"
-              >
-                <a-input-number v-model:value="formData.settlementServiceRate" placeholder="请输入结算服务费率" style="width: 100%" />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item
-                label="结算服务费"
-                v-bind="validateInfos.settlementServicePrice"
-                id="ParkingOrderForm-settlementServicePrice"
-                name="settlementServicePrice"
-              >
-                <a-input-number v-model:value="formData.settlementServicePrice" placeholder="请输入结算服务费" style="width: 100%" />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="结算费率(%)" v-bind="validateInfos.settlementRate" id="ParkingOrderForm-settlementRate" name="settlementRate">
-                <a-input-number v-model:value="formData.settlementRate" placeholder="请输入结算费率" style="width: 100%" />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="结算金额" v-bind="validateInfos.settlementPrice" id="ParkingOrderForm-settlementPrice" name="settlementPrice">
-                <a-input-number v-model:value="formData.settlementPrice" placeholder="请输入结算金额" style="width: 100%" />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="是否已结算" v-bind="validateInfos.isSettlement" id="ParkingOrderForm-isSettlement" name="isSettlement">
-                <j-dict-select-tag v-model:value="formData.isSettlement" dictCode="yn" placeholder="请选择是否已结算" allow-clear />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="第一天总价" v-bind="validateInfos.parkingPriceSum1" id="ParkingOrderForm-parkingPriceSum1" name="parkingPriceSum1">
-                <a-input-number v-model:value="formData.parkingPriceSum1" placeholder="请输入第一天总价" style="width: 100%" />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="第二天总价" v-bind="validateInfos.parkingPriceSum2" id="ParkingOrderForm-parkingPriceSum2" name="parkingPriceSum2">
-                <a-input-number v-model:value="formData.parkingPriceSum2" placeholder="请输入第二天总价" style="width: 100%" />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="第三天总价" v-bind="validateInfos.parkingPriceSum3" id="ParkingOrderForm-parkingPriceSum3" name="parkingPriceSum3">
-                <a-input-number v-model:value="formData.parkingPriceSum3" placeholder="请输入第三天总价" style="width: 100%" />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="第四天总价" v-bind="validateInfos.parkingPriceSum4" id="ParkingOrderForm-parkingPriceSum4" name="parkingPriceSum4">
-                <a-input-number v-model:value="formData.parkingPriceSum4" placeholder="请输入第四天总价" style="width: 100%" />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="第五天总价" v-bind="validateInfos.parkingPriceSum5" id="ParkingOrderForm-parkingPriceSum5" name="parkingPriceSum5">
-                <a-input-number v-model:value="formData.parkingPriceSum5" placeholder="请输入第五天总价" style="width: 100%" />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="第六天总价" v-bind="validateInfos.parkingPriceSum6" id="ParkingOrderForm-parkingPriceSum6" name="parkingPriceSum6">
-                <a-input-number v-model:value="formData.parkingPriceSum6" placeholder="请输入第六天总价" style="width: 100%" />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="第七天总价" v-bind="validateInfos.parkingPriceSum7" id="ParkingOrderForm-parkingPriceSum7" name="parkingPriceSum7">
-                <a-input-number v-model:value="formData.parkingPriceSum7" placeholder="请输入第七天总价" style="width: 100%" />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="在X天后" v-bind="validateInfos.afterDay" id="ParkingOrderForm-afterDay" name="afterDay">
-                <a-input-number v-model:value="formData.afterDay" placeholder="请输入在X天后" style="width: 100%" />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item
-                label="在X天后每天价格"
-                v-bind="validateInfos.afterDailyPrice"
-                id="ParkingOrderForm-afterDailyPrice"
-                name="afterDailyPrice"
-              >
-                <a-input-number v-model:value="formData.afterDailyPrice" placeholder="请输入在X天后每天价格" style="width: 100%" />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="调价类型" v-bind="validateInfos.adjustPriceType" id="ParkingOrderForm-adjustPriceType" name="adjustPriceType">
-                <j-dict-select-tag v-model:value="formData.adjustPriceType" dictCode="adjust_price_type" placeholder="请选择调价类型" allow-clear />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="调整价格" v-bind="validateInfos.adjustPrice" id="ParkingOrderForm-adjustPrice" name="adjustPrice">
-                <a-input-number v-model:value="formData.adjustPrice" placeholder="请输入调整价格" style="width: 100%" />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="调价开始日" v-bind="validateInfos.adjustStartDate" id="ParkingOrderForm-adjustStartDate" name="adjustStartDate">
-                <a-date-picker
-                  placeholder="请选择调价开始日"
-                  v-model:value="formData.adjustStartDate"
-                  value-format="YYYY-MM-DD"
-                  style="width: 100%"
-                  allow-clear
-                />
-              </a-form-item>
-            </a-col>
-            <a-col :span="24">
-              <a-form-item label="调价结束日" v-bind="validateInfos.adjustEndDate" id="ParkingOrderForm-adjustEndDate" name="adjustEndDate">
-                <a-date-picker
-                  placeholder="请选择调价结束日"
-                  v-model:value="formData.adjustEndDate"
-                  value-format="YYYY-MM-DD"
-                  style="width: 100%"
-                  allow-clear
-                />
+            <a-col :span="8">
+              <a-form-item label="是否已结算" name="isSettlement">
+                <j-dict-select-tag v-model:value="formData.isSettlement" dictCode="yn" disabled />
               </a-form-item>
             </a-col>
           </a-row>
@@ -310,6 +218,7 @@
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
   import JDictSelectTag from '../../../../components/Form/src/jeecg/components/JDictSelectTag.vue';
   import JSearchSelect from '../../../../components/Form/src/jeecg/components/JSearchSelect.vue';
+  import dayjs from 'dayjs';
 
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
@@ -321,15 +230,20 @@
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
     id: '',
+    createTime: '',
+    orderNo: '',
     parkingName: '',
     parkingType: '',
+    merchantName: '',
     userId: '',
     payStatus: '',
     carStatus: '',
     predictStartDate: '',
     predictEndDate: '',
+    predictDays: '',
     realStartDate: '',
     realEndDate: '',
+    realDays: '',
     settlementDate: '',
     carPlate: '',
     couponId: '',
@@ -344,7 +258,10 @@
     settlementServicePrice: undefined,
     settlementRate: undefined,
     settlementPrice: undefined,
+    settlementRatePrice:'',
     isSettlement: '',
+    payChannelRate: undefined,
+    payChannelPrice: undefined,
     parkingPriceSum1: undefined,
     parkingPriceSum2: undefined,
     parkingPriceSum3: undefined,
@@ -362,38 +279,11 @@
     settlementPlatformCouponPrice: '',
   });
   const { createMessage } = useMessage();
-  const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
-  const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 16 } });
+  const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 9 } });
+  const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 15 } });
   const confirmLoading = ref<boolean>(false);
   //表单验证
-  const validatorRules = reactive({
-    parkingId: [{ required: true, message: '请输入停车场Id!' }],
-    parkingName: [{ required: true, message: '请输入停车场名!' }],
-    parkingType: [{ required: true, message: '请输入停车场类型!' }],
-    usreId: [{ required: true, message: '请选择用户手机号!' }],
-    predictStartDate: [{ required: true, message: '请输入预计进场时间!' }],
-    predictEndDate: [{ required: true, message: '请输入预计离场时间!' }],
-    carPlate: [{ required: true, message: '请输入车牌号!' }],
-    payablePrice: [{ required: true, message: '请输入应付金额!' }],
-    firstRealPrice: [{ required: true, message: '请输入首付金额!' }],
-    secondRealPrice: [{ required: true, message: '请输入尾款金额!' }],
-    peopleCount: [{ required: true, message: '请输入出行人数!' }],
-    parkingPriceSum1: [{ required: true, message: '请输入总价!' }],
-    parkingPriceSum2: [{ required: true, message: '请输入总价!' }],
-    parkingPriceSum3: [{ required: true, message: '请输入总价!' }],
-    parkingPriceSum4: [{ required: true, message: '请输入总价!' }],
-    parkingPriceSum5: [{ required: true, message: '请输入总价!' }],
-    parkingPriceSum6: [{ required: true, message: '请输入总价!' }],
-    parkingPriceSum7: [{ required: true, message: '请输入总价!' }],
-    afterDay: [{ required: true, message: '请输入X天后!' }],
-    afterDailyPrice: [{ required: true, message: '请输入X天后每天价格!' }],
-    adjustPriceType: [{ required: true, message: '调价类型!' }],
-    payStatus: [{ required: true, message: '请输入支付状态!' }],
-    carStatus: [{ required: true, message: '请输入车辆状态!' }],
-    isSettlement: [{ required: true, message: '请输入是否已结算!' }],
-    adjustPrice: [{ required: true, message: '请输入调整价格!' }],
-    payType: [{ required: true, message: '请输入支付方式!' }],
-  });
+  const validatorRules = reactive({});
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: false });
 
   // 表单禁用
@@ -427,8 +317,21 @@
           tmpData[key] = record[key];
         }
       });
-      //赋值
+      // 赋值
       Object.assign(formData, tmpData);
+      
+      // 计算天数
+      if (formData.predictStartDate && formData.predictEndDate) {
+        const start = dayjs(formData.predictStartDate);
+        const end = dayjs(formData.predictEndDate);
+        formData.predictDays = end.diff(start, 'day');
+      }
+      
+      if (formData.realStartDate && formData.realEndDate) {
+        const start = dayjs(formData.realStartDate);
+        const end = dayjs(formData.realEndDate);
+        formData.realDays = end.diff(start, 'day');
+      }
     });
   }
 
@@ -490,5 +393,21 @@
 <style lang="less" scoped>
   .antd-modal-form {
     padding: 14px;
+    
+    .section-header {
+      margin-bottom: 24px;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      
+      .section-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        border-left: 4px solid #1890ff;
+        padding-left: 10px;
+        line-height: 1;
+      }
+    }
   }
 </style>

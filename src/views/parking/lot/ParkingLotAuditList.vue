@@ -273,7 +273,7 @@
     return [
       {
         tooltip: '查看',
-        onClick: handleShowInfo.bind(null, record),
+        onClick: handleDetail.bind(null, record),
         icon: 'mdi:eye',
       },
       {

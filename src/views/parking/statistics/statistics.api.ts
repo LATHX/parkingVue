@@ -54,3 +54,17 @@ export const queryUserMerchantStats = (params?) => defHttp.get({ url: '/parking/
  * @param params
  */
 export const queryCustomerCityStats = (params?) => defHttp.get({ url: '/parking/statistics/queryCustomerCityStats', params });
+
+/**
+ * 综合统计接口
+ * @param params
+ */
+export const queryComprehensiveStatistics = (params?) => defHttp.get({ url: '/parking/statistics/queryComprehensiveStatistics', params });
+
+/**
+ * 收入和支出统计接口
+ * @param params
+ */
+export const queryIncomeAndPayStats = (params?) => defHttp.get({ url: '/parking/statistics/queryIncomeAndPayStats', params });
+
+

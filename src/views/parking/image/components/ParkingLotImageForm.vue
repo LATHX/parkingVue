@@ -4,7 +4,7 @@
       <template #detail>
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ParkingLotImageForm">
           <a-row>
-            <a-col :span="24" :hidden="formData.parkingId !== null">
+            <a-col :span="24" :hidden="hiddenParkingId">
               <a-form-item label="停车场名称" v-bind="validateInfos.parkingId" id="ParkingLotImageForm-parkingId" name="parkingId">
                 <j-search-select v-model:value="formData.parkingId" dict="parking_lot,parking_name,id" allow-clear />
               </a-form-item>
@@ -68,6 +68,7 @@
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
   import JSearchSelect from '../../../../components/Form/src/jeecg/components/JSearchSelect.vue';
 
+  const hiddenParkingId = ref(true)
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({}) },
@@ -114,6 +115,7 @@
    * 新增
    */
   function add() {
+    hiddenParkingId.value = false;
     edit({});
   }
 

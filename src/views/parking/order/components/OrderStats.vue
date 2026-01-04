@@ -53,38 +53,46 @@
     <!-- Date Filter -->
     <div class="date-filter">
       <div
-        v-for="type in ['日', '月', '年']"
-        :key="type"
+        v-for="item in dateTypes"
+        :key="item.value"
         class="filter-btn"
-        :class="{ active: activeDateType === type }"
-        @click="activeDateType = type"
+        :class="{ active: activeDateType === item.value }"
+        @click="activeDateType = item.value"
       >
-        {{ type }}
+        {{ item.label }}
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { ref, onMounted, reactive, Ref } from 'vue';
+  import { ref, onMounted, reactive, Ref, watch } from 'vue';
   import { useECharts } from '/@/hooks/web/useECharts';
+  import { queryComprehensiveStatistics } from '/@/views/parking/statistics/statistics.api';
 
-  const activeDateType = ref('日');
-  const totalOrders = ref(2854);
+  const activeDateType = ref('D');
+  const dateTypes = [
+    { label: '日', value: 'D' },
+    { label: '月', value: 'M' },
+    { label: '年', value: 'Y' },
+  ];
+  const totalOrders = ref(0);
 
-  const orderStats = reactive([
-    { label: '待支付', value: 23, color: 'orange' },
-    { label: '待付尾款', value: 8, color: 'red' },
-    { label: '待退款', value: 0, color: 'purple' },
-    { label: '待完成', value: 2, color: 'cyan' },
-    { label: '进行中', value: 237, color: 'blue' },
-    { label: '已退款', value: 14, color: 'grey' },
-    { label: '已取消', value: 5, color: 'grey' },
-    { label: '已完成', value: 1862, color: 'green' },
-  ]);
+  const statsConfig = [
+    { label: '待支付', color: 'orange' },
+    { label: '待付尾款', color: 'red' },
+    { label: '待退款', color: 'purple' },
+    { label: '待完成', color: 'cyan' },
+    { label: '进行中', color: 'blue' },
+    { label: '已退款', color: 'grey' },
+    { label: '已取消', color: 'grey' },
+    { label: '已完成', color: 'green' },
+  ];
 
-  const newOrders = reactive({ value: 285, rate: -5 });
-  const newRevenue = reactive({ value: '24,540', rate: 365 });
+  const orderStats = reactive(statsConfig.map((item) => ({ ...item, value: 0 })));
+
+  const newOrders = reactive({ value: 0, rate: 0 });
+  const newRevenue = reactive({ value: '0', rate: 0 });
 
   const cityChartRef = ref<HTMLDivElement | null>(null);
   const { setOptions: setCityChart } = useECharts(cityChartRef as Ref<HTMLDivElement>);
@@ -92,53 +100,122 @@
   const parkingChartRef = ref<HTMLDivElement | null>(null);
   const { setOptions: setParkingChart } = useECharts(parkingChartRef as Ref<HTMLDivElement>);
 
+  // Chart Base Options
+  const baseCityOptions = {
+    tooltip: { trigger: 'axis' },
+    grid: { left: '0%', right: '0%', bottom: '0%', top: '15%', containLabel: true },
+    xAxis: {
+      type: 'category' as const,
+      data: [],
+      axisLine: { show: false },
+      axisTick: { show: false },
+    },
+    yAxis: { type: 'value' as const, show: false },
+    series: [
+      {
+        data: [],
+        type: 'bar' as const,
+        barWidth: '30%',
+        itemStyle: { color: '#FFB980', borderRadius: [4, 4, 0, 0] },
+        label: { show: true, position: 'top', color: '#FFB980' },
+      },
+    ],
+  };
+
+  const baseParkingOptions = {
+    tooltip: { trigger: 'axis' },
+    grid: { left: '0%', right: '5%', bottom: '0%', top: '15%', containLabel: true },
+    xAxis: { type: 'value' as const, show: false },
+    yAxis: {
+      type: 'category' as const,
+      data: [],
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { width: 100, overflow: 'truncate' },
+    },
+    series: [
+      {
+        data: [],
+        type: 'bar' as const,
+        barWidth: '10%',
+        itemStyle: { color: '#00C292', borderRadius: [0, 4, 4, 0] },
+        label: { show: true, position: 'right', color: '#00C292' },
+      },
+    ],
+  };
+
   onMounted(() => {
     initCharts();
+    fetchData();
   });
 
-  function initCharts() {
-    setCityChart({
-      tooltip: { trigger: 'axis' },
-      grid: { left: '-40px', right: '0%', bottom: '0%', top: '15%', containLabel: true },
-      xAxis: {
-        type: 'category',
-        data: ['广州', '深圳', '上海', '北京', '苏州'],
-        axisLine: { show: false },
-        axisTick: { show: false },
-      },
-      yAxis: { type: 'value', show: false },
-      series: [
-        {
-          data: [1269, 1031, 864, 650, 342],
-          type: 'bar',
-          barWidth: '30%',
-          itemStyle: { color: '#FFB980', borderRadius: [4, 4, 0, 0] },
-          label: { show: true, position: 'top', color: '#FFB980' },
-        },
-      ],
-    });
+  watch(activeDateType, () => {
+    fetchData();
+  });
 
-    setParkingChart({
-      tooltip: { trigger: 'axis' },
-      grid: { left: '0%', right: '5%', bottom: '0%', top: '15%', containLabel: true },
-      xAxis: { type: 'value', show: false },
-      yAxis: {
-        type: 'category',
-        data: ['XXXX停车场', 'XXXX停车场', 'XXXX停车场', 'XXXX停车场', 'XXXX停车场'],
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: { width: 100, overflow: 'truncate' },
-      },
-      series: [
-        {
-          data: [29, 36, 40, 54, 82],
-          type: 'bar',
-          barWidth: '20%',
-          itemStyle: { color: '#00C292', borderRadius: [0, 4, 4, 0] },
-          label: { show: true, position: 'right', color: '#00C292' },
-        },
-      ],
-    });
+  async function fetchData() {
+    try {
+      const res = await queryComprehensiveStatistics({ type: activeDateType.value });
+      if (res) {
+        // Update totalOrders
+        if (res.orderPayStatusStats && res.orderPayStatusStats.total !== undefined) {
+          totalOrders.value = res.orderPayStatusStats.total;
+        }
+
+        // Update orderStats
+        if (res.orderPayStatusStats && res.orderPayStatusStats.list && Array.isArray(res.orderPayStatusStats.list)) {
+          // Reset values first
+          orderStats.forEach(item => item.value = 0);
+          
+          res.orderPayStatusStats.list.forEach((stat) => {
+            const target = orderStats.find((item) => item.label === stat.name);
+            if (target) {
+              target.value = stat.count;
+            }
+          });
+        }
+
+        // Update newOrders
+        if (res.orderCountRate) {
+          newOrders.value = res.orderCountRate.value;
+          newOrders.rate = res.orderCountRate.rate;
+        }
+
+        // Update newRevenue
+        if (res.orderAmountRate) {
+          newRevenue.value = res.orderAmountRate.value;
+          newRevenue.rate = res.orderAmountRate.rate;
+        }
+
+        // Update Charts
+        if (res.top5CityStats) {
+          const cities = res.top5CityStats.map((i) => i.name);
+          const values = res.top5CityStats.map((i) => i.count);
+          setCityChart({
+            ...baseCityOptions,
+            xAxis: { ...baseCityOptions.xAxis, data: cities },
+            series: [{ ...baseCityOptions.series[0], data: values }],
+          } as any);
+        }
+
+        if (res.top5ParkingLotStats) {
+          const parks = res.top5ParkingLotStats.map((i) => i.name);
+          const values = res.top5ParkingLotStats.map((i) => i.count);
+          setParkingChart({
+            ...baseParkingOptions,
+            yAxis: { ...baseParkingOptions.yAxis, data: parks },
+            series: [{ ...baseParkingOptions.series[0], data: values }],
+          } as any);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch stats:', error);
+    }
+  }
+
+  function initCharts() {
+    setCityChart(baseCityOptions as any);
+    setParkingChart(baseParkingOptions as any);
   }
 </script>
 

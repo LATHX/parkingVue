@@ -1,11 +1,11 @@
 <template>
-  <div class="p-2 parking-price-list">
+  <div class="p-2 parking-image-list">
     <!--引用表格-->
-    <BasicTable @register="registerTable">
+    <BasicTable @register="registerTable" >
       <!--插槽:table标题-->
       <template #tableTitle>
         <div class="custom-toolbar">
-          <div class="page-title">价格审核</div>
+          <div class="page-title">图片审核</div>
         </div>
       </template>
 
@@ -25,6 +25,7 @@
               </div>
             </div>
             <div class="actions">
+              <a-button @click="searchReset">重置</a-button>
               <a-button @click="onImportXls">导入</a-button>
               <a-button @click="onExportXls">导出</a-button>
               <a-button type="primary" @click="handleAdd">新增</a-button>
@@ -40,31 +41,27 @@
 
     </BasicTable>
     <!-- 表单区域 -->
-    <ParkingPriceModal ref="registerModal" @success="handleSuccess"></ParkingPriceModal>
+    <ParkingLotImageModal ref="registerModal" @success="handleSuccess"></ParkingLotImageModal>
   </div>
 </template>
 
-<script lang="ts" name="parking-parkingPrice" setup>
-import { ref, reactive, watch } from 'vue';
+<script lang="ts" name="parking-parkingLotImage" setup>
+import { ref, reactive, watchEffect, watch } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
-  import { columns, superQuerySchema } from './ParkingPriceAudit.data';
-  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ParkingPrice.api';
+  import { columns, superQuerySchema } from './ParkingLotImageAudit.data';
+  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl, audit } from './ParkingLotImage.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
-  import ParkingPriceModal from './components/ParkingPriceModal.vue';
+  import ParkingLotImageModal from './components/ParkingLotImageModal.vue';
   import { useUserStore } from '/@/store/modules/user';
-  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
-  import JSelectMultiple from '/@/components/Form/src/jeecg/components/JSelectMultiple.vue';
   import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
-  import { TimePicker } from 'ant-design-vue';
-  import { audit } from '@/views/parking/price/ParkingPrice.api';
 
   const formRef = ref();
   const queryParam = reactive<any>({});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
   const userStore = useUserStore();
-
+  let customQueryParam = reactive<any>({});
   const props = defineProps({
     parkingId: {
       type: String,
@@ -74,7 +71,7 @@ import { ref, reactive, watch } from 'vue';
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
-      title: '停车场价格表',
+      title: '停车场图片',
       api: list,
       columns,
       canResize: false,
@@ -90,11 +87,11 @@ import { ref, reactive, watch } from 'vue';
         fixed: 'right',
       },
       beforeFetch: async (params) => {
-        return Object.assign(params, queryParam, { auditStatus: '1' });
+        return Object.assign(params, queryParam, { auditStatus: '0' });
       },
     },
     exportConfig: {
-      name: '停车场价格表',
+      name: '停车场图片',
       url: getExportUrl,
       params: queryParam,
     },
@@ -105,6 +102,7 @@ import { ref, reactive, watch } from 'vue';
   });
   const [registerTable, { reload, collapseAll, updateTableDataRecord, findTableDataRecord, getDataSource }, { rowSelection, selectedRowKeys }] =
     tableContext;
+
   watch(
     () => props.parkingId,
     (newVal) => {
@@ -162,15 +160,15 @@ import { ref, reactive, watch } from 'vue';
     registerModal.value.edit(record);
   }
 
-  async function handleAudit(id, auditStatus) {
-    await audit({ id: id, auditStatus: auditStatus }, handleSuccess);
-  }
-
   /**
    * 删除事件
    */
   async function handleDelete(record) {
     await deleteOne({ id: record.id }, handleSuccess);
+  }
+
+  async function handleAudit(id, auditStatus) {
+    await audit({ id: id, auditStatus: auditStatus }, handleSuccess);
   }
 
   /**
@@ -195,7 +193,7 @@ import { ref, reactive, watch } from 'vue';
       {
         label: '编辑',
         onClick: handleEdit.bind(null, record),
-        auth: 'parking:parking_price:edit',
+        auth: 'parking:parking_lot_image:edit',
       },
     ];
   }
@@ -232,7 +230,7 @@ import { ref, reactive, watch } from 'vue';
           confirm: handleDelete.bind(null, record),
           placement: 'topLeft',
         },
-        auth: 'parking:parking_price:delete',
+        auth: 'parking:parking_lot_image:delete',
       },
     ];
   }
@@ -261,7 +259,7 @@ import { ref, reactive, watch } from 'vue';
 </script>
 
 <style lang="less" scoped>
-  .parking-price-list {
+  .parking-image-list {
     .custom-toolbar {
       display: flex;
       justify-content: space-between;

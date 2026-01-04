@@ -90,7 +90,7 @@ import { ref, reactive, watch } from 'vue';
         fixed: 'right',
       },
       beforeFetch: async (params) => {
-        return Object.assign(params, queryParam, { auditStatus: '1' });
+        return Object.assign(params, queryParam, { auditStatus: '0' });
       },
     },
     exportConfig: {
