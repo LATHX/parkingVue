@@ -5,7 +5,7 @@
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="ParkingOrderForm">
           <a-row :gutter="24">
             <a-col :span="12">
-              <a-form-item label="关联车场" name="parkingId">
+              <a-form-item label="关联车场" v-bind="validateInfos.parkingId" name="parkingId">
                  <j-search-select
                   v-model:value="formData.parkingId"
                   dict="parking_lot,parking_name,id"
@@ -15,29 +15,29 @@
               </a-form-item>
             </a-col>
             <a-col :span="12">
-              <a-form-item label="手机号" name="userId">
+              <a-form-item label="手机号" name="userId" v-bind="validateInfos.userId">
                 <!-- <j-dict-select-tag v-model:value="formData.userId" dictCode="parking_customer,phone,id" placeholder="请选择用户" :disabled="disabled" /> -->
                <a-input v-model:value="formData.userId" placeholder="请输入手机号" :disabled="disabled" />
               
               </a-form-item>
             </a-col>
             <a-col :span="12">
-              <a-form-item label="车位类型" name="parkingType">
+              <a-form-item label="车位类型" name="parkingType" v-bind="validateInfos.parkingType">
                 <j-dict-select-tag v-model:value="formData.parkingType" dictCode="parking_type" placeholder="请选择车位类型" :disabled="disabled" />
               </a-form-item>
             </a-col>
             <a-col :span="12">
-              <a-form-item label="车牌号" name="carPlate">
+              <a-form-item label="车牌号" name="carPlate" v-bind="validateInfos.carPlate">
                 <a-input v-model:value="formData.carPlate" placeholder="请输入车牌号" :disabled="disabled" />
               </a-form-item>
             </a-col>
             <a-col :span="12">
-              <a-form-item label="出行人数" name="peopleCount">
+              <a-form-item label="出行人数" name="peopleCount" v-bind="validateInfos.peopleCount">
                 <a-input v-model:value="formData.peopleCount" placeholder="请输入出行人数" :disabled="disabled" />
               </a-form-item>
             </a-col>
             <a-col :span="12">
-              <a-form-item label="预计进场时间" name="predictStartDate">
+              <a-form-item label="预计进场时间" name="predictStartDate" v-bind="validateInfos.predictStartDate">
                 <a-date-picker
                   v-model:value="formData.predictStartDate"
                   showTime
@@ -48,7 +48,7 @@
               </a-form-item>
             </a-col>
             <a-col :span="12">
-              <a-form-item label="预计离场时间" name="predictEndDate">
+              <a-form-item label="预计离场时间" v-bind="validateInfos.predictEndDate" name="predictEndDate">
                 <a-date-picker
                   v-model:value="formData.predictEndDate"
                   showTime
@@ -105,8 +105,16 @@
   const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 16 } });
   const confirmLoading = ref<boolean>(false);
   //表单验证
-  const validatorRules = reactive({});
-  const { resetFields, validate } = useForm(formData, validatorRules, { immediate: false });
+ const validatorRules = reactive({
+    parkingId: [{ required: true, message: '请选择关联车场', trigger: 'change' }],
+    userId: [{ required: true, message: '请选择用户', trigger: 'change' }],
+    parkingType: [{ required: true, message: '请选择车位类型', trigger: 'change' }],
+    carPlate: [{ required: true, message: '请输入车牌号', trigger: 'blur' }],
+    peopleCount: [{ required: true, message: '请输入出行人数', trigger: 'blur' }],
+    predictStartDate: [{ required: true, message: '请选择预计进场时间', trigger: 'change' }],
+    predictEndDate: [{ required: true, message: '请选择预计离场时间', trigger: 'change' }],
+  });
+  const { resetFields, validate,validateInfos } = useForm(formData, validatorRules, { immediate: false });
 
   // 表单禁用
   const disabled = computed(() => {
