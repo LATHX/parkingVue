@@ -6,6 +6,7 @@ const { createConfirm } = useMessage();
 enum Api {
   list = '/parking/parkingOrder/list',
   save = '/parking/parkingOrder/add',
+  manualCreateOrder = '/parking/parkingOrder/manualCreateOrder',
   edit = '/parking/parkingOrder/edit',
   deleteOne = '/parking/parkingOrder/delete',
   deleteBatch = '/parking/parkingOrder/deleteBatch',
@@ -93,5 +94,10 @@ export const batchDelete = (params, handleSuccess) => {
  */
 export const saveOrUpdate = (params, isUpdate) => {
   let url = isUpdate ? Api.edit : Api.save;
+  return defHttp.post({ url: url, params }, { isTransformResponse: false });
+};
+
+export const saveOrUpdateManualOrder = (params, isUpdate) => {
+  let url = isUpdate ? Api.manualCreateOrder : Api.manualCreateOrder;
   return defHttp.post({ url: url, params }, { isTransformResponse: false });
 };

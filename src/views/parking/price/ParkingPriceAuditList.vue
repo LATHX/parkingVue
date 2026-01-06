@@ -25,8 +25,9 @@
               </div>
             </div>
             <div class="actions">
-              <a-button @click="onImportXls">导入</a-button>
-              <a-button @click="onExportXls">导出</a-button>
+              <a-button @click="searchReset">重置</a-button>
+              <!-- <a-button @click="onImportXls">导入</a-button> -->
+              <!-- <a-button @click="onExportXls">导出</a-button> -->
               <a-button type="primary" @click="handleAdd">新增</a-button>
             </div>
           </div>
@@ -86,7 +87,7 @@ import { ref, reactive, watch } from 'vue';
         fullScreen: false,
       },
       actionColumn: {
-        width: 120,
+        width: 220,
         fixed: 'right',
       },
       beforeFetch: async (params) => {
@@ -193,9 +194,25 @@ import { ref, reactive, watch } from 'vue';
   function getTableAction(record) {
     return [
       {
-        label: '编辑',
+        tooltip: '查看',
+        onClick: handleDetail.bind(null, record),
+        icon: 'mdi:eye',
+      },
+      {
+        tooltip: '编辑',
         onClick: handleEdit.bind(null, record),
+        icon: 'ri:edit-line',
         auth: 'parking:parking_price:edit',
+      },
+      {
+        tooltip: '删除',
+        icon: 'material-symbols:delete',
+        popConfirm: {
+          title: '是否确认删除',
+          confirm: handleDelete.bind(null, record),
+          placement: 'topLeft',
+        },
+        auth: 'parking:parking_price:delete',
       },
     ];
   }
@@ -205,10 +222,6 @@ import { ref, reactive, watch } from 'vue';
    */
   function getDropDownAction(record) {
     return [
-      {
-        label: '详情',
-        onClick: handleDetail.bind(null, record),
-      },
       {
         label: '审核通过',
         popConfirm: {
@@ -224,15 +237,6 @@ import { ref, reactive, watch } from 'vue';
           confirm: handleAudit.bind(null, record.id, 2),
           placement: 'topLeft',
         },
-      },
-      {
-        label: '删除',
-        popConfirm: {
-          title: '是否确认删除',
-          confirm: handleDelete.bind(null, record),
-          placement: 'topLeft',
-        },
-        auth: 'parking:parking_price:delete',
       },
     ];
   }
@@ -257,6 +261,7 @@ import { ref, reactive, watch } from 'vue';
     selectedRowKeys.value = [];
     //刷新数据
     reload();
+    queryParam.parkingId = '';
   }
 </script>
 

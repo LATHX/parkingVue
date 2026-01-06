@@ -1,11 +1,11 @@
 <template>
-  <div class="p-2 parking-image-list">
+  <div class="p-2 parking-certification-list">
     <!--引用表格-->
-    <BasicTable @register="registerTable" >
+    <BasicTable @register="registerTable">
       <!--插槽:table标题-->
       <template #tableTitle>
         <div class="custom-toolbar">
-          <div class="page-title">图片审核</div>
+          <div class="page-title">资质审核</div>
         </div>
       </template>
 
@@ -41,18 +41,18 @@
 
     </BasicTable>
     <!-- 表单区域 -->
-    <ParkingLotImageModal ref="registerModal" @success="handleSuccess"></ParkingLotImageModal>
+    <ParkingCertificationModal ref="registerModal" @success="handleSuccess"></ParkingCertificationModal>
   </div>
 </template>
 
-<script lang="ts" name="parking-parkingLotImage" setup>
-import { ref, reactive, watchEffect, watch } from 'vue';
+<script lang="ts" name="parking-parkingCertification" setup>
+  import { ref, reactive, watchEffect, watch } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
-  import { columns, superQuerySchema } from './ParkingLotImageAudit.data';
-  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl, audit } from './ParkingLotImage.api';
+  import { columns, superQuerySchema } from './ParkingCertificationAudit.data';
+  import { list, audit, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ParkingCertification.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
-  import ParkingLotImageModal from './components/ParkingLotImageModal.vue';
+  import ParkingCertificationModal from './components/ParkingCertificationModal.vue';
   import { useUserStore } from '/@/store/modules/user';
   import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
 
@@ -61,6 +61,7 @@ import { ref, reactive, watchEffect, watch } from 'vue';
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
   const userStore = useUserStore();
+
   let customQueryParam = reactive<any>({});
   const props = defineProps({
     parkingId: {
@@ -71,7 +72,7 @@ import { ref, reactive, watchEffect, watch } from 'vue';
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
-      title: '停车场图片',
+      title: '停车场资质证明',
       api: list,
       columns,
       canResize: false,
@@ -87,11 +88,11 @@ import { ref, reactive, watchEffect, watch } from 'vue';
         fixed: 'right',
       },
       beforeFetch: async (params) => {
-        return Object.assign(params, queryParam, { auditStatus: '0' });
+        return Object.assign(params, queryParam, { 'auditStatus': '0' });
       },
     },
     exportConfig: {
-      name: '停车场图片',
+      name: '停车场资质证明',
       url: getExportUrl,
       params: queryParam,
     },
@@ -160,15 +161,15 @@ import { ref, reactive, watchEffect, watch } from 'vue';
     registerModal.value.edit(record);
   }
 
+  async function handleAudit(id, auditStatus) {
+    await audit({ id: id, auditStatus: auditStatus }, handleSuccess);
+  }
+
   /**
    * 删除事件
    */
   async function handleDelete(record) {
     await deleteOne({ id: record.id }, handleSuccess);
-  }
-
-  async function handleAudit(id, auditStatus) {
-    await audit({ id: id, auditStatus: auditStatus }, handleSuccess);
   }
 
   /**
@@ -199,7 +200,7 @@ import { ref, reactive, watchEffect, watch } from 'vue';
         tooltip: '编辑',
         onClick: handleEdit.bind(null, record),
         icon: 'ri:edit-line',
-        auth: 'parking:parking_lot_image:edit',
+        auth: 'parking:parking_certification:edit',
       },
       {
         tooltip: '删除',
@@ -209,7 +210,7 @@ import { ref, reactive, watchEffect, watch } from 'vue';
           confirm: handleDelete.bind(null, record),
           placement: 'topLeft',
         },
-        auth: 'parking:parking_lot_image:delete',
+        auth: 'parking:parking_certification:delete',
       },
     ];
   }
@@ -259,11 +260,11 @@ import { ref, reactive, watchEffect, watch } from 'vue';
     selectedRowKeys.value = [];
     //刷新数据
     reload();
-    }
+  }
 </script>
 
 <style lang="less" scoped>
-  .parking-image-list {
+  .parking-certification-list {
     .custom-toolbar {
       display: flex;
       justify-content: space-between;

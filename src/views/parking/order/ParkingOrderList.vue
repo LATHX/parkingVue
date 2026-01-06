@@ -57,6 +57,7 @@
     </BasicTable>
     <!-- 表单区域 -->
     <ParkingOrderModal ref="registerModal" @success="handleSuccess"></ParkingOrderModal>
+    <ParkingManualOrderModal ref="manualOrderModal" @success="handleSuccess"></ParkingManualOrderModal>
   </div>
 </template>
 
@@ -78,6 +79,7 @@
   } from './ParkingOrder.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
   import ParkingOrderModal from './components/ParkingOrderModal.vue';
+  import ParkingManualOrderModal from './components/ParkingManualOrderModal.vue';
   import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
   import OrderStats from './components/OrderStats.vue';
   import { useUserStore } from '/@/store/modules/user';
@@ -91,6 +93,7 @@
   const queryParam = reactive<any>({});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
+  const manualOrderModal = ref();
   const userStore = useUserStore();
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
@@ -161,8 +164,8 @@
    * 新增事件
    */
   function handleAdd() {
-    registerModal.value.disableSubmit = false;
-    registerModal.value.add();
+    manualOrderModal.value.disableSubmit = false;
+    manualOrderModal.value.add();
   }
 
   /**
@@ -267,7 +270,7 @@
           placement: 'topLeft',
         },
         icon: 'material-symbols:task-outline',
-        ifShow: () => (record.payStatus === '1' || record.payStatus === '2') && record.carStatus === '1',
+        ifShow: () => (record.payStatus === '1' || record.payStatus === '2' || record.payStatus === '7') && record.carStatus === '1',
       },
       {
         tooltip: '退款订单',

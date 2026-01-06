@@ -11,7 +11,7 @@
         <ParkingLotImageAuditList />
       </a-tab-pane>
       <a-tab-pane key="4" tab="资质审核">
-        <div class="p-4">资质审核模块开发中...</div>
+        <ParkingCertificationAuditList />
       </a-tab-pane>
     </a-tabs>
   </a-card>
@@ -22,6 +22,7 @@
   import ParkingLotAuditList from '../../lot/ParkingLotAuditList.vue';
   import ParkingPriceAuditList from '../../price/ParkingPriceAuditList.vue';
   import ParkingLotImageAuditList from '../../image/ParkingLotImageAuditList.vue';
+  import ParkingCertificationAuditList from '../../certification/ParkingCertificationAuditList.vue';
 
   const activeKey = ref('1');
 </script>
