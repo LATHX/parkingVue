@@ -25,12 +25,12 @@ export const columns: BasicColumn[] = [
   {
     title: '平台承担',
     align: 'center',
-    dataIndex: 'platformSubsidy',
+    dataIndex: 'settlementPlatformCouponPrice',
   },
   {
     title: '商家承担',
     align: 'center',
-    dataIndex: 'merchantSubsidy',
+    dataIndex: 'settlementMerchantCouponPrice',
   },
   {
     title: '应付金额',

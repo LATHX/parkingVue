@@ -4,7 +4,7 @@
     <div class="stat-card main-stats">
       <div class="total-section">
         <div class="label">订单总数</div>
-        <div class="value">{{ totalOrders }}</div>
+        <div class="value">{{ incomeStats.totalOrders }}</div>
       </div>
       <!-- <div class="status-grid">
         <div class="status-item" v-for="item in statusStats" :key="item.label">
@@ -63,7 +63,6 @@
   import { queryIncomeAndPayStatsBySettlementId } from '/@/views/parking/statistics/statistics.api';
 
   const props = defineProps({
-    totalOrders: { type: Number, default: 0 },
     statusStats: { type: Array as PropType<any[]>, default: () => [] },
     orderAmount: { type: String, default: '0.00' },
     platformShare: { type: String, default: '0.00' },
@@ -82,6 +81,7 @@
   ];
 
   const incomeStats = reactive({
+    totalOrders:'0',
     orderAmount: '0.00',
     platformShare: '0.00',
     parkingSettlement: '0.00',
@@ -98,6 +98,9 @@
           incomeStats.orderAmount = res.incomeStats.totalAmount !== undefined ? res.incomeStats.totalAmount.toFixed(2) : '0.00';
           incomeStats.platformShare = res.incomeStats.platformIncome !== undefined ? res.incomeStats.platformIncome.toFixed(2) : '0.00';
           incomeStats.parkingSettlement = res.incomeStats.merchantIncome !== undefined ? res.incomeStats.merchantIncome.toFixed(2) : '0.00';
+        }
+        if(res.orderPayStatusStats){
+          incomeStats.totalOrders = res.orderPayStatusStats.total !== undefined ? res.orderPayStatusStats.total : 0;
         }
       }
     } catch (e) {

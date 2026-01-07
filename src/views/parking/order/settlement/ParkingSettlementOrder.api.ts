@@ -4,7 +4,7 @@ import { useMessage } from '/@/hooks/web/useMessage';
 const { createConfirm } = useMessage();
 
 enum Api {
-  list = '/parking/parkingOrder/list',
+  list = '/parking/parkingSettlementOrder/queryPageOrderList',
   save = '/parking/parkingOrder/add',
   edit = '/parking/parkingOrder/edit',
   deleteOne = '/parking/parkingOrder/delete',

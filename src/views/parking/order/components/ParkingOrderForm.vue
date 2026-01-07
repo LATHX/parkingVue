@@ -83,8 +83,8 @@
               </a-form-item>
             </a-col>
             <a-col :span="8">
-              <a-form-item label="预计停车天数" name="predictDays">
-                <a-input v-model:value="formData.predictDays" disabled />
+              <a-form-item label="预计停车天数" name="predictTotalDay">
+                <a-input v-model:value="formData.predictTotalDay" disabled />
               </a-form-item>
             </a-col>
             <a-col :span="8">
@@ -110,8 +110,8 @@
               </a-form-item>
             </a-col>
             <a-col :span="8">
-              <a-form-item label="实际停车天数" name="realDays">
-                <a-input v-model:value="formData.realDays" disabled />
+              <a-form-item label="实际停车天数" name="realTotalDay">
+                <a-input v-model:value="formData.realTotalDay" disabled />
               </a-form-item>
             </a-col>
           </a-row>
@@ -240,10 +240,10 @@
     carStatus: '',
     predictStartDate: '',
     predictEndDate: '',
-    predictDays: '',
+    predictTotalDay: '',
     realStartDate: '',
     realEndDate: '',
-    realDays: '',
+    realTotalDay: '',
     settlementDate: '',
     carPlate: '',
     couponId: '',
@@ -320,18 +320,6 @@
       // 赋值
       Object.assign(formData, tmpData);
       
-      // 计算天数
-      if (formData.predictStartDate && formData.predictEndDate) {
-        const start = dayjs(formData.predictStartDate);
-        const end = dayjs(formData.predictEndDate);
-        formData.predictDays = end.diff(start, 'day');
-      }
-      
-      if (formData.realStartDate && formData.realEndDate) {
-        const start = dayjs(formData.realStartDate);
-        const end = dayjs(formData.realEndDate);
-        formData.realDays = end.diff(start, 'day');
-      }
     });
   }
 
