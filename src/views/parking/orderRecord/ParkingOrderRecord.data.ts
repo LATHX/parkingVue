@@ -9,11 +9,13 @@ export const columns: BasicColumn[] = [
     title: '流水号',
     align: 'center',
     dataIndex: 'id',
+    width: 180,
   },
   {
     title: '订单号',
     align: 'center',
     dataIndex: 'orderId',
+    width: 180,
   },
   {
     title: '付款类型',
@@ -36,7 +38,7 @@ export const columns: BasicColumn[] = [
     dataIndex: 'remainPrice',
   },
   {
-    title: '完成',
+    title: '是否完成',
     align: 'center',
     dataIndex: 'isFinished_dictText',
   },

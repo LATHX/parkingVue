@@ -8,7 +8,7 @@
             <span class="title">车场保证金</span>
           </div>
           <a-row>
-            <a-col :span="16" :hidden="formData.parkingId !== null">
+            <a-col :span="16" :hidden="hiddenParkingId">
               <a-form-item label="停车场名称" v-bind="validateInfos.parkingId" id="ParkingLotImageForm-parkingId" name="parkingId">
                 <j-search-select v-model:value="formData.parkingId" dict="parking_lot,parking_name,id" allow-clear />
               </a-form-item>
@@ -41,6 +41,7 @@
     formBpm: { type: Boolean, default: true },
   });
   const formRef = ref();
+  const hiddenParkingId = ref(true)
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
@@ -72,6 +73,7 @@
    * 新增
    */
   function add() {
+    hiddenParkingId.value = false;
     edit({});
   }
 

@@ -1,22 +1,5 @@
 <template>
-  <div class="order-list-stats">
-    <!-- Total & Status -->
-    <div class="stat-card main-stats">
-      <div class="total-section">
-        <div class="label">订单总数</div>
-        <div class="value">{{ totalOrders }}</div>
-      </div>
-      <div class="status-grid">
-        <div class="status-item" v-for="item in statusStats" :key="item.label">
-          <span class="label">{{ item.label }}</span>
-          <span class="count" :class="item.color">{{ item.value }}</span>
-        </div>
-      </div>
-      <div class="filter-icon">
-        <AppstoreOutlined />
-      </div>
-    </div>
-
+  <div class="settlement-stats">
     <!-- Money Stats -->
     <div class="stat-card money-card green">
       <div class="header">
@@ -58,18 +41,12 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, PropType, onMounted, watch, reactive } from 'vue';
-  import { AppstoreOutlined, WalletOutlined, GoldOutlined, BankOutlined } from '@ant-design/icons-vue';
-  import { queryIncomeAndPayStats } from '/@/views/parking/statistics/statistics.api';
+  import { ref, reactive, onMounted, watch } from 'vue';
+  import { WalletOutlined, GoldOutlined, BankOutlined } from '@ant-design/icons-vue';
+  import { queryIncomeAndPayStatsBySettlementId } from '/@/views/parking/statistics/statistics.api';
 
   const props = defineProps({
-    totalOrders: { type: Number, default: 0 },
-    statusStats: { type: Array as PropType<any[]>, default: () => [] },
-    orderAmount: { type: String, default: '0.00' },
-    platformShare: { type: String, default: '0.00' },
-    parkingSettlement: { type: String, default: '0.00' },
     parkingId: { type: String, default: '' },
-    settlementId: { type: String, default: '' },
   });
 
   const emit = defineEmits(['dateTypeChange']);
@@ -90,10 +67,9 @@
   async function fetchIncomeStats() {
     try {
       const params = {
-        type: activeDateType.value,
-        parkingId: props.parkingId
+        type: activeDateType.value
       };
-      const res = await queryIncomeAndPayStats(params);
+      const res = await queryIncomeAndPayStatsBySettlementId(params);
       if (res) {
         if (res.incomeStats) {
           incomeStats.orderAmount = res.incomeStats.totalAmount !== undefined ? res.incomeStats.totalAmount.toFixed(2) : '0.00';
@@ -122,86 +98,21 @@
       fetchIncomeStats();
     }
   );
-  
-  watch(
-    () => props.settlementId,
-    () => {
-      fetchIncomeStats();
-    }
-  );
 </script>
 
 <style lang="less" scoped>
-  .order-list-stats {
+  .settlement-stats {
     display: flex;
     gap: 16px;
     margin-bottom: 16px;
     align-items: stretch;
+    height: 100px;
 
     .stat-card {
       background: #fff;
       border-radius: 4px;
       padding: 16px;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .main-stats {
-      flex: 2;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-
-      .total-section {
-        .label {
-          font-size: 14px;
-          color: #333;
-          font-weight: bold;
-          margin-bottom: 8px;
-        }
-        .value {
-          font-size: 32px;
-          color: #1890ff;
-          font-weight: bold;
-        }
-      }
-
-      .status-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px 24px;
-        flex: 1;
-        margin-left: 40px;
-
-        .status-item {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 12px;
-          
-          .label {
-            color: #666;
-          }
-          .count {
-            font-weight: bold;
-            &.orange { color: #fa8c16; }
-            &.blue { color: #1890ff; }
-            &.red { color: #f5222d; }
-            &.green { color: #52c41a; }
-            &.cyan { color: #13c2c2; }
-            &.purple { color: #722ed1; }
-            &.grey { color: #999; }
-          }
-        }
-      }
-      
-      .filter-icon {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          color: #1890ff;
-          cursor: pointer;
-      }
     }
 
     .money-card {
@@ -220,9 +131,7 @@
           color: #666;
         }
         .icon {
-            // background: #f0f0f0;
-            // border-radius: 50%;
-            // padding: 4px;
+           font-size: 20px;
         }
       }
 
@@ -255,7 +164,7 @@
       
       .filter-btn {
         width: 32px;
-        height: 32px;
+        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -266,7 +175,6 @@
         flex: 1;
         
         &.active {
-          // background: #1890ff;
           color: #1890ff;
           font-weight: bold;
         }

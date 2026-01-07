@@ -67,4 +67,8 @@ export const queryComprehensiveStatistics = (params?) => defHttp.get({ url: '/pa
  */
 export const queryIncomeAndPayStats = (params?) => defHttp.get({ url: '/parking/statistics/queryIncomeAndPayStats', params });
 
-
+/**
+ * 结算记录统计接口
+ * @param params
+ */
+export const queryIncomeAndPayStatsBySettlementId = (params?) => defHttp.get({ url: '/parking/statistics/queryIncomeAndPayStatsBySettlementId', params });

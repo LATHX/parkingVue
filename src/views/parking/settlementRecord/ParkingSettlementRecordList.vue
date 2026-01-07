@@ -1,44 +1,53 @@
 <template>
-  <div class="p-2">
-    <!--查询区域-->
-    <div class="jeecg-basic-table-form-container">
-      <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
-        <a-row :gutter="24">
-        </a-row>
-      </a-form>
-    </div>
+  <div class="p-2 parking-settlement-record-list">
+    <!-- Top Stats -->
+    <SettlementStats :parkingId="queryParam.parkingId" />
+
     <!--引用表格-->
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
-      <template #tableTitle>
-        <a-button type="primary" v-auth="'parking:parking_settlement_record:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button  type="primary" v-auth="'parking:parking_settlement_record:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button  type="primary" v-auth="'parking:parking_settlement_record:importExcel'"  preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
-        <a-dropdown v-if="selectedRowKeys.length > 0">
-          <template #overlay>
-            <a-menu>
-              <a-menu-item key="1" @click="batchHandleDelete">
-                <Icon icon="ant-design:delete-outlined"></Icon>
-                删除
-              </a-menu-item>
-            </a-menu>
-          </template>
-          <a-button v-auth="'parking:parking_settlement_record:deleteBatch'">批量操作
-            <Icon icon="mdi:chevron-down"></Icon>
-          </a-button>
-        </a-dropdown>
-        <!-- 高级查询 -->
-        <super-query :config="superQueryConfig" @search="handleSuperQuery" />
+      <template #toolbar>
+        <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam">
+          <div class="custom-toolbar">
+            <div class="filters">
+              <div class="search-input-wrapper">
+                <j-dict-select-tag
+                  v-model:value="queryParam.parkingId"
+                  dictCode="parking_lot,parking_name,id"
+                  placeholder="请输入车场名称检索"
+                  class="search-input"
+                  @change="handleParkingIdSelect"
+                />
+              </div>
+
+              <div class="filter-item status-select">
+                <j-dict-select-tag
+                  v-model:value="queryParam.isSettlement"
+                  dictCode="yn"
+                  placeholder="结算状态"
+                  @change="handleSettlementStatus"
+                />
+              </div>
+            </div>
+
+            <div class="actions">
+              <!-- <a-button @click="onImportXls">导入</a-button> -->
+              <a-button @click="onExportXls">导出</a-button>
+              <!-- <a-button type="primary" @click="handleAdd">结算</a-button> -->
+            </div>
+          </div>
+        </a-form>
       </template>
+
       <!--操作栏-->
       <template #action="{ record }">
         <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)"/>
       </template>
-      <template v-slot:bodyCell="{ column, record, index, text }">
-      </template>
+
     </BasicTable>
     <!-- 表单区域 -->
     <ParkingSettlementRecordModal ref="registerModal" @success="handleSuccess"></ParkingSettlementRecordModal>
+    <ParkingSettlementDetailModal ref="detailModal" @register="registerDetailModal"></ParkingSettlementDetailModal>
   </div>
 </template>
 
@@ -50,21 +59,34 @@
   import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ParkingSettlementRecord.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
   import ParkingSettlementRecordModal from './components/ParkingSettlementRecordModal.vue'
+  import ParkingSettlementDetailModal from './components/ParkingSettlementDetailModal.vue'
   import { useUserStore } from '/@/store/modules/user';
+  import SettlementStats from './components/SettlementStats.vue';
+  import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
+  import { useModal } from '/@/components/Modal';
 
   const formRef = ref();
   const queryParam = reactive<any>({});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
+  const detailModal = ref();
   const userStore = useUserStore();
   //注册table数据
-  const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
+  const { tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
       title: '车场结算表',
       api: list,
       columns,
       canResize:false,
       useSearchForm: false,
+      showIndexColumn: true,
+      tableSetting: {
+        redo: false,
+        size: false,
+        setting: false,
+        fullScreen: false,
+      },
       actionColumn: {
         width: 120,
         fixed: 'right',
@@ -84,16 +106,8 @@
 	  },
   });
   const [registerTable, { reload, collapseAll, updateTableDataRecord, findTableDataRecord, getDataSource }, { rowSelection, selectedRowKeys }] = tableContext;
-  const labelCol = reactive({
-    xs:24,
-    sm:4,
-    xl:6,
-    xxl:4
-  });
-  const wrapperCol = reactive({
-    xs: 24,
-    sm: 20,
-  });
+
+  const [registerDetailModal, { openModal: openDetailModal }] = useModal();
 
   // 高级查询配置
   const superQueryConfig = reactive(superQuerySchema);
@@ -128,8 +142,10 @@
    * 详情
    */
   function handleDetail(record: Recordable) {
-    registerModal.value.disableSubmit = true;
-    registerModal.value.edit(record);
+    openDetailModal(true, {
+      record,
+      isUpdate: true,
+    });
   }
    
   /**
@@ -152,6 +168,16 @@
   function handleSuccess() {
     (selectedRowKeys.value = []) && reload();
   }
+
+  function handleParkingIdSelect(val) {
+    queryParam.parkingId = val;
+    searchQuery();
+  }
+
+  function handleSettlementStatus(val) {
+    queryParam.isSettlement = val;
+    searchQuery();
+  }
    
   /**
    * 操作栏
@@ -159,9 +185,26 @@
   function getTableAction(record) {
     return [
       {
-        label: '编辑',
-        onClick: handleEdit.bind(null, record),
-        auth: 'parking:parking_settlement_record:edit'
+        tooltip: '详情',
+        onClick: handleDetail.bind(null, record),
+        icon: 'mdi:eye',
+      },
+      // {
+      //   tooltip: '结算',
+      //   onClick: handleEdit.bind(null, record),
+      //   icon: 'mdi:checkbox-marked-circle-outline',
+      //   auth: 'parking:parking_settlement_record:edit',
+      //   ifShow: () => record.isSettlement === '0', // 0 for Pending
+      // },
+      {
+        tooltip: '删除',
+        icon: 'material-symbols:delete',
+        popConfirm: {
+          title: '是否确认删除',
+          confirm: handleDelete.bind(null, record),
+          placement: 'topLeft',
+        },
+        auth: 'parking:parking_settlement_record:delete',
       },
     ];
   }
@@ -170,20 +213,7 @@
    * 下拉操作栏
    */
   function getDropDownAction(record) {
-    return [
-      {
-        label: '详情',
-        onClick: handleDetail.bind(null, record),
-      }, {
-        label: '删除',
-        popConfirm: {
-          title: '是否确认删除',
-          confirm: handleDelete.bind(null, record),
-          placement: 'topLeft',
-        },
-        auth: 'parking:parking_settlement_record:delete'
-      }
-    ]
+    return [];
   }
 
   /**
@@ -199,6 +229,8 @@
   function searchReset() {
     formRef.value.resetFields();
     selectedRowKeys.value = [];
+    queryParam.parkingId = undefined;
+    queryParam.isSettlement = undefined;
     //刷新数据
     reload();
   }
@@ -210,27 +242,51 @@
 </script>
 
 <style lang="less" scoped>
-  .jeecg-basic-table-form-container {
+  .parking-settlement-record-list {
+    .custom-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 0px;
+
+      .page-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+      }
+      
+      .filters {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex: 1;
+          
+          .search-input-wrapper {
+              width: 260px;
+              .search-input {
+                width: 100%;
+                border-radius: 4px;
+              }
+          }
+          
+          .filter-item {
+              &.status-select {
+                  width: 120px;
+              }
+          }
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-left: 10px;
+      }
+    }
+  }
+
+  /* Override basic table default padding/margin if needed */
+  :deep(.jeecg-basic-table-form-container) {
     padding: 0;
-    .table-page-search-submitButtons {
-      display: block;
-      margin-bottom: 24px;
-      white-space: nowrap;
-    }
-    .query-group-cust{
-      min-width: 100px !important;
-    }
-    .query-group-split-cust{
-      width: 30px;
-      display: inline-block;
-      text-align: center
-    }
-    .ant-form-item:not(.ant-form-item-with-help){
-      margin-bottom: 16px;
-      height: 32px;
-    }
-    :deep(.ant-picker),:deep(.ant-input-number){
-      width: 100%;
-    }
   }
 </style>

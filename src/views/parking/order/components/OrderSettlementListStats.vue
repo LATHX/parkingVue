@@ -6,12 +6,12 @@
         <div class="label">订单总数</div>
         <div class="value">{{ totalOrders }}</div>
       </div>
-      <div class="status-grid">
+      <!-- <div class="status-grid">
         <div class="status-item" v-for="item in statusStats" :key="item.label">
           <span class="label">{{ item.label }}</span>
           <span class="count" :class="item.color">{{ item.value }}</span>
         </div>
-      </div>
+      </div> -->
       <div class="filter-icon">
         <AppstoreOutlined />
       </div>
@@ -43,7 +43,7 @@
     </div>
 
     <!-- Date Filter -->
-    <div class="date-filter">
+    <!-- <div class="date-filter">
       <div
         v-for="item in dateTypes"
         :key="item.value"
@@ -53,14 +53,14 @@
       >
         {{ item.label }}
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script lang="ts" setup>
   import { ref, PropType, onMounted, watch, reactive } from 'vue';
   import { AppstoreOutlined, WalletOutlined, GoldOutlined, BankOutlined } from '@ant-design/icons-vue';
-  import { queryIncomeAndPayStats } from '/@/views/parking/statistics/statistics.api';
+  import { queryIncomeAndPayStatsBySettlementId } from '/@/views/parking/statistics/statistics.api';
 
   const props = defineProps({
     totalOrders: { type: Number, default: 0 },
@@ -74,7 +74,7 @@
 
   const emit = defineEmits(['dateTypeChange']);
 
-  const activeDateType = ref('D');
+  const activeDateType = ref(null);
   const dateTypes = [
     { label: '日', value: 'D' },
     { label: '月', value: 'M' },
@@ -90,10 +90,9 @@
   async function fetchIncomeStats() {
     try {
       const params = {
-        type: activeDateType.value,
-        parkingId: props.parkingId
+        settlementId: props.settlementId
       };
-      const res = await queryIncomeAndPayStats(params);
+      const res = await queryIncomeAndPayStatsBySettlementId(params);
       if (res) {
         if (res.incomeStats) {
           incomeStats.orderAmount = res.incomeStats.totalAmount !== undefined ? res.incomeStats.totalAmount.toFixed(2) : '0.00';

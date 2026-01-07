@@ -6,34 +6,70 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '停车场',
+    title: '停车场名称',
     align: 'center',
     dataIndex: 'parkingId_dictText',
+    width: 150,
   },
   {
-    title: '开始日期',
+    title: '结算周期',
     align: 'center',
     dataIndex: 'startDate',
+    width: 150,
+    customRender: ({ record }) => {
+      return record.startDate + ' 至 ' + record.endDate;
+    },
   },
   {
-    title: '结束日期',
+    title: '订单总数',
     align: 'center',
-    dataIndex: 'endDate',
+    dataIndex: 'orderCount',
+    width: 100,
+  },
+  {
+    title: '订单金额',
+    align: 'center',
+    dataIndex: 'totalBalance',
+    width: 100,
   },
   {
     title: '结算金额',
     align: 'center',
     dataIndex: 'balance',
+    width: 100,
+  },
+   {
+    title: '渠道费率',
+    align: 'center',
+    dataIndex: 'payTypeRate',
+    width: 60,
+    customRender: ({ record }) => {
+      return record.payTypeRate + '‰';
+    },
+  },
+   {
+    title: '渠道金额',
+    align: 'center',
+    dataIndex: 'payTypeBalance',
+    width: 60,
   },
   {
-    title: '是否结算',
+    title: '平台分成',
+    align: 'center',
+    dataIndex: 'platformSettlementBalance',
+    width: 100,
+  },
+  {
+    title: '车场最终结算',
+    align: 'center',
+    dataIndex: 'merchantSettlementBalance',
+    width: 100,
+  },
+  {
+    title: '结算状态',
     align: 'center',
     dataIndex: 'isSettlement_dictText',
-  },
-  {
-    title: '系统完成结算',
-    align: 'center',
-    dataIndex: 'isComplete_dictText',
+    width: 60,
   },
 ];
 
