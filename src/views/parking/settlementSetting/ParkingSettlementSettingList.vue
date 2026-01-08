@@ -1,50 +1,36 @@
 <template>
-  <div class="p-2">
-    <!--查询区域-->
-    <div class="jeecg-basic-table-form-container">
-      <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
-        <a-row :gutter="24"> </a-row>
-      </a-form>
-    </div>
+  <div class="p-2 parking-settlement-setting-list">
     <!--引用表格-->
-    <BasicTable @register="registerTable" :rowSelection="rowSelection">
+    <BasicTable @register="registerTable">
       <!--插槽:table标题-->
-      <template #tableTitle>
-        <a-button type="primary" v-auth="'parking:parking_settlement_setting:add'" @click="handleAdd" preIcon="ant-design:plus-outlined">
-          新增
-        </a-button>
-        <a-button type="primary" v-auth="'parking:parking_settlement_setting:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls">
-          导出
-        </a-button>
-        <j-upload-button
-          type="primary"
-          v-auth="'parking:parking_settlement_setting:importExcel'"
-          preIcon="ant-design:import-outlined"
-          @click="onImportXls"
-          >导入
-        </j-upload-button>
-        <a-dropdown v-if="selectedRowKeys.length > 0">
-          <template #overlay>
-            <a-menu>
-              <a-menu-item key="1" @click="batchHandleDelete">
-                <Icon icon="ant-design:delete-outlined"></Icon>
-                删除
-              </a-menu-item>
-            </a-menu>
-          </template>
-          <a-button v-auth="'parking:parking_settlement_setting:deleteBatch'"
-            >批量操作
-            <Icon icon="mdi:chevron-down"></Icon>
-          </a-button>
-        </a-dropdown>
-        <!-- 高级查询 -->
-        <super-query :config="superQueryConfig" @search="handleSuperQuery" />
+      <template #toolbar>
+        <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam">
+          <div class="custom-toolbar">
+            <div class="filters">
+              <div class="search-input-wrapper">
+                <j-search-select
+                  v-model:value="queryParam.parkingId"
+                  dict="parking_lot,parking_name,id"
+                  placeholder="请输入车场名称检索"
+                  class="search-input"
+                  @change="handleParkingIdSelect"
+                />
+              </div>
+            </div>
+            <div class="actions">
+              <a-button @click="searchReset">重置</a-button>
+              <!-- <a-button @click="onImportXls">导入</a-button> -->
+              <a-button @click="onExportXls">导出</a-button>
+              <a-button type="primary" @click="handleAdd">新增</a-button>
+            </div>
+          </div>
+        </a-form>
       </template>
       <!--操作栏-->
       <template #action="{ record }">
         <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)" />
       </template>
-      <template v-slot:bodyCell="{ column, record, index, text }"> </template>
+
     </BasicTable>
     <!-- 表单区域 -->
     <ParkingSettlementSettingModal ref="registerModal" @success="handleSuccess"></ParkingSettlementSettingModal>
@@ -60,12 +46,11 @@ import { ref, reactive, watch } from 'vue';
   import { downloadFile } from '/@/utils/common/renderUtils';
   import ParkingSettlementSettingModal from './components/ParkingSettlementSettingModal.vue';
   import { useUserStore } from '/@/store/modules/user';
+  import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
 
   const formRef = ref();
   const queryParam = reactive<any>({});
-  const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
-  const userStore = useUserStore();
   const props = defineProps({
     parkingId: {
       type: String,
@@ -73,19 +58,20 @@ import { ref, reactive, watch } from 'vue';
     },
   });
   //注册table数据
-  const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
+  const { tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
       title: '车场结算设置',
       api: list,
       columns,
       canResize: false,
       useSearchForm: false,
+      showIndexColumn: true,
       actionColumn: {
         width: 120,
         fixed: 'right',
       },
       beforeFetch: async (params) => {
-        return Object.assign(params, queryParam, { parkingId: props.parkingId });
+        return Object.assign(params, queryParam);
       },
     },
     exportConfig: {
@@ -98,7 +84,7 @@ import { ref, reactive, watch } from 'vue';
       success: handleSuccess,
     },
   });
-  const [registerTable, { reload, collapseAll, updateTableDataRecord, findTableDataRecord, getDataSource }, { rowSelection, selectedRowKeys }] =
+  const [registerTable, { reload }, { rowSelection, selectedRowKeys }] =
     tableContext;
   watch(
     () => props.parkingId,
@@ -109,16 +95,6 @@ import { ref, reactive, watch } from 'vue';
     // 可选配置： immediate 表示是否在初始时立即执行一次
     { immediate: true }
   );
-  const labelCol = reactive({
-    xs: 24,
-    sm: 4,
-    xl: 6,
-    xxl: 4,
-  });
-  const wrapperCol = reactive({
-    xs: 24,
-    sm: 20,
-  });
 
   // 高级查询配置
   const superQueryConfig = reactive(superQuerySchema);
@@ -178,30 +154,30 @@ import { ref, reactive, watch } from 'vue';
     (selectedRowKeys.value = []) && reload();
   }
 
+  function handleParkingIdSelect(val) {
+    queryParam.parkingId = val;
+    searchQuery();
+  }
+
   /**
    * 操作栏
    */
   function getTableAction(record) {
     return [
       {
-        label: '编辑',
+        tooltip: '详情',
+        onClick: handleDetail.bind(null, record),
+        icon: 'mdi:eye',
+      },
+      {
+        tooltip: '编辑',
         onClick: handleEdit.bind(null, record),
+        icon: 'ri:edit-line',
         auth: 'parking:parking_settlement_setting:edit',
       },
-    ];
-  }
-
-  /**
-   * 下拉操作栏
-   */
-  function getDropDownAction(record) {
-    return [
       {
-        label: '详情',
-        onClick: handleDetail.bind(null, record),
-      },
-      {
-        label: '删除',
+        tooltip: '删除',
+        icon: 'material-symbols:delete',
         popConfirm: {
           title: '是否确认删除',
           confirm: handleDelete.bind(null, record),
@@ -210,6 +186,13 @@ import { ref, reactive, watch } from 'vue';
         auth: 'parking:parking_settlement_setting:delete',
       },
     ];
+  }
+
+  /**
+   * 下拉操作栏
+   */
+  function getDropDownAction(record) {
+    return [];
   }
 
   /**
@@ -225,39 +208,52 @@ import { ref, reactive, watch } from 'vue';
   function searchReset() {
     formRef.value.resetFields();
     selectedRowKeys.value = [];
+    queryParam.parkingId = undefined;
     //刷新数据
     reload();
   }
 </script>
 
 <style lang="less" scoped>
-  .jeecg-basic-table-form-container {
+  .parking-settlement-setting-list {
+    .custom-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 0px;
+
+      .page-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+      }
+      
+      .filters {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex: 1;
+          
+          .search-input-wrapper {
+              width: 260px;
+              .search-input {
+                width: 100%;
+                border-radius: 4px;
+              }
+          }
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-left: 10px;
+      }
+    }
+  }
+
+  /* Override basic table default padding/margin if needed */
+  :deep(.jeecg-basic-table-form-container) {
     padding: 0;
-
-    .table-page-search-submitButtons {
-      display: block;
-      margin-bottom: 24px;
-      white-space: nowrap;
-    }
-
-    .query-group-cust {
-      min-width: 100px !important;
-    }
-
-    .query-group-split-cust {
-      width: 30px;
-      display: inline-block;
-      text-align: center;
-    }
-
-    .ant-form-item:not(.ant-form-item-with-help) {
-      margin-bottom: 16px;
-      height: 32px;
-    }
-
-    :deep(.ant-picker),
-    :deep(.ant-input-number) {
-      width: 100%;
-    }
   }
 </style>

@@ -6,7 +6,7 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '名称',
+    title: '商户名称',
     align: 'center',
     dataIndex: 'merchantName',
   },
@@ -21,14 +21,19 @@ export const columns: BasicColumn[] = [
     dataIndex: 'city',
   },
   {
+    title: '父账号',
+    align: 'center',
+    dataIndex: 'parentId_dictText',
+  },
+  {
     title: '是否可用',
     align: 'center',
     dataIndex: 'status_dictText',
   },
   {
-    title: '父账号',
+    title: '关联车场',
     align: 'center',
-    dataIndex: 'parentId_dictText',
+    dataIndex: 'parkingId_dictText',
   },
 ];
 

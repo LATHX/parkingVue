@@ -9,18 +9,18 @@ export const columns: BasicColumn[] = [
     title: '用户ID',
     align: 'center',
     dataIndex: 'id',
-  },
-  {
-    title: '性别',
-    align: 'center',
-    dataIndex: 'sex_dictText',
+    width: 200,
   },
   {
     title: '手机号',
     align: 'center',
     dataIndex: 'phone',
   },
-
+  {
+    title: '归属地',
+    align: 'center',
+    dataIndex: 'city',
+  },
   {
     title: '注册日期',
     align: 'center',

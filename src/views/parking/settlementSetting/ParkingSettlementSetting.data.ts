@@ -6,7 +6,7 @@ import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
-    title: '停车场',
+    title: '车场名称',
     align: 'center',
     dataIndex: 'parkingId_dictText',
   },
