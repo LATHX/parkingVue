@@ -1,7 +1,7 @@
 <template>
   <div class="p-2 parking-merchant-list">
     <!--引用表格-->
-    <BasicTable @register="registerTable" style="height: 75vh">
+    <BasicTable @register="registerTable" >
       <!--插槽:table标题-->
       <template #toolbar>
         <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam">
