@@ -30,11 +30,11 @@ export const columns: BasicColumn[] = [
     align: 'center',
     dataIndex: 'status_dictText',
   },
-  {
-    title: '关联车场',
-    align: 'center',
-    dataIndex: 'parkingId_dictText',
-  },
+  // {
+  //   title: '关联车场',
+  //   align: 'center',
+  //   dataIndex: 'parkingId_dictText',
+  // },
 ];
 
 // 高级查询数据

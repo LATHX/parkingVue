@@ -33,10 +33,11 @@
       <template #action="{ record }">
         <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)" />
       </template>
-      <template v-slot:bodyCell="{ column, record, index, text }"></template>
+
     </BasicTable>
     <!-- 表单区域 -->
     <ParkingMerchantModal ref="registerModal" @success="handleSuccess" />
+    <ParkingLotMerchantModal @register="registerParkingLotModal" />
   </div>
 </template>
 
@@ -47,11 +48,14 @@
   import { columns, superQuerySchema } from './ParkingMerchant.data';
   import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ParkingMerchant.api';
   import ParkingMerchantModal from './components/ParkingMerchantModal.vue';
+  import ParkingLotMerchantModal from './components/ParkingLotMerchantModal.vue';
   import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
+  import { useModal } from '/@/components/Modal';
 
   const formRef = ref();
   const queryParam = reactive<any>({});
   const registerModal = ref();
+  const [registerParkingLotModal, { openModal: openParkingLotModal }] = useModal();
   //注册table数据
   const { tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
@@ -122,9 +126,7 @@
   }
 
   function handleVisibleParkingLotList(record: Recordable) {
-    registerModal.value.merchantId = record.id;
-    registerModal.value.disableSubmit = true;
-    registerModal.value.showParkingLotList();
+    openParkingLotModal(true, { merchantId: record.id });
   }
 
   /**
@@ -173,7 +175,7 @@
         auth: 'parking:parking_merchant:edit',
       },
       {
-        tooltip: '显示关联油站',
+        title: '显示关联车场',
         onClick: handleVisibleParkingLotList.bind(null, record),
         icon: 'ant-design:link-outlined',
       },

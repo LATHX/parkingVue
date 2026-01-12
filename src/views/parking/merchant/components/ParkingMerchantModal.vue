@@ -7,17 +7,18 @@
     :okButtonProps="{ class: { 'jee-hidden': disableSubmit } }"
     @cancel="handleCancel"
     cancelText="关闭"
+    destroyOnClose
   >
-    <parking-lot-list :merchant-id="merchantId" v-if="showType === 'parkingLotList'" />
+    <ParkingLotMerchantList :merchant-id="merchantId" v-if="showType === 'parkingLotList'" />
     <ParkingMerchantForm ref="registerForm" @ok="submitCallback" :formDisabled="disableSubmit" :formBpm="false" v-else />
   </j-modal>
 </template>
 
 <script lang="ts" setup>
-  import { ref, nextTick, defineExpose } from 'vue';
+  import { ref, nextTick } from 'vue';
   import ParkingMerchantForm from './ParkingMerchantForm.vue';
   import JModal from '/@/components/Modal/src/JModal/JModal.vue';
-  import ParkingLotList from '../../lot/ParkingLotList.vue';
+  import ParkingLotMerchantList from '/@/views/parking/lot/ParkingLotMerchantList.vue';
 
   let showType = ref('');
   const title = ref<string>('');
@@ -28,9 +29,10 @@
   let merchantId = ref<string>('');
   const emit = defineEmits(['register', 'success']);
 
-  function showParkingLotList() {
-    showType = ref('parkingLotList');
-    title.value = '显示关联油站';
+  function showParkingLotList(id: string) {
+    showType.value = 'parkingLotList';
+    merchantId.value = id;
+    title.value = '关联车场';
     visible.value = true;
   }
 
