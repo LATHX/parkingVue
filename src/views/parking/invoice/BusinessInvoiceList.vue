@@ -1,41 +1,59 @@
 <template>
   <div class="p-2">
-    <!--查询区域-->
-    <div class="jeecg-basic-table-form-container">
-      <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
-        <a-row :gutter="24">
-        </a-row>
-      </a-form>
-    </div>
     <!--引用表格-->
-    <BasicTable @register="registerTable" :rowSelection="rowSelection">
+    <BasicTable @register="registerTable">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" v-auth="'invoice:business_invoice:add'"  @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button  type="primary" v-auth="'invoice:business_invoice:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button  type="primary" v-auth="'invoice:business_invoice:importExcel'"  preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
-        <a-dropdown v-if="selectedRowKeys.length > 0">
-          <template #overlay>
-            <a-menu>
-              <a-menu-item key="1" @click="batchHandleDelete">
-                <Icon icon="ant-design:delete-outlined"></Icon>
-                删除
-              </a-menu-item>
-            </a-menu>
-          </template>
-          <a-button v-auth="'invoice:business_invoice:deleteBatch'">批量操作
-            <Icon icon="mdi:chevron-down"></Icon>
-          </a-button>
-        </a-dropdown>
-        <!-- 高级查询 -->
-        <super-query :config="superQueryConfig" @search="handleSuperQuery" />
+        <div class="custom-toolbar">
+          <div class="page-title">发票申请</div>
+        </div>
+      </template>
+      <template #toolbar>
+        <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam">
+          <div class="custom-toolbar">
+            <div class="filters">
+              <div class="search-input-wrapper">
+                <j-search-select
+                  v-model:value="queryParam.userId"
+                  dict="parking_customer,phone,id"
+                  placeholder="请输入申请用户手机号检索"
+                  class="search-input"
+                  @change="handleUserSelect"
+                />
+              </div>
+              <div class="search-input-wrapper">
+                <j-dict-select-tag
+                  v-model:value="queryParam.type"
+                  dictCode="invoice_type"
+                  placeholder="抬头类型"
+                  class="search-input"
+                  @change="handleInvoiceTypeSelect"
+                />
+              </div>
+              <div class="search-input-wrapper">
+                <j-dict-select-tag
+                  v-model:value="queryParam.status"
+                  dictCode="invoice_status"
+                  placeholder="开票状态"
+                  class="search-input"
+                  @change="handleInvoiceStatusSelect"
+                />
+              </div>
+            </div>
+            <div class="actions">
+              <a-button @click="searchReset">重置</a-button>
+              <j-upload-button type="default" v-auth="'invoice:business_invoice:importExcel'" @click="onImportXls">导入</j-upload-button>
+              <a-button type="default" v-auth="'invoice:business_invoice:exportXls'" @click="onExportXls"> 导出</a-button>
+              <a-button type="primary" v-auth="'invoice:business_invoice:add'" @click="handleAdd"> 新增</a-button>
+            </div>
+          </div>
+        </a-form>
       </template>
       <!--操作栏-->
       <template #action="{ record }">
         <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)"/>
       </template>
-      <template v-slot:bodyCell="{ column, record, index, text }">
-      </template>
+
     </BasicTable>
     <!-- 表单区域 -->
     <BusinessInvoiceModal ref="registerModal" @success="handleSuccess"></BusinessInvoiceModal>
@@ -48,12 +66,13 @@
   import { useListPage } from '/@/hooks/system/useListPage';
   import { columns, superQuerySchema } from './BusinessInvoice.data';
   import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './BusinessInvoice.api';
-  import { downloadFile } from '/@/utils/common/renderUtils';
   import BusinessInvoiceModal from './components/BusinessInvoiceModal.vue'
-  import { useUserStore } from '/@/store/modules/user';
   import { useMessage } from '/@/hooks/web/useMessage';
-   import {useModal} from '/@/components/Modal';
+  import {useModal} from '/@/components/Modal';
   import { getDateByPicker } from '/@/utils';
+  import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
+  import { SearchOutlined } from '@ant-design/icons-vue';
 
   const fieldPickers = reactive({
   });
@@ -62,7 +81,6 @@
   const queryParam = reactive<any>({});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
-  const userStore = useUserStore();
   const { createMessage } = useMessage();
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
@@ -70,7 +88,12 @@
       title: '通用发票模块',
       api: list,
       columns,
-      canResize:true,
+      tableSetting: {
+        redo: false,
+        size: false,
+        setting: false,
+        fullScreen: false,
+      },
       useSearchForm: false,
       actionColumn: {
         width: 120,
@@ -165,6 +188,21 @@
     (selectedRowKeys.value = []) && reload();
   }
    
+  function handleUserSelect(val) {
+    queryParam.userId = val;
+    searchQuery();
+  }
+
+  function handleInvoiceTypeSelect(val) {
+    queryParam.type = val;
+    searchQuery();
+  }
+
+  function handleInvoiceStatusSelect(val) {
+    queryParam.status = val;
+    searchQuery();
+  }
+
   /**
    * 操作栏
    */
@@ -211,6 +249,9 @@
   function searchReset() {
     formRef.value.resetFields();
     selectedRowKeys.value = [];
+    queryParam.userId = undefined;
+    queryParam.type = undefined;
+    queryParam.status = undefined;
     //刷新数据
     reload();
   }
@@ -223,27 +264,44 @@
 </script>
 
 <style lang="less" scoped>
-  .jeecg-basic-table-form-container {
+  /* Override basic table default padding/margin if needed */
+  :deep(.jeecg-basic-table-form-container) {
     padding: 0;
-    .table-page-search-submitButtons {
-      display: block;
-      margin-bottom: 24px;
-      white-space: nowrap;
+  }
+
+  .custom-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0px;
+
+    .page-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
     }
-    .query-group-cust{
-      min-width: 100px !important;
+
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      justify-content: flex-end; /* Align filters to right */
+
+      .search-input-wrapper {
+        width: 260px;
+        .search-input {
+          width: 100%;
+          border-radius: 4px;
+        }
+      }
     }
-    .query-group-split-cust{
-      width: 30px;
-      display: inline-block;
-      text-align: center
-    }
-    .ant-form-item:not(.ant-form-item-with-help){
-      margin-bottom: 16px;
-      height: 32px;
-    }
-    :deep(.ant-picker),:deep(.ant-input-number){
-      width: 100%;
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-left: 10px;
     }
   }
 </style>

@@ -53,7 +53,6 @@
       <template #action="{ record }">
         <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)" />
       </template>
-      <template v-slot:bodyCell="{ column, record, index, text }" ></template>
     </BasicTable>
     <!-- 表单区域 -->
     <ParkingOrderModal ref="registerModal" @success="handleSuccess"></ParkingOrderModal>
@@ -75,6 +74,7 @@
     carEnterStatus,
     carLeaveStatus,
     cancelOrder,
+    sendSms,
     systemCompleteOrder,
   } from './ParkingOrder.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
@@ -214,6 +214,10 @@
     await systemCompleteOrder({ orderId: record.id }, handleSuccess);
   }
 
+  async function resendSmsHandle(record) {
+    await sendSms({ id: record.id }, handleSuccess);
+  }
+
   /**
    * 成功回调
    */
@@ -282,6 +286,14 @@
         icon: 'mdi:cash-refund',
         ifShow: () => ['1', '2', '3'].includes(record.payStatus) && record.carStatus !== '2', // Assuming '2' is left? Logic kept from original
       },
+         {
+        tooltip: '重发短信',
+        popConfirm: {
+          title: '是否确认重发短信',
+          confirm: resendSmsHandle.bind(null, record),
+          placement: 'topLeft',
+        },
+        icon: 'mdi:message-text-outline'  },
     ];
   }
 

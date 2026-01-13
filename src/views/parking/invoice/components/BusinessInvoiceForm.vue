@@ -4,81 +4,86 @@
       <template #detail>
         <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol" name="BusinessInvoiceForm">
           <a-row>
-						<a-col :span="24">
-							<a-form-item label="发票类型(0个人,1企业)" v-bind="validateInfos.type" id="BusinessInvoiceForm-type" name="type">
-								<a-input v-model:value="formData.type" placeholder="请输入发票类型(0个人,1企业)"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="发票抬头" v-bind="validateInfos.title" id="BusinessInvoiceForm-title" name="title">
-								<a-input v-model:value="formData.title" placeholder="请输入发票抬头"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="发票税号" v-bind="validateInfos.tax" id="BusinessInvoiceForm-tax" name="tax">
-								<a-input v-model:value="formData.tax" placeholder="请输入发票税号"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="地址" v-bind="validateInfos.address" id="BusinessInvoiceForm-address" name="address">
-								<a-input v-model:value="formData.address" placeholder="请输入地址"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="手机号" v-bind="validateInfos.phone" id="BusinessInvoiceForm-phone" name="phone">
-								<a-input v-model:value="formData.phone" placeholder="请输入手机号"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="银行名" v-bind="validateInfos.bankName" id="BusinessInvoiceForm-bankName" name="bankName">
-								<a-input v-model:value="formData.bankName" placeholder="请输入银行名"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="银行帐号" v-bind="validateInfos.bankAccount" id="BusinessInvoiceForm-bankAccount" name="bankAccount">
-								<a-input v-model:value="formData.bankAccount" placeholder="请输入银行帐号"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="订单号" v-bind="validateInfos.orderId" id="BusinessInvoiceForm-orderId" name="orderId">
-								<a-input v-model:value="formData.orderId" placeholder="请输入订单号"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="发票金额" v-bind="validateInfos.invoicePrice" id="BusinessInvoiceForm-invoicePrice" name="invoicePrice">
-								<a-input-number v-model:value="formData.invoicePrice" placeholder="请输入发票金额" style="width: 100%" />
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="发票状态" v-bind="validateInfos.status" id="BusinessInvoiceForm-status" name="status">
-								<a-input v-model:value="formData.status" placeholder="请输入发票状态"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="收票邮箱" v-bind="validateInfos.mail" id="BusinessInvoiceForm-mail" name="mail">
-								<a-input v-model:value="formData.mail" placeholder="请输入收票邮箱"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="备注" v-bind="validateInfos.remark" id="BusinessInvoiceForm-remark" name="remark">
-								<a-textarea v-model:value="formData.remark" :rows="4" placeholder="请输入备注" />
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="重发状态 0否1是" v-bind="validateInfos.resendStatus" id="BusinessInvoiceForm-resendStatus" name="resendStatus">
-								<a-input v-model:value="formData.resendStatus" placeholder="请输入重发状态 0否1是"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="发票处理方" v-bind="validateInfos.invoiceSource" id="BusinessInvoiceForm-invoiceSource" name="invoiceSource">
-								<a-input v-model:value="formData.invoiceSource" placeholder="请输入发票处理方"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
-						<a-col :span="24">
-							<a-form-item label="订单来源" v-bind="validateInfos.orderSource" id="BusinessInvoiceForm-orderSource" name="orderSource">
-								<a-input v-model:value="formData.orderSource" placeholder="请输入订单来源"  allow-clear ></a-input>
-							</a-form-item>
-						</a-col>
+              <a-col :span="24">
+                <a-form-item label="发票类型" v-bind="validateInfos.type" id="BusinessInvoiceForm-type" name="type">
+                  <j-dict-select-tag v-model:value="formData.type" dictCode="invoice_type" placeholder="请选择发票类型" :disabled="disabled"/>
+                </a-form-item>
+              </a-col>
+              <a-col :span="24">
+                <a-form-item label="发票抬头" v-bind="validateInfos.title" id="BusinessInvoiceForm-title" name="title">
+                  <a-input v-model:value="formData.title" placeholder="请输入发票抬头" allow-clear :disabled="disabled"></a-input>
+                </a-form-item>
+              </a-col>
+              <a-col :span="24">
+                <a-form-item label="发票税号" v-bind="validateInfos.tax" id="BusinessInvoiceForm-tax" name="tax">
+                  <a-input v-model:value="formData.tax" placeholder="请输入发票税号" allow-clear :disabled="disabled"></a-input>
+                </a-form-item>
+              </a-col>
+              <a-col :span="24">
+                <a-form-item label="开票地址" v-bind="validateInfos.address" id="BusinessInvoiceForm-address" name="address">
+                  <a-input v-model:value="formData.address" placeholder="请输入开票地址" allow-clear :disabled="disabled"></a-input>
+                </a-form-item>
+              </a-col>
+              <a-col :span="24">
+                <a-form-item label="申请用户" v-bind="validateInfos.userId" id="BusinessInvoiceForm-userId" name="userId">
+                  <j-search-select v-model:value="formData.userId" dict="parking_customer,phone,id,phone is not null" placeholder="请选择用户" :disabled="disabled"/>
+                </a-form-item>
+              </a-col>
+              <a-col :span="24">
+                <a-form-item label="开票手机" v-bind="validateInfos.phone" id="BusinessInvoiceForm-phone" name="phone">
+                  <a-input v-model:value="formData.phone" placeholder="请输入手机号" allow-clear :disabled="disabled"></a-input>
+                </a-form-item>
+              </a-col>
+              <a-col :span="24">
+                <a-form-item label="银行名" v-bind="validateInfos.bankName" id="BusinessInvoiceForm-bankName" name="bankName">
+                  <a-input v-model:value="formData.bankName" placeholder="请输入银行名" allow-clear :disabled="disabled"></a-input>
+                </a-form-item>
+              </a-col>
+              <a-col :span="24">
+                <a-form-item label="银行帐号" v-bind="validateInfos.bankAccount" id="BusinessInvoiceForm-bankAccount" name="bankAccount">
+                  <a-input v-model:value="formData.bankAccount" placeholder="请输入银行帐号" allow-clear :disabled="disabled"></a-input>
+                </a-form-item>
+              </a-col>
+              <a-col :span="24">
+                <a-form-item label="订单号" v-bind="validateInfos.orderId" id="BusinessInvoiceForm-orderId" name="orderId">
+                  <a-input v-model:value="formData.orderId" placeholder="请输入订单号" allow-clear :disabled="disabled"></a-input>
+                </a-form-item>
+              </a-col>
+              <a-col :span="24">
+                <a-form-item label="发票金额" v-bind="validateInfos.invoicePrice" id="BusinessInvoiceForm-invoicePrice" name="invoicePrice">
+                  <a-input-number v-model:value="formData.invoicePrice" placeholder="请输入发票金额" style="width: 100%" :disabled="disabled" />
+                </a-form-item>
+              </a-col>
+              <a-col :span="24">
+                <a-form-item label="发票状态" v-bind="validateInfos.status" id="BusinessInvoiceForm-status" name="status">
+                  <j-dict-select-tag v-model:value="formData.status" dictCode="invoice_status" placeholder="请选择发票状态" :disabled="disabled"/>
+                </a-form-item>
+              </a-col>
+              <a-col :span="24">
+                <a-form-item label="收票邮箱" v-bind="validateInfos.mail" id="BusinessInvoiceForm-mail" name="mail">
+                  <a-input v-model:value="formData.mail" placeholder="请输入收票邮箱" allow-clear :disabled="disabled"></a-input>
+                </a-form-item>
+              </a-col>
+              <a-col :span="24">
+                <a-form-item label="备注" v-bind="validateInfos.remark" id="BusinessInvoiceForm-remark" name="remark">
+                  <a-textarea v-model:value="formData.remark" :rows="4" placeholder="请输入备注" :disabled="disabled"/>
+                </a-form-item>
+              </a-col>
+              <a-col :span="24">
+                <a-form-item label="重发状态" v-bind="validateInfos.resendStatus" id="BusinessInvoiceForm-resendStatus" name="resendStatus">
+                  <j-dict-select-tag v-model:value="formData.resendStatus" dictCode="yn" placeholder="请选择重发状态" :disabled="disabled"/>
+                </a-form-item>
+              </a-col>
+              <a-col :span="24">
+                <a-form-item label="发票处理方" v-bind="validateInfos.invoiceSource" id="BusinessInvoiceForm-invoiceSource" name="invoiceSource">
+                  <a-input v-model:value="formData.invoiceSource" placeholder="请输入发票处理方" allow-clear :disabled="disabled"></a-input>
+                </a-form-item>
+              </a-col>
+              <a-col :span="24">
+                <a-form-item label="订单来源" v-bind="validateInfos.orderSource" id="BusinessInvoiceForm-orderSource" name="orderSource">
+                  <a-input v-model:value="formData.orderSource" placeholder="请输入订单来源" allow-clear :disabled="disabled"></a-input>
+                </a-form-item>
+              </a-col>
           </a-row>
         </a-form>
       </template>
@@ -87,13 +92,16 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, defineExpose, nextTick, defineProps, computed, onMounted } from 'vue';
+  import { ref, reactive, nextTick, computed, onMounted } from 'vue';
   import { defHttp } from '/@/utils/http/axios';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { getDateByPicker, getValueType } from '/@/utils';
   import { saveOrUpdate } from '../BusinessInvoice.api';
   import { Form } from 'ant-design-vue';
+  import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
+  
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
+  import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
     formData: { type: Object, default: () => ({})},
@@ -104,21 +112,22 @@
   const emit = defineEmits(['register', 'ok']);
   const formData = reactive<Record<string, any>>({
     id: '',
-    type: '',   
-    title: '',   
-    tax: '',   
-    address: '',   
-    phone: '',   
-    bankName: '',   
-    bankAccount: '',   
-    orderId: '',   
+    type: undefined,
+    title: '',
+    tax: '',
+    address: '',
+    userId: '',
+    phone: '',
+    bankName: '',
+    bankAccount: '',
+    orderId: '',
     invoicePrice: undefined,
-    status: '',   
-    mail: '',   
-    remark: '',   
-    resendStatus: '',   
-    invoiceSource: '',   
-    orderSource: '',   
+    status: undefined,
+    mail: '',
+    remark: '',
+    resendStatus: undefined,
+    invoiceSource: '',
+    orderSource: '',
   });
   const { createMessage } = useMessage();
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
@@ -179,7 +188,8 @@
     try {
       // 触发表单验证
       await validate();
-    } catch ({ errorFields }) {
+    } catch (error: any) {
+      const { errorFields } = error;
       if (errorFields) {
         const firstField = errorFields[0];
         if (firstField) {

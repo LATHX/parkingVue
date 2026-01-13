@@ -1,44 +1,53 @@
 <template>
   <div class="p-2">
-    <!--查询区域-->
-    <div class="jeecg-basic-table-form-container">
-      <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
-        <a-row :gutter="24"> </a-row>
-      </a-form>
-    </div>
     <!--引用表格-->
-    <BasicTable @register="registerTable" :rowSelection="rowSelection">
+    <BasicTable @register="registerTable">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" v-auth="'parking:parking_location:add'" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增 </a-button>
-        <a-button type="primary" v-auth="'parking:parking_location:exportXls'" preIcon="ant-design:export-outlined" @click="onExportXls">
-          导出
-        </a-button>
-        <j-upload-button type="primary" v-auth="'parking:parking_location:importExcel'" preIcon="ant-design:import-outlined" @click="onImportXls"
-          >导入
-        </j-upload-button>
-        <a-dropdown v-if="selectedRowKeys.length > 0">
-          <template #overlay>
-            <a-menu>
-              <a-menu-item key="1" @click="batchHandleDelete">
-                <Icon icon="ant-design:delete-outlined"></Icon>
-                删除
-              </a-menu-item>
-            </a-menu>
-          </template>
-          <a-button v-auth="'parking:parking_location:deleteBatch'"
-            >批量操作
-            <Icon icon="mdi:chevron-down"></Icon>
-          </a-button>
-        </a-dropdown>
-        <!-- 高级查询 -->
-        <super-query :config="superQueryConfig" @search="handleSuperQuery" />
+        <div class="custom-toolbar">
+          <div class="page-title">车站站点</div>
+        </div>
+      </template>
+      <template #toolbar>
+        <a-form ref="formRef" @keyup.enter.native="searchQuery" :model="queryParam">
+          <div class="custom-toolbar">
+            <div class="filters">
+              <div class="search-input-wrapper">
+                <j-search-select
+                  v-model:value="queryParam.id"
+                  dict="parking_location,location_name,id"
+                  placeholder="请输入入驻车站站点名称检索"
+                  class="search-input"
+                  @change="handleLocationNameSelect"
+                />
+              </div>
+              <div class="search-input-wrapper">
+                <j-search-select
+                  v-model:value="queryParam.locationType"
+                  dict="locationType"
+                  placeholder="车场类型"
+                  class="search-input"
+                  @change="handleLocationTypeSelect"
+                />
+              </div>
+              <div class="search-input-wrapper">
+                <j-search-select v-model:value="queryParam.city" dict="city" placeholder="城市" class="search-input" @change="handleCitySelect" />
+              </div>
+            </div>
+            <div class="actions">
+              <a-button @click="searchReset">重置</a-button>
+              <!-- <j-upload-button type="default" v-auth="'parking:parking_location:importExcel'" @click="onImportXls">导入 </j-upload-button>
+              <a-button type="default" v-auth="'parking:parking_location:exportXls'" @click="onExportXls"> 导出 </a-button> -->
+              <a-button type="primary" v-auth="'parking:parking_location:add'" @click="handleAdd"> 新增 </a-button>
+            </div>
+          </div>
+        </a-form>
       </template>
       <!--操作栏-->
       <template #action="{ record }">
         <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)" />
       </template>
-      <template v-slot:bodyCell="{ column, record, index, text }"> </template>
+
     </BasicTable>
     <!-- 表单区域 -->
     <ParkingLocationModal ref="registerModal" @success="handleSuccess"></ParkingLocationModal>
@@ -55,6 +64,8 @@
   import ParkingLocationModal from './components/ParkingLocationModal.vue';
   import { useUserStore } from '/@/store/modules/user';
 
+  import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
+
   const formRef = ref();
   const queryParam = reactive<any>({});
   const toggleSearchStatus = ref<boolean>(false);
@@ -68,6 +79,12 @@
       columns,
       canResize: false,
       useSearchForm: false,
+      tableSetting: {
+        redo: false,
+        size: false,
+        setting: false,
+        fullScreen: false,
+      },
       actionColumn: {
         width: 120,
         fixed: 'right',
@@ -158,6 +175,21 @@
     (selectedRowKeys.value = []) && reload();
   }
 
+  function handleLocationNameSelect(val) {
+    queryParam.id = val;
+    searchQuery();
+  }
+
+  function handleCitySelect(val) {
+    queryParam.city = val;
+    searchQuery();
+  }
+
+  function handleLocationTypeSelect(val) {
+    queryParam.locationType = val;
+    searchQuery();
+  }
+
   /**
    * 操作栏
    */
@@ -205,39 +237,53 @@
   function searchReset() {
     formRef.value.resetFields();
     selectedRowKeys.value = [];
+    queryParam.id = undefined;
+    queryParam.locationType = undefined;
+    queryParam.city = undefined;
     //刷新数据
     reload();
   }
 </script>
 
 <style lang="less" scoped>
-  .jeecg-basic-table-form-container {
+  /* Override basic table default padding/margin if needed */
+  :deep(.jeecg-basic-table-form-container) {
     padding: 0;
+  }
 
-    .table-page-search-submitButtons {
-      display: block;
-      margin-bottom: 24px;
-      white-space: nowrap;
+  .custom-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0px;
+
+    .page-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
     }
 
-    .query-group-cust {
-      min-width: 100px !important;
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      justify-content: flex-end; /* Align filters to right */
+
+      .search-input-wrapper {
+        width: 260px;
+        .search-input {
+          width: 100%;
+          border-radius: 4px;
+        }
+      }
     }
 
-    .query-group-split-cust {
-      width: 30px;
-      display: inline-block;
-      text-align: center;
-    }
-
-    .ant-form-item:not(.ant-form-item-with-help) {
-      margin-bottom: 16px;
-      height: 32px;
-    }
-
-    :deep(.ant-picker),
-    :deep(.ant-input-number) {
-      width: 100%;
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-left: 10px;
     }
   }
 </style>

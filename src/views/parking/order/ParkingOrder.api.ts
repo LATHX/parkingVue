@@ -16,7 +16,9 @@ enum Api {
   carEnterStatus = '/parking/parkingOrder/carEnterStatus',
   carLeaveStatus = '/parking/parkingOrder/carLeaveStatus',
   systemCompleteOrder = '/parking/parkingOrder/systemCompleteOrder',
+  sendSms = '/parking/parkingOrder/sendSms',
 }
+
 
 /**
  * 导出api
@@ -36,6 +38,12 @@ export const cancelOrder = (params, handleSuccess) => {
 };
 export const systemCompleteOrder = (params, handleSuccess) => {
   defHttp.post({ url: Api.systemCompleteOrder, params: params }).then(() => {
+    handleSuccess();
+  });
+};
+
+export const sendSms = (params, handleSuccess) => {
+  defHttp.post({ url: Api.sendSms, params: params }).then(() => {
     handleSuccess();
   });
 };

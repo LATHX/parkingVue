@@ -5,6 +5,11 @@ import { render } from '/@/utils/common/renderUtils';
 import { getWeekMonthQuarterYear } from '/@/utils';
 //列表数据
 export const columns: BasicColumn[] = [
+   {
+    title: '申请日期',
+    align: 'center',
+    dataIndex: 'createTime',
+  },
   {
     title: '发票类型',
     align: 'center',
@@ -20,70 +25,25 @@ export const columns: BasicColumn[] = [
     align: 'center',
     dataIndex: 'tax',
   },
-  {
-    title: '地址',
-    align: 'center',
-    dataIndex: 'address',
-  },
-  {
-    title: '用户Id',
-    align: 'center',
-    dataIndex: 'userId',
-  },
-  {
-    title: '手机号',
-    align: 'center',
-    dataIndex: 'phone',
-  },
-  {
-    title: '银行名',
-    align: 'center',
-    dataIndex: 'bankName',
-  },
-  {
-    title: '银行帐号',
-    align: 'center',
-    dataIndex: 'bankAccount',
-  },
-  {
-    title: '订单号',
-    align: 'center',
-    dataIndex: 'orderId',
-  },
-  {
+    {
     title: '发票金额',
     align: 'center',
     dataIndex: 'invoicePrice',
   },
   {
-    title: '发票状态',
+    title: '联系电话',
     align: 'center',
-    dataIndex: 'status_dictText',
+    dataIndex: 'phone',
   },
   {
-    title: '收票邮箱',
+    title: '电子邮箱',
     align: 'center',
     dataIndex: 'mail',
   },
   {
-    title: '备注',
+    title: '发票状态',
     align: 'center',
-    dataIndex: 'remark',
-  },
-  {
-    title: '重发状态',
-    align: 'center',
-    dataIndex: 'resendStatus_dictText',
-  },
-  {
-    title: '发票处理方',
-    align: 'center',
-    dataIndex: 'invoiceSource',
-  },
-  {
-    title: '订单来源',
-    align: 'center',
-    dataIndex: 'orderSource',
+    dataIndex: 'status_dictText',
   },
 ];
 

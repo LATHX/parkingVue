@@ -6,7 +6,7 @@
           <a-row>
             <a-col :span="24">
               <a-form-item label="用户手机号" v-bind="validateInfos.userId" id="ParkingUserCouponForm-userId" name="userId">
-                <j-search-select v-model:value="formData.userId" dict="parking_customer,phone,id" allow-clear />
+                <j-search-select v-model:value="formData.userId" dict="parking_customer,phone,id,phone is not null" allow-clear />
               </a-form-item>
             </a-col>
             <a-col :span="24">
