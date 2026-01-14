@@ -16,9 +16,9 @@
             </a-col>
             <a-col :span="8">
               <a-form-item label="关联站点" v-bind="validateInfos.parkingLocationId" id="ParkingLotForm-parkingLocationId" name="parkingLocationId">
-                <j-dict-select-tag
+                <j-search-select
                   v-model:value="formData.parkingLocationId"
-                  dictCode="parking_location,location_name,id"
+                  dict="parking_location,location_name,id"
                   placeholder="请选择关联站点"
                   allow-clear
                 />
@@ -26,9 +26,9 @@
             </a-col>
             <a-col :span="8">
               <a-form-item label="关联商户" v-bind="validateInfos.merchantId" id="ParkingLotForm-merchantId" name="merchantId">
-                <j-dict-select-tag
+                <j-search-select
                   v-model:value="formData.merchantId"
-                  dictCode="parking_merchant,phone,id"
+                  dict="parking_merchant,phone,id"
                   placeholder="请选择关联商户"
                   allow-clear
                 />
@@ -146,7 +146,7 @@
             </a-col>
             <a-col :span="8">
               <a-form-item label="永久休息" v-bind="validateInfos.isRest" id="ParkingLotForm-isRest" name="isRest">
-                <j-dict-select-tag v-model:value="formData.isRest" dictCode="yn" placeholder="请选择" allow-clear />
+                <j-search-select v-model:value="formData.isRest" dict="yn" placeholder="请选择" allow-clear />
               </a-form-item>
             </a-col>
             <a-col :span="8">
@@ -278,6 +278,7 @@
   import { saveOrUpdate } from '../ParkingLot.api';
   import { Form, TimePicker } from 'ant-design-vue';
   import JFormContainer from '/@/components/Form/src/container/JFormContainer.vue';
+import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
 
   const props = defineProps({
     formDisabled: { type: Boolean, default: false },
