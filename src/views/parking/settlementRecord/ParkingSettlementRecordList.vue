@@ -189,13 +189,12 @@
         onClick: handleDetail.bind(null, record),
         icon: 'mdi:eye',
       },
-      // {
-      //   tooltip: '结算',
-      //   onClick: handleEdit.bind(null, record),
-      //   icon: 'mdi:checkbox-marked-circle-outline',
-      //   auth: 'parking:parking_settlement_record:edit',
-      //   ifShow: () => record.isSettlement === '0', // 0 for Pending
-      // },
+      {
+        tooltip: '编辑',
+        onClick: handleEdit.bind(null, record),
+        icon: 'ri:edit-line',
+        auth: 'parking:parking_settlement_record:edit'
+      },
       {
         tooltip: '删除',
         icon: 'material-symbols:delete',

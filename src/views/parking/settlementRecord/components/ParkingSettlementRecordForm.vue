@@ -11,12 +11,12 @@
             </a-col>
             <a-col :span="24">
               <a-form-item label="开始日期" v-bind="validateInfos.startDate" id="ParkingSettlementRecordForm-startDate" name="startDate">
-                <a-date-picker v-model:value="formData.startDate" placeholder="请输入开始日期" allow-clear></a-date-picker>
+                <a-date-picker  :show-time="true" valueFormat="YYYY-MM-DD HH:mm:ss" v-model:value="formData.startDate" placeholder="请输入开始日期" allow-clear></a-date-picker>
               </a-form-item>
             </a-col>
             <a-col :span="24">
               <a-form-item label="结束日期" v-bind="validateInfos.endDate" id="ParkingSettlementRecordForm-endDate" name="endDate">
-                <a-date-picker v-model:value="formData.endDate" placeholder="请输入结束日期" allow-clear></a-date-picker>
+                <a-date-picker  :show-time="true" valueFormat="YYYY-MM-DD HH:mm:ss" v-model:value="formData.endDate" placeholder="请输入结束日期" allow-clear></a-date-picker>
               </a-form-item>
             </a-col>
             <a-col :span="24">

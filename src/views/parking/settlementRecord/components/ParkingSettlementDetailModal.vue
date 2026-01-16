@@ -1,6 +1,6 @@
 <template>
   <BasicModal v-bind="$attrs" @register="registerModal" title="结算单详情" :width="1200" :footer="null">
-    <ParkingSettlementOrderList :parkingId="parkingId" :settlementId="settlementId" />
+    <ParkingSettlementOrderList v-if="settlementId" :parkingId="parkingId" :settlementId="settlementId" />
   </BasicModal>
 </template>
 

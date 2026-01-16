@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts" name="parking-parkingOrder" setup>
-  import { ref, reactive, onMounted, watch } from 'vue';
+  import { ref, reactive, watch, onMounted } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
   import { columns, superQuerySchema } from './ParkingSettlementOrder.data';
@@ -223,18 +223,12 @@
   });
 
   watch(
-    () => props.parkingId,
-    () => {
-      fetchStats();
-      reload();
-    }
-  );
-  
-  watch(
-    () => props.settlementId,
-    () => {
-      fetchStats();
-      reload();
+    [() => props.parkingId, () => props.settlementId],
+    ([newParkingId, newSettlementId]) => {
+      if (newParkingId || newSettlementId) {
+        fetchStats();
+        reload();
+      }
     }
   );
 
