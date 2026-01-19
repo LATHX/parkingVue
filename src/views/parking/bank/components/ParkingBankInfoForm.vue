@@ -10,7 +10,7 @@
           <a-row>
             <a-col :span="16" :hidden="hiddenParkingId">
               <a-form-item label="停车场名称" v-bind="validateInfos.parkingId" id="ParkingLotImageForm-parkingId" name="parkingId">
-                <j-search-select v-model:value="formData.parkingId" dict="parking_lot,parking_name,id" allow-clear />
+                <j-search-select v-model:value="formData.parkingId" dict="parking_lot,parking_name,id,audit_status=1" allow-clear />
               </a-form-item>
             </a-col>
             <a-col :span="16">

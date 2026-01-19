@@ -8,7 +8,7 @@
               <a-form-item label="关联车场" v-bind="validateInfos.parkingId" name="parkingId">
                  <j-search-select
                   v-model:value="formData.parkingId"
-                  dict="parking_lot,parking_name,id"
+                  dict="parking_lot,parking_name,id,audit_status=1"
                   placeholder="请输入关联车场"
                   :disabled="disabled"
                 />

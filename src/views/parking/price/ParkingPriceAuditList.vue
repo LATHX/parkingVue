@@ -278,13 +278,13 @@ import { ref, reactive, watch } from 'vue';
         font-weight: bold;
         color: #333;
       }
-      
+
       .filters {
           display: flex;
           align-items: center;
           gap: 10px;
           flex: 1;
-          
+
           .search-input-wrapper {
               width: 260px;
               .search-input {

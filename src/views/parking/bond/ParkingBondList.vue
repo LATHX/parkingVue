@@ -11,7 +11,7 @@
               <div class="search-input-wrapper">
                 <j-search-select
                   v-model:value="queryParam.parkingId"
-                  dict="parking_lot,parking_name,id"
+                  dict="parking_lot,parking_name,id,audit_status=1"
                   placeholder="请输入车场名称检索"
                   class="search-input"
                   @change="handleParkingIdSelect"
